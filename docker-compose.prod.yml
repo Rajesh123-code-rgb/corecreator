@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  corecreator:
+    container_name: corecreator_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env.production
+    networks:
+      - corecreator_network
+
+networks:
+  corecreator_network:
+    driver: bridge
