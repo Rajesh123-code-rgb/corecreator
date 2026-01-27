@@ -115,7 +115,7 @@ export default function WorkshopsListingPage() {
                         <span className="inline-block px-3 py-1 mb-4 rounded-full bg-white/20 backdrop-blur-sm text-sm font-medium">
                             Live Interactive Sessions
                         </span>
-                        <h1 className="text-3xl lg:text-5xl font-bold mb-6">Upcoming Workshops</h1>
+                        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-6">Upcoming Workshops</h1>
                         <p className="text-lg text-white/80 mb-8">
                             Join live classes with professional artists. Get real-time feedback, ask questions, and learn together.
                         </p>

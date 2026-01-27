@@ -846,7 +846,7 @@ export default function HomePage() {
             <div className="absolute inset-0 gradient-gold" />
             <div className="absolute inset-0 bg-black/10" />
             <div className="relative px-8 py-16 lg:px-16 lg:py-24 text-center text-white">
-              <h2 className="text-3xl lg:text-5xl font-bold mb-6">Ready to Start Your Creative Journey?</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-6">Ready to Start Your Creative Journey?</h2>
               <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">Join thousands of artists, learners, and art lovers on the world's most vibrant creative platform.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="xl" className="bg-white text-[var(--foreground)] hover:bg-white/90 w-full sm:w-auto font-semibold" asChild>

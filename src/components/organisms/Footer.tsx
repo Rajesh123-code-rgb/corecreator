@@ -115,7 +115,7 @@ export function Footer() {
                                     <GraduationCap className="w-7 h-7" />
                                 </div>
                             </div>
-                            <h3 className="text-3xl lg:text-5xl font-bold mb-4 leading-tight">Join the Art & Craft Ecosystem</h3>
+                            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-4 leading-tight">Join the Art & Craft Ecosystem</h3>
                             <p className="text-white/80 text-lg lg:text-xl mb-8 max-w-lg leading-relaxed">
                                 Whether you want to teach courses, sell your creations, or both — Core Creator gives you the tools to turn your passion into profit.
                             </p>
@@ -135,15 +135,15 @@ export function Footer() {
                         {/* Stats */}
                         <div className="grid grid-cols-3 gap-4 lg:gap-6">
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-3xl lg:text-5xl font-bold mb-2">50K+</p>
+                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">50K+</p>
                                 <p className="text-white/70 text-sm lg:text-base">Artists & Creators</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-3xl lg:text-5xl font-bold mb-2">2.5K+</p>
+                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">2.5K+</p>
                                 <p className="text-white/70 text-sm lg:text-base">Courses & Workshops</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-3xl lg:text-5xl font-bold mb-2">50L+</p>
+                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">50L+</p>
                                 <p className="text-white/70 text-sm lg:text-base">Creator Earnings</p>
                             </div>
                         </div>
