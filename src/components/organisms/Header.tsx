@@ -277,13 +277,19 @@ export function Header() {
                                 placeholder="Search..."
                                 className="flex-1 bg-transparent border-none focus:outline-none text-sm"
                             />
-                            <button
-                                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                                className="p-2 rounded-md hover:bg-white/10 transition-colors ml-2"
-                                aria-label="Toggle Theme"
-                            >
-                                {mounted && (resolvedTheme === "dark" ? <Sun className="w-5 h-5 text-[var(--foreground)]" /> : <Moon className="w-5 h-5 text-[var(--foreground)]" />)}
-                            </button>
+                            {mounted && (
+                                <button
+                                    onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                                    className="p-2 rounded-md hover:bg-[var(--muted)] transition-colors ml-2"
+                                    aria-label="Toggle Theme"
+                                >
+                                    {resolvedTheme === "dark" ? (
+                                        <Sun className="w-5 h-5 text-yellow-500" />
+                                    ) : (
+                                        <Moon className="w-5 h-5 text-[var(--foreground)]" />
+                                    )}
+                                </button>
+                            )}
                         </div>
 
                         {/* Navigation Links */}
