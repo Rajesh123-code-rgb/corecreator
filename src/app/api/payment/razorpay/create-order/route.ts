@@ -207,8 +207,13 @@ export async function POST(request: NextRequest) {
         const total = subtotal + shipping + tax - discount;
         const finalAmount = Math.max(0, parseFloat(total.toFixed(2))); // Ensure non-negative and 2 decimals
 
-        // 2. Create MongoDB Order (Pending)
+        // 2. Generate Order Number
+        const orderCount = await Order.countDocuments();
+        const orderNumber = `ORD-${String(orderCount + 1).padStart(6, "0")}-${Date.now().toString(36).toUpperCase()}`;
+
+        // 3. Create MongoDB Order (Pending)
         const dbOrder = new Order({
+            orderNumber: orderNumber,
             user: new mongoose.Types.ObjectId(session.user.id),
             items: orderItems,
             total: finalAmount,
