@@ -1,12 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Truck, Package, Clock, AlertCircle } from "lucide-react";
+import { Truck, Package, Clock, AlertCircle, DollarSign } from "lucide-react";
 import { Input } from "@/components/atoms";
 import { Card } from "@/components/molecules";
 
 interface ShippingConfig {
     requiresShipping: boolean;
+    freeShipping?: boolean;
+    shippingPrice?: number;
     weight?: number; // kg
     width?: number; // cm
     height?: number; // cm  
@@ -94,22 +96,111 @@ export default function ProductShippingManager({
                 </div>
 
                 {shipping.requiresShipping && (
-                    <div className="pt-4 border-t border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Shipping Profile</label>
-                        <select
-                            value={shipping.shippingProfile || ""}
-                            onChange={(e) => handleUpdate("shippingProfile", e.target.value)}
-                            className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                        >
-                            <option value="">-- Manual Calculation (Use dimensions below) --</option>
-                            {profiles.map(p => (
-                                <option key={p._id} value={p._id}>{p.name} {p.isDefault ? "(Default)" : ""}</option>
-                            ))}
-                        </select>
-                        <p className="text-xs text-gray-500 mt-1">
-                            Select a saved shipping profile or configure manual dimensional weight below.
-                        </p>
-                    </div>
+                    <>
+                        {/* Shipping Price Options */}
+                        <div className="pt-4 border-t border-gray-100 mb-6">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                <DollarSign className="w-4 h-4 text-amber-500" />
+                                Shipping Cost
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Free Shipping Option */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        handleUpdate("freeShipping", true);
+                                        handleUpdate("shippingPrice", 0);
+                                    }}
+                                    className={`p-4 rounded-xl border-2 text-left transition-all ${shipping.freeShipping
+                                            ? "border-green-500 bg-green-50"
+                                            : "border-gray-200 hover:border-gray-300"
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shipping.freeShipping
+                                                ? "border-green-500 bg-green-500"
+                                                : "border-gray-300"
+                                            }`}>
+                                            {shipping.freeShipping && (
+                                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                                            )}
+                                        </div>
+                                        <span className="font-semibold text-gray-900">Free Shipping</span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 ml-8">
+                                        Customers pay no shipping charges. Great for boosting sales!
+                                    </p>
+                                </button>
+
+                                {/* Add Shipping Charges Option */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleUpdate("freeShipping", false)}
+                                    className={`p-4 rounded-xl border-2 text-left transition-all ${shipping.freeShipping === false
+                                            ? "border-amber-500 bg-amber-50"
+                                            : "border-gray-200 hover:border-gray-300"
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shipping.freeShipping === false
+                                                ? "border-amber-500 bg-amber-500"
+                                                : "border-gray-300"
+                                            }`}>
+                                            {shipping.freeShipping === false && (
+                                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                                            )}
+                                        </div>
+                                        <span className="font-semibold text-gray-900">Add Shipping Charges</span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 ml-8">
+                                        Set a fixed shipping price for this product.
+                                    </p>
+                                </button>
+                            </div>
+
+                            {/* Shipping Price Input */}
+                            {shipping.freeShipping === false && (
+                                <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Shipping Price
+                                    </label>
+                                    <div className="relative max-w-xs">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={shipping.shippingPrice || ""}
+                                            onChange={(e) => handleUpdate("shippingPrice", parseFloat(e.target.value) || 0)}
+                                            placeholder="0.00"
+                                            className="pl-8"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        This fixed shipping charge will be added to the product price at checkout.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Shipping Profile */}
+                        <div className="pt-4 border-t border-gray-100">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Shipping Profile</label>
+                            <select
+                                value={shipping.shippingProfile || ""}
+                                onChange={(e) => handleUpdate("shippingProfile", e.target.value)}
+                                className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                            >
+                                <option value="">-- Manual Calculation (Use dimensions below) --</option>
+                                {profiles.map(p => (
+                                    <option key={p._id} value={p._id}>{p.name} {p.isDefault ? "(Default)" : ""}</option>
+                                ))}
+                            </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Select a saved shipping profile or configure manual dimensional weight below.
+                            </p>
+                        </div>
+                    </>
                 )}
             </Card>
 

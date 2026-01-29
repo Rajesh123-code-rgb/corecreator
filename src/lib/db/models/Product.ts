@@ -98,6 +98,8 @@ export interface IProduct extends Document {
         height?: number; // in cm
         depth?: number; // in cm (length)
         requiresShipping: boolean;
+        freeShipping?: boolean;
+        shippingPrice?: number;
         processingTime?: string; // e.g. "1-2 days"
         shippingProfile?: mongoose.Types.ObjectId; // Link to specific profile
     };
@@ -203,6 +205,8 @@ const productSchema = new Schema<IProduct>(
             height: { type: Number },
             depth: { type: Number },
             requiresShipping: { type: Boolean, default: true },
+            freeShipping: { type: Boolean, default: false },
+            shippingPrice: { type: Number, default: 0 },
             processingTime: { type: String },
             shippingProfile: { type: Schema.Types.ObjectId, ref: "ShippingProfile" }
         },
