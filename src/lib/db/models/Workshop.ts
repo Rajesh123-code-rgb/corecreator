@@ -14,6 +14,21 @@ export interface IWorkshop extends Document {
     date: Date;
     duration: number; // in minutes
 
+    // Workshop Type
+    workshopType: "online" | "offline";
+
+    // Location (for offline workshops)
+    location?: {
+        country: string;
+        city: string;
+        address: string;
+    };
+
+    // Online Meeting Details (for online workshops)
+    meetingUrl?: string; // Zoom/Google Meet link
+    meetingUserId?: string;
+    meetingPassword?: string;
+
     // Details
     capacity: number;
     enrolledCount: number;
@@ -22,7 +37,6 @@ export interface IWorkshop extends Document {
 
     // Content
     thumbnail: string;
-    meetingUrl?: string; // Zoom/Google Meet link
     requirements?: string[];
     agenda?: string[];
 
@@ -32,7 +46,7 @@ export interface IWorkshop extends Document {
     level: "beginner" | "intermediate" | "advanced" | "all";
 
     // Status
-    status: "draft" | "pending" | "upcoming" | "rejected" | "completed" | "cancelled";
+    status: "draft" | "pending" | "upcoming" | "rejected" | "completed" | "cancelled" | "blocked";
     rejectionReason?: string;
     submittedAt?: Date;
     reviewedAt?: Date;
@@ -56,13 +70,27 @@ const workshopSchema = new Schema<IWorkshop>(
         date: { type: Date, required: true, index: true },
         duration: { type: Number, required: true }, // minutes
 
+        // Workshop Type
+        workshopType: { type: String, enum: ["online", "offline"], default: "online" },
+
+        // Location (for offline workshops)
+        location: {
+            country: { type: String },
+            city: { type: String },
+            address: { type: String },
+        },
+
+        // Online Meeting Details
+        meetingUrl: { type: String },
+        meetingUserId: { type: String },
+        meetingPassword: { type: String },
+
         capacity: { type: Number, required: true },
         enrolledCount: { type: Number, default: 0 },
         price: { type: Number, required: true, min: 0 },
         currency: { type: String, default: "USD" },
 
         thumbnail: { type: String, required: true },
-        meetingUrl: { type: String },
         requirements: [{ type: String }],
         agenda: [{ type: String }],
 
@@ -70,7 +98,7 @@ const workshopSchema = new Schema<IWorkshop>(
         tags: [{ type: String }],
         level: { type: String, enum: ["beginner", "intermediate", "advanced", "all"], default: "all" },
 
-        status: { type: String, enum: ["draft", "pending", "upcoming", "rejected", "completed", "cancelled"], default: "draft", index: true },
+        status: { type: String, enum: ["draft", "pending", "upcoming", "rejected", "completed", "cancelled", "blocked"], default: "draft", index: true },
         rejectionReason: { type: String },
         submittedAt: { type: Date },
         reviewedAt: { type: Date },

@@ -36,9 +36,12 @@ export default function ProductVariantManager({
 
     // Generate variants when attributes change
     const generateVariants = () => {
-        // If no attributes, no variants
-        if (attributes.length === 0) {
-            onChange([], []);
+        // Filter out attributes with no values before generating
+        const validAttributes = attributes.filter(attr => attr.values.length > 0);
+
+        // If no valid attributes with values, clear variants
+        if (validAttributes.length === 0) {
+            onChange([], attributes);
             return;
         }
 
@@ -49,7 +52,7 @@ export default function ProductVariantManager({
             attrIndex: number,
             currentAttrs: { name: string; value: string }[]
         ) => {
-            if (attrIndex === attributes.length) {
+            if (attrIndex === validAttributes.length) {
                 // Leaf node: create variant
                 // Check if this variant already exists to preserve data
                 const variantId = currentAttrs.map(a => `${a.name}:${a.value}`).join("|");
@@ -61,7 +64,7 @@ export default function ProductVariantManager({
 
                 updatedVariants.push(existing || {
                     id: variantId,
-                    attributes: currentAttrs,
+                    attributes: [...currentAttrs],
                     price: basePrice,
                     stock: 0,
                     sku: ""
@@ -69,9 +72,7 @@ export default function ProductVariantManager({
                 return;
             }
 
-            const currentAttr = attributes[attrIndex];
-            if (currentAttr.values.length === 0) return; // Skip empty attributes
-
+            const currentAttr = validAttributes[attrIndex];
             for (const val of currentAttr.values) {
                 generateCombinations(attrIndex + 1, [...currentAttrs, { name: currentAttr.name, value: val }]);
             }

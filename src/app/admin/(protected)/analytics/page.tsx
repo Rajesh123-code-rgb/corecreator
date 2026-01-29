@@ -6,6 +6,7 @@ import {
 } from "recharts";
 import { Loader2, TrendingUp, Users, ShoppingBag, DollarSign, ArrowUp, ArrowDown, Calendar, Filter } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface AnalyticsData {
     date: string;
@@ -40,11 +41,11 @@ export default function AdminAnalyticsPage() {
     const [period, setPeriod] = React.useState("30d");
 
     // Data State
+    const { formatPrice, symbol } = useCurrency();
     const [data, setData] = React.useState<AnalyticsData[]>([]);
     const [totals, setTotals] = React.useState<AnalyticsTotals>({ revenue: 0, users: 0, orders: 0 });
     const [funnelData, setFunnelData] = React.useState<FunnelStep[]>([]);
     const [attributionData, setAttributionData] = React.useState<AttributionSource[]>([]);
-
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState("");
 
@@ -145,7 +146,7 @@ export default function AdminAnalyticsPage() {
                                     <ArrowUp className="w-4 h-4" /> 12.5%
                                 </div>
                             </div>
-                            <p className="text-3xl font-bold text-gray-900 mt-4">₹{totals.revenue.toLocaleString()}</p>
+                            <p className="text-3xl font-bold text-gray-900 mt-4">{formatPrice(totals.revenue)}</p>
                             <p className="text-sm text-gray-500 mt-1">Total Revenue</p>
                         </div>
 
@@ -198,13 +199,13 @@ export default function AdminAnalyticsPage() {
                                             tickLine={false}
                                         />
                                         <YAxis
-                                            tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}K`}
+                                            tickFormatter={(val) => `${symbol}${(val / 1000).toFixed(0)}K`}
                                             tick={{ fontSize: 12, fill: "#9ca3af" }}
                                             axisLine={false}
                                             tickLine={false}
                                         />
                                         <Tooltip
-                                            formatter={(val: any) => [`₹${val.toLocaleString()}`, "Revenue"]}
+                                            formatter={(val: any) => [formatPrice(val), "Revenue"]}
                                             labelFormatter={(label) => new Date(label).toDateString()}
                                             contentStyle={{ background: "#1f2937", border: "none", borderRadius: "8px", color: "#fff" }}
                                         />
@@ -372,9 +373,9 @@ export default function AdminAnalyticsPage() {
                                                     {item.source !== "google" && item.source !== "facebook" && item.source !== "instagram" && item.source}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">{item.count}</td>
-                                                <td className="px-6 py-4 text-right">₹{item.revenue.toLocaleString()}</td>
+                                                <td className="px-6 py-4 text-right">{formatPrice(item.revenue)}</td>
                                                 <td className="px-6 py-4 text-right text-gray-500">
-                                                    ₹{item.count ? Math.round(item.revenue / item.count).toLocaleString() : 0}
+                                                    {item.count ? formatPrice(item.revenue / item.count) : formatPrice(0)}
                                                 </td>
                                             </tr>
                                         ))

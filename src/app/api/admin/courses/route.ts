@@ -31,8 +31,14 @@ export async function GET(request: NextRequest) {
 
         const query: any = {};
 
-        if (status && status !== "all") {
+        // Exclude drafts by default - admins shouldn't see studio drafts unless explicitly filtering
+        if (status === "draft") {
+            query.status = "draft";
+        } else if (status && status !== "all") {
             query.status = status;
+        } else {
+            // Default: exclude drafts
+            query.status = { $ne: "draft" };
         }
 
         if (search) {
@@ -44,10 +50,10 @@ export async function GET(request: NextRequest) {
 
         const [courses, total] = await Promise.all([
             Course.find(query)
+                .populate("instructor", "_id name email studioProfile.name")
                 .sort({ updatedAt: -1 })
                 .skip(skip)
                 .limit(limit)
-                .select("title slug thumbnail price instructorName status createdAt totalStudents averageRating")
                 .lean(),
             Course.countDocuments(query),
         ]);

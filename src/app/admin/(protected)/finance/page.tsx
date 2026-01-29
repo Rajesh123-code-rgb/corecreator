@@ -7,6 +7,7 @@ import {
 import { Card } from "@/components/molecules";
 import { Loader2, DollarSign, RefreshCcw, Percent, CreditCard } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/molecules/Table";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface RevenueCategory {
     category: string;
@@ -26,6 +27,7 @@ interface FinanceData {
 const COLORS = ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b"];
 
 export default function AdminFinancePage() {
+    const { formatPrice } = useCurrency();
     const [data, setData] = React.useState<FinanceData | null>(null);
     const [loading, setLoading] = React.useState(true);
 
@@ -55,6 +57,8 @@ export default function AdminFinancePage() {
 
     if (!data) return <div>Failed to load data</div>;
 
+    const grossRevenue = data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0);
+
     return (
         <div className="space-y-8">
             <h1 className="text-2xl font-bold tracking-tight">Financial Reports</h1>
@@ -65,7 +69,7 @@ export default function AdminFinancePage() {
                     <div>
                         <p className="text-sm font-medium text-gray-500">Gross Revenue</p>
                         <h2 className="text-3xl font-bold mt-2">
-                            ₹{data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0).toLocaleString()}
+                            {formatPrice(grossRevenue)}
                         </h2>
                     </div>
                     <div className="p-3 bg-purple-100 rounded-full">
@@ -77,7 +81,7 @@ export default function AdminFinancePage() {
                     <div>
                         <p className="text-sm font-medium text-gray-500">Platform Commission</p>
                         <h2 className="text-3xl font-bold mt-2 text-green-600">
-                            ₹{Math.round(data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0) * 0.12).toLocaleString()}
+                            {formatPrice(Math.round(grossRevenue * 0.12))}
                         </h2>
                         <span className="text-xs text-gray-500">12% of gross</span>
                     </div>
@@ -90,7 +94,7 @@ export default function AdminFinancePage() {
                     <div>
                         <p className="text-sm font-medium text-gray-500">Processing Fees</p>
                         <h2 className="text-3xl font-bold mt-2 text-blue-600">
-                            ₹{Math.round(data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0) * 0.029).toLocaleString()}
+                            {formatPrice(Math.round(grossRevenue * 0.029))}
                         </h2>
                         <span className="text-xs text-gray-500">2.9% gateway</span>
                     </div>
@@ -103,7 +107,7 @@ export default function AdminFinancePage() {
                     <div>
                         <p className="text-sm font-medium text-gray-500">Total Refunds</p>
                         <h2 className="text-3xl font-bold mt-2 text-red-600">
-                            -₹{data.refunds.amount.toLocaleString()}
+                            -{formatPrice(data.refunds.amount)}
                         </h2>
                         <span className="text-xs text-gray-500">{data.refunds.count} transactions</span>
                     </div>
@@ -121,21 +125,21 @@ export default function AdminFinancePage() {
                         <p className="text-3xl font-bold text-purple-600">12%</p>
                         <p className="text-sm text-gray-500 mt-1">Platform Commission Rate</p>
                         <p className="text-lg font-medium mt-2">
-                            ₹{Math.round(data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0) * 0.12).toLocaleString()}
+                            {formatPrice(Math.round(grossRevenue * 0.12))}
                         </p>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                         <p className="text-3xl font-bold text-blue-600">2.9%</p>
                         <p className="text-sm text-gray-500 mt-1">Payment Processing Fee</p>
                         <p className="text-lg font-medium mt-2">
-                            ₹{Math.round(data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0) * 0.029).toLocaleString()}
+                            {formatPrice(Math.round(grossRevenue * 0.029))}
                         </p>
                     </div>
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                         <p className="text-3xl font-bold text-green-600">14.9%</p>
                         <p className="text-sm text-gray-500 mt-1">Total Platform Earnings</p>
                         <p className="text-lg font-medium mt-2">
-                            ₹{Math.round(data.revenueByCategory.reduce((acc, curr) => acc + curr.revenue, 0) * 0.149).toLocaleString()}
+                            {formatPrice(Math.round(grossRevenue * 0.149))}
                         </p>
                     </div>
                 </div>
@@ -167,7 +171,7 @@ export default function AdminFinancePage() {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip formatter={(value: any) => `$${value.toLocaleString()}`} />
+                                <Tooltip formatter={(value: any) => formatPrice(value)} />
                                 <Legend />
                             </PieChart>
                         </ResponsiveContainer>
@@ -192,7 +196,7 @@ export default function AdminFinancePage() {
                                         <TableCell className="font-medium text-sm">{tx.orderNumber}</TableCell>
                                         <TableCell className="text-sm text-gray-500">{tx.user?.name || "Unknown"}</TableCell>
                                         <TableCell className="text-right font-medium text-green-600">
-                                            +${tx.total}
+                                            +{formatPrice(tx.total)}
                                         </TableCell>
                                     </TableRow>
                                 ))}

@@ -44,8 +44,20 @@ interface Workshop {
     enrolled: number;
     thumbnail: string;
     tags: string[];
-    country: string;
-    city: string;
+    workshopType: "online" | "offline";
+    // Offline fields
+    location?: {
+        country: string;
+        city: string;
+        address: string;
+    };
+    // Online fields
+    meetingUrl?: string;
+    meetingUserId?: string;
+    meetingPassword?: string;
+    // Legacy fields (for backward compatibility)
+    country?: string;
+    city?: string;
     requirements?: string[];
     agenda?: string[];
 }
@@ -178,7 +190,14 @@ export default function WorkshopDetailPage() {
                             </div>
                             <div className="flex items-center gap-3">
                                 <MapPin className="w-6 h-6 text-blue-400" />
-                                <span>{workshop.city}, {workshop.country}</span>
+                                {workshop.workshopType === "offline" ? (
+                                    <span>{workshop.location?.city || workshop.city}, {workshop.location?.country || workshop.country}</span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        <Video className="w-5 h-5" />
+                                        Online Workshop
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -278,14 +297,35 @@ export default function WorkshopDetailPage() {
                                     </div>
 
                                     <ul className="space-y-3 pt-2">
-                                        <li className="flex gap-2">
-                                            <Video className="w-4 h-4 text-[var(--muted-foreground)]" />
-                                            <span>Live interactive Zoom session</span>
-                                        </li>
-                                        <li className="flex gap-2">
-                                            <Clock className="w-4 h-4 text-[var(--muted-foreground)]" />
-                                            <span>Recording available for 30 days</span>
-                                        </li>
+                                        {workshop.workshopType === "offline" ? (
+                                            <>
+                                                <li className="flex gap-2">
+                                                    <MapPin className="w-4 h-4 text-[var(--muted-foreground)]" />
+                                                    <span>In-person workshop experience</span>
+                                                </li>
+                                                <li className="flex gap-2">
+                                                    <Users className="w-4 h-4 text-[var(--muted-foreground)]" />
+                                                    <span>Hands-on learning with the instructor</span>
+                                                </li>
+                                                {workshop.location?.address && (
+                                                    <li className="flex gap-2">
+                                                        <MapPin className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                                        <span className="text-xs text-gray-600">{workshop.location.address}</span>
+                                                    </li>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <li className="flex gap-2">
+                                                    <Video className="w-4 h-4 text-[var(--muted-foreground)]" />
+                                                    <span>Live interactive online session</span>
+                                                </li>
+                                                <li className="flex gap-2">
+                                                    <Clock className="w-4 h-4 text-[var(--muted-foreground)]" />
+                                                    <span>Recording available for 30 days</span>
+                                                </li>
+                                            </>
+                                        )}
                                         <li className="flex gap-2">
                                             <Shield className="w-4 h-4 text-[var(--muted-foreground)]" />
                                             <span>30-day money-back guarantee</span>

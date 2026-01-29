@@ -18,6 +18,7 @@ import {
     X,
 } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface ReturnRequest {
     _id: string;
@@ -63,6 +64,7 @@ interface ReturnRequest {
 }
 
 export default function AdminReturnsPage() {
+    const { formatPrice } = useCurrency();
     const [requests, setRequests] = React.useState<ReturnRequest[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [page, setPage] = React.useState(1);
@@ -259,7 +261,7 @@ export default function AdminReturnsPage() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
-                                        ₹{req.refundAmount.toFixed(2)}
+                                        {formatPrice(req.refundAmount)}
                                     </td>
                                     <td className="px-6 py-4">{getStatusBadge(req.status)}</td>
                                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -311,7 +313,7 @@ export default function AdminReturnsPage() {
                                         </div>
                                         <div>
                                             <p className="font-medium text-gray-900">{selectedRequest.item.name}</p>
-                                            <p className="text-sm text-gray-500">Qty: {selectedRequest.item.quantity} × ₹{selectedRequest.item.price}</p>
+                                            <p className="text-sm text-gray-500">Qty: {selectedRequest.item.quantity} × {formatPrice(selectedRequest.item.price)}</p>
                                             <p className="text-sm text-purple-600 mt-1">Sold by: {selectedRequest.item.sellerId.name}</p>
                                             <div className="text-xs text-gray-400 mt-1">
                                                 Order: {selectedRequest.order.orderNumber} ({new Date(selectedRequest.order.createdAt).toLocaleDateString()})
@@ -402,7 +404,7 @@ export default function AdminReturnsPage() {
                                                     />
                                                 </div>
                                                 <p className="text-xs text-gray-500 mt-1">
-                                                    Max valid amount: ₹{(selectedRequest.item.price * selectedRequest.item.quantity).toFixed(2)}
+                                                    Max valid amount: {formatPrice(selectedRequest.item.price * selectedRequest.item.quantity)}
                                                 </p>
                                             </div>
 
@@ -452,7 +454,7 @@ export default function AdminReturnsPage() {
                                             </p>
                                             {selectedRequest.status === "approved" && (
                                                 <p className="font-mono font-medium text-green-700 mt-2">
-                                                    Refunded: ₹{selectedRequest.refundAmount.toFixed(2)}
+                                                    Refunded: {formatPrice(selectedRequest.refundAmount)}
                                                 </p>
                                             )}
                                         </div>

@@ -34,8 +34,15 @@ interface Workshop {
     enrolled: number;
     thumbnail: string;
     tags: string[];
-    country: string;
-    city: string;
+    workshopType?: "online" | "offline";
+    location?: {
+        country: string;
+        city: string;
+        address: string;
+    };
+    // Legacy fields for backward compatibility
+    country?: string;
+    city?: string;
 }
 
 export default function WorkshopsListingPage() {
@@ -45,6 +52,7 @@ export default function WorkshopsListingPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCountry, setSelectedCountry] = useState("");
     const [selectedCity, setSelectedCity] = useState("");
+    const [selectedType, setSelectedType] = useState<"" | "online" | "offline">("");
     const [sortOption, setSortOption] = useState("upcoming");
 
     // Unique locations for filters
@@ -53,7 +61,7 @@ export default function WorkshopsListingPage() {
 
     useEffect(() => {
         fetchWorkshops();
-    }, [selectedCountry, selectedCity, sortOption]);
+    }, [selectedCountry, selectedCity, selectedType, sortOption]);
 
     const fetchWorkshops = async () => {
         setLoading(true);
@@ -61,6 +69,7 @@ export default function WorkshopsListingPage() {
             const params = new URLSearchParams();
             if (selectedCountry) params.append("country", selectedCountry);
             if (selectedCity) params.append("city", selectedCity);
+            if (selectedType) params.append("workshopType", selectedType);
             if (sortOption) params.append("sort", sortOption);
 
             const res = await fetch(`/api/workshops?${params.toString()}`);
@@ -89,10 +98,10 @@ export default function WorkshopsListingPage() {
         const loadFilters = async () => {
             const res = await fetch('/api/workshops');
             const data: Workshop[] = await res.json();
-            const uniqueCountries = Array.from(new Set(data.map(w => w.country))).sort();
-            const uniqueCities = Array.from(new Set(data.map(w => w.city))).sort();
-            setCountries(uniqueCountries);
-            setCities(uniqueCities);
+            const uniqueCountries = Array.from(new Set(data.map(w => w.location?.country || w.country).filter(Boolean))).sort();
+            const uniqueCities = Array.from(new Set(data.map(w => w.location?.city || w.city).filter(Boolean))).sort();
+            setCountries(uniqueCountries as string[]);
+            setCities(uniqueCities as string[]);
         };
         loadFilters();
     }, []);
@@ -120,44 +129,78 @@ export default function WorkshopsListingPage() {
                             Join live classes with professional artists. Get real-time feedback, ask questions, and learn together.
                         </p>
 
-                        <div className="relative max-w-2xl mx-auto flex flex-col sm:flex-row gap-4">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search by topic, instructor..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 rounded-xl text-[var(--foreground)] bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                />
+                        <div className="relative max-w-3xl mx-auto flex flex-col gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search by topic, instructor..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-3 rounded-xl text-[var(--foreground)] bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    />
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 justify-center">
+                                    <select
+                                        value={selectedCountry}
+                                        onChange={(e) => {
+                                            setSelectedCountry(e.target.value);
+                                            setSelectedCity(""); // Reset city when country changes
+                                        }}
+                                        className="px-4 py-3 rounded-xl bg-white text-[var(--foreground)] shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer min-w-[140px]"
+                                    >
+                                        <option value="">All Countries</option>
+                                        {countries.map(c => <option key={c} value={c}>{c}</option>)}
+                                    </select>
+
+                                    <select
+                                        value={selectedCity}
+                                        onChange={(e) => setSelectedCity(e.target.value)}
+                                        className="px-4 py-3 rounded-xl bg-white text-[var(--foreground)] shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer min-w-[140px]"
+                                    >
+                                        <option value="">All Cities</option>
+                                        {cities.filter(city => {
+                                            // If a country is selected, only show cities from that country. 
+                                            // Simple approximation since we don't have a map
+                                            return true;
+                                        }).map(c => <option key={c} value={c}>{c}</option>)}
+                                    </select>
+                                </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-2 justify-center">
-                                <select
-                                    value={selectedCountry}
-                                    onChange={(e) => {
-                                        setSelectedCountry(e.target.value);
-                                        setSelectedCity(""); // Reset city when country changes
-                                    }}
-                                    className="px-4 py-3 rounded-xl bg-white text-[var(--foreground)] shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer min-w-[140px]"
+                            {/* Workshop Type Filter */}
+                            <div className="flex justify-center gap-2">
+                                <button
+                                    onClick={() => setSelectedType("")}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${selectedType === ""
+                                        ? "bg-white text-blue-600 shadow-lg"
+                                        : "bg-white/20 text-white hover:bg-white/30"
+                                        }`}
                                 >
-                                    <option value="">All Countries</option>
-                                    {countries.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-
-                                <select
-                                    value={selectedCity}
-                                    onChange={(e) => setSelectedCity(e.target.value)}
-                                    className="px-4 py-3 rounded-xl bg-white text-[var(--foreground)] shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer min-w-[140px]"
+                                    All Types
+                                </button>
+                                <button
+                                    onClick={() => setSelectedType("online")}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${selectedType === "online"
+                                        ? "bg-white text-blue-600 shadow-lg"
+                                        : "bg-white/20 text-white hover:bg-white/30"
+                                        }`}
                                 >
-                                    <option value="">All Cities</option>
-                                    {cities.filter(city => {
-                                        // If a country is selected, only show cities from that country. 
-                                        // Simple approximation since we don't have a map
-                                        return true;
-                                    }).map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
-
+                                    <Video className="w-4 h-4" />
+                                    Online
+                                </button>
+                                <button
+                                    onClick={() => setSelectedType("offline")}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${selectedType === "offline"
+                                        ? "bg-white text-blue-600 shadow-lg"
+                                        : "bg-white/20 text-white hover:bg-white/30"
+                                        }`}
+                                >
+                                    <MapPin className="w-4 h-4" />
+                                    In-Person
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -209,9 +252,15 @@ export default function WorkshopsListingPage() {
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         />
                                         <div className="absolute top-3 left-3 flex gap-2">
-                                            <span className="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-md text-xs font-semibold text-blue-600 flex items-center gap-1">
-                                                <Video className="w-3 h-3" /> Live
-                                            </span>
+                                            {workshop.workshopType === "offline" ? (
+                                                <span className="px-2 py-1 bg-green-500/90 backdrop-blur-sm rounded-md text-xs font-semibold text-white flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3" /> In-Person
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 py-1 bg-blue-500/90 backdrop-blur-sm rounded-md text-xs font-semibold text-white flex items-center gap-1">
+                                                    <Video className="w-3 h-3" /> Online
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="absolute bottom-3 left-3 right-3">
                                             <div className="bg-black/60 backdrop-blur-sm text-white p-2 rounded-lg text-xs flex items-center justify-between">
@@ -219,10 +268,17 @@ export default function WorkshopsListingPage() {
                                                     <Calendar className="w-3 h-3" />
                                                     {new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                                 </span>
-                                                <span className="flex items-center gap-1">
-                                                    <MapPin className="w-3 h-3" />
-                                                    {workshop.city}, {workshop.country}
-                                                </span>
+                                                {workshop.workshopType === "offline" ? (
+                                                    <span className="flex items-center gap-1">
+                                                        <MapPin className="w-3 h-3" />
+                                                        {workshop.location?.city || workshop.city}, {workshop.location?.country || workshop.country}
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1">
+                                                        <Video className="w-3 h-3" />
+                                                        Virtual Event
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

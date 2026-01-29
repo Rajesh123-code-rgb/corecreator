@@ -13,19 +13,16 @@ import {
     Bell,
     Shield,
     Globe,
-    CreditCard,
     Lock,
     CheckCircle,
     Save,
     Smartphone,
     X,
-    Loader2
 } from "lucide-react";
 
 const settingsSchema = z.object({
     preferences: z.object({
         language: z.string(),
-        currency: z.string(),
         emailNotifications: z.boolean(),
         pushNotifications: z.boolean(),
     }),
@@ -47,7 +44,7 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 export default function UserSettingsPage() {
     const { data: session } = useSession();
     const { language, setLanguage, t } = useLanguage();
-    const { currency, setCurrency } = useCurrency();
+    // Currency is now global via header, no settings page config needed
 
     const [isLoading, setIsLoading] = React.useState(true);
     const [isSaving, setIsSaving] = React.useState(false);
@@ -64,7 +61,6 @@ export default function UserSettingsPage() {
         defaultValues: {
             preferences: {
                 language: "en",
-                currency: "INR",
                 emailNotifications: true,
                 pushNotifications: true,
             },
@@ -83,16 +79,9 @@ export default function UserSettingsPage() {
 
     const twoFactorEnabled = watch("twoFactorEnabled");
 
-
-
     React.useEffect(() => {
         setValue("preferences.language", language);
     }, [language, setValue]);
-
-    React.useEffect(() => {
-        setValue("preferences.currency", currency);
-    }, [currency, setValue]);
-
 
     React.useEffect(() => {
         const fetchSettings = async () => {
@@ -101,14 +90,11 @@ export default function UserSettingsPage() {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.settings) {
-                        // Use active context values for currency/language to keep sync with footer
-                        // This prevents DB values from overwriting local session changes
                         const syncedSettings = {
                             ...data.settings,
                             preferences: {
                                 ...data.settings.preferences,
-                                language: language, // Keep currently active language
-                                currency: currency  // Keep currently active currency
+                                language: language,
                             }
                         };
                         reset(syncedSettings);
@@ -124,15 +110,11 @@ export default function UserSettingsPage() {
         if (session?.user) {
             fetchSettings();
         }
-
-    }, [session, reset, setLanguage, setCurrency]);
+    }, [session, reset, language]);
 
     const onSubmit = async (data: SettingsFormData) => {
         setIsSaving(true);
-        // Update Contexts immediately for instant feedback
-
         setLanguage(data.preferences.language as any);
-        setCurrency(data.preferences.currency as any);
 
         try {
             const res = await fetch("/api/user/settings", {
@@ -225,22 +207,6 @@ export default function UserSettingsPage() {
                                 Select your preferred language for the interface.
                             </p>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Currency</label>
-                            <select
-                                {...register("preferences.currency")}
-                                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-background focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                            >
-                                <option value="INR">INR (₹)</option>
-                                <option value="USD">USD ($)</option>
-                                <option value="EUR">EUR (€)</option>
-                                <option value="GBP">GBP (£)</option>
-                            </select>
-                            <p className="text-xs text-[var(--muted-foreground)] mt-1">
-                                Prices will be displayed in this currency where possible.
-                            </p>
-                        </div>
-
                     </CardContent>
                 </Card>
 
@@ -361,61 +327,58 @@ export default function UserSettingsPage() {
                 </div>
             </form>
 
-            {/* Password Change Modal */}
-            {
-                showPasswordModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-                        <div className="bg-[var(--card)] rounded-lg shadow-xl w-full max-w-md border border-[var(--border)] overflow-hidden">
-                            <div className="p-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--muted)]">
-                                <h3 className="font-bold">Change Password</h3>
-                                <button onClick={() => setShowPasswordModal(false)} className="p-1 hover:bg-[var(--border)] rounded">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-                            <div className="p-6">
-                                {passwordError && (
-                                    <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-md border border-red-100">
-                                        {passwordError}
-                                    </div>
-                                )}
-                                {passwordSuccess && (
-                                    <div className="mb-4 p-3 bg-green-50 text-green-600 text-sm rounded-md border border-green-100">
-                                        {passwordSuccess}
-                                    </div>
-                                )}
-                                <form onSubmit={handleSubmitPassword(onPasswordSubmit)} className="space-y-4">
-                                    <Input
-                                        label="Current Password"
-                                        type="password"
-                                        {...registerPassword("currentPassword")}
-                                        error={passwordErrors.currentPassword?.message}
-                                    />
-                                    <Input
-                                        label="New Password"
-                                        type="password"
-                                        {...registerPassword("newPassword")}
-                                        error={passwordErrors.newPassword?.message}
-                                    />
-                                    <Input
-                                        label="Confirm New Password"
-                                        type="password"
-                                        {...registerPassword("confirmPassword")}
-                                        error={passwordErrors.confirmPassword?.message}
-                                    />
-                                    <div className="flex justify-end gap-3 mt-6">
-                                        <Button type="button" variant="outline" onClick={() => setShowPasswordModal(false)}>
-                                            Cancel
-                                        </Button>
-                                        <Button type="submit" isLoading={isChangingPassword}>
-                                            Update Password
-                                        </Button>
-                                    </div>
-                                </form>
-                            </div>
+            {showPasswordModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                    <div className="bg-[var(--card)] rounded-lg shadow-xl w-full max-w-md border border-[var(--border)] overflow-hidden">
+                        <div className="p-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--muted)]">
+                            <h3 className="font-bold">Change Password</h3>
+                            <button onClick={() => setShowPasswordModal(false)} className="p-1 hover:bg-[var(--border)] rounded">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            {passwordError && (
+                                <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-md border border-red-100">
+                                    {passwordError}
+                                </div>
+                            )}
+                            {passwordSuccess && (
+                                <div className="mb-4 p-3 bg-green-50 text-green-600 text-sm rounded-md border border-green-100">
+                                    {passwordSuccess}
+                                </div>
+                            )}
+                            <form onSubmit={handleSubmitPassword(onPasswordSubmit)} className="space-y-4">
+                                <Input
+                                    label="Current Password"
+                                    type="password"
+                                    {...registerPassword("currentPassword")}
+                                    error={passwordErrors.currentPassword?.message}
+                                />
+                                <Input
+                                    label="New Password"
+                                    type="password"
+                                    {...registerPassword("newPassword")}
+                                    error={passwordErrors.newPassword?.message}
+                                />
+                                <Input
+                                    label="Confirm New Password"
+                                    type="password"
+                                    {...registerPassword("confirmPassword")}
+                                    error={passwordErrors.confirmPassword?.message}
+                                />
+                                <div className="flex justify-end gap-3 mt-6">
+                                    <Button type="button" variant="outline" onClick={() => setShowPasswordModal(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" isLoading={isChangingPassword}>
+                                        Update Password
+                                    </Button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
 }

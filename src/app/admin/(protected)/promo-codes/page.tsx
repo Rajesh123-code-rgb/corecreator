@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useConfirmModal } from "@/components/molecules";
 import {
     Tag,
@@ -43,6 +44,7 @@ interface PromoCode {
 export default function AdminPromoCodesPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { formatPrice } = useCurrency();
     const [promoCodes, setPromoCodes] = React.useState<PromoCode[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [searchQuery, setSearchQuery] = React.useState("");
@@ -289,7 +291,7 @@ export default function AdminPromoCodesPage() {
                             <DollarSign className="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">~₹{stats.value.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-gray-900">~{formatPrice(stats.value)}</p>
                             <p className="text-sm text-gray-500">Discounts Given</p>
                         </div>
                     </div>
@@ -373,7 +375,7 @@ export default function AdminPromoCodesPage() {
                                                 ) : (
                                                     <>
                                                         <DollarSign className="w-4 h-4 text-green-600" />
-                                                        <span className="font-semibold">₹{code.discountValue}</span>
+                                                        <span className="font-semibold">{formatPrice(code.discountValue)}</span>
                                                     </>
                                                 )}
                                             </div>
@@ -545,7 +547,7 @@ export default function AdminPromoCodesPage() {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     >
                                         <option value="percentage">Percentage (%)</option>
-                                        <option value="fixed">Fixed (₹)</option>
+                                        <option value="fixed">Fixed</option>
                                     </select>
                                 </div>
                                 <div>

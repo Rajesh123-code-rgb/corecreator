@@ -125,7 +125,7 @@ export interface IProduct extends Document {
     };
 
     // Status
-    status: "draft" | "pending" | "active" | "sold" | "archived" | "rejected";
+    status: "draft" | "pending" | "active" | "sold" | "archived" | "rejected" | "blocked";
     isFeatured: boolean;
 
     // Stats
@@ -222,7 +222,7 @@ const productSchema = new Schema<IProduct>(
 
         status: {
             type: String,
-            enum: ["draft", "pending", "active", "sold", "archived", "rejected"],
+            enum: ["draft", "pending", "active", "sold", "archived", "rejected", "blocked"],
             default: "draft",
             index: true,
         },

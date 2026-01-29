@@ -33,6 +33,7 @@ import {
     RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface AdminStats {
     stats: {
@@ -63,6 +64,7 @@ const monthlyData = [
 
 export default function AdminDashboardPage() {
     const { data: session } = useSession();
+    const { formatPrice } = useCurrency();
     const router = useRouter();
     const [data, setData] = React.useState<AdminStats | null>(null);
     const [loading, setLoading] = React.useState(true);
@@ -291,7 +293,7 @@ export default function AdminDashboardPage() {
                             <div className="flex items-end justify-between">
                                 <div>
                                     <p className="text-3xl font-bold text-gray-900">
-                                        ₹{totalRevenue.toLocaleString()}
+                                        {formatPrice(totalRevenue)}
                                     </p>
                                     <p className="text-sm text-gray-500 mt-1">
                                         {totalOrders} orders
@@ -422,10 +424,10 @@ export default function AdminDashboardPage() {
                                         axisLine={false}
                                         tickLine={false}
                                         tick={{ fill: "#9ca3af", fontSize: 12 }}
-                                        tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}K`}
+                                        tickFormatter={(value) => formatPrice(value, "INR", { notation: "compact", maximumFractionDigits: 1 })}
                                     />
                                     <Tooltip
-                                        formatter={(value) => [`₹${(value as number || 0).toLocaleString()}`, "Revenue"]}
+                                        formatter={(value) => [formatPrice(value as number), "Revenue"]}
                                         contentStyle={{
                                             background: "#1f2937",
                                             border: "none",
@@ -523,7 +525,7 @@ export default function AdminDashboardPage() {
                                     <DollarSign className="w-4 h-4 text-green-600" />
                                     <div>
                                         <p className="text-xs text-gray-500">Revenue</p>
-                                        <p className="font-semibold">₹{totalRevenue.toLocaleString()}</p>
+                                        <p className="font-semibold">{formatPrice(totalRevenue)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -627,7 +629,7 @@ export default function AdminDashboardPage() {
                                     <tr key={order.id} className="text-sm hover:bg-gray-50">
                                         <td className="px-4 py-3 font-medium text-purple-600">{order.id}</td>
                                         <td className="px-4 py-3 text-gray-600">{order.customer}</td>
-                                        <td className="px-4 py-3 font-medium">₹{order.amount.toFixed(2)}</td>
+                                        <td className="px-4 py-3 font-medium">{formatPrice(order.amount)}</td>
                                         <td className="px-4 py-3">
                                             <span className={`text-xs px-2 py-1 rounded-full ${order.status === "completed" || order.status === "paid"
                                                 ? "bg-green-100 text-green-700"

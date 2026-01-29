@@ -15,6 +15,7 @@ import {
     ArrowUpRight,
     ArrowDownRight
 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface SalesReport {
     summary: {
@@ -41,6 +42,7 @@ interface ProductsReport {
 }
 
 export default function AdminReportsPage() {
+    const { formatPrice } = useCurrency();
     const [reportType, setReportType] = React.useState<"sales" | "users" | "products">("sales");
     const [loading, setLoading] = React.useState(false);
     const [dateRange, setDateRange] = React.useState({ start: "", end: "" });
@@ -81,7 +83,7 @@ export default function AdminReportsPage() {
         window.open(`/api/admin/reports?${params.toString()}`, "_blank");
     };
 
-    const formatCurrency = (amount: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(amount);
+
 
     return (
         <div className="space-y-6">
@@ -156,7 +158,7 @@ export default function AdminReportsPage() {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-sm text-gray-500">Total Revenue</p>
-                                            <p className="text-2xl font-bold mt-1">{formatCurrency(salesData.summary.totalRevenue)}</p>
+                                            <p className="text-2xl font-bold mt-1">{formatPrice(salesData.summary.totalRevenue)}</p>
                                         </div>
                                         <div className="p-3 bg-green-100 rounded-lg"><DollarSign className="w-6 h-6 text-green-600" /></div>
                                     </div>
@@ -183,7 +185,7 @@ export default function AdminReportsPage() {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="text-sm text-gray-500">Avg Order Value</p>
-                                            <p className="text-2xl font-bold mt-1">{formatCurrency(salesData.summary.averageOrderValue)}</p>
+                                            <p className="text-2xl font-bold mt-1">{formatPrice(salesData.summary.averageOrderValue)}</p>
                                         </div>
                                         <div className="p-3 bg-orange-100 rounded-lg"><BarChart3 className="w-6 h-6 text-orange-600" /></div>
                                     </div>
@@ -204,7 +206,7 @@ export default function AdminReportsPage() {
                                                     <span className="text-sm text-gray-600">{day._id}</span>
                                                     <div className="flex items-center gap-4">
                                                         <span className="text-sm text-gray-500">{day.orders} orders</span>
-                                                        <span className="font-medium">{formatCurrency(day.revenue)}</span>
+                                                        <span className="font-medium">{formatPrice(day.revenue)}</span>
                                                     </div>
                                                 </div>
                                             ))}
@@ -226,7 +228,7 @@ export default function AdminReportsPage() {
                                                         <p className="text-sm font-medium text-gray-900 truncate">{product.name || "Unknown Product"}</p>
                                                         <p className="text-xs text-gray-500">{product.quantity} sold</p>
                                                     </div>
-                                                    <span className="font-medium text-gray-900">{formatCurrency(product.revenue)}</span>
+                                                    <span className="font-medium text-gray-900">{formatPrice(product.revenue)}</span>
                                                 </div>
                                             ))}
                                         </div>

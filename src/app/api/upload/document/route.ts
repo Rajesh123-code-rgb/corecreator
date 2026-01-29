@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export async function POST(request: NextRequest) {
     try {
@@ -32,38 +30,37 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "File too large. Maximum size is 5MB" }, { status: 400 });
         }
 
-        // Create upload directory if it doesn't exist
-        const uploadDir = join(process.cwd(), "public", "uploads", "documents");
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-        }
-
-        // Generate unique filename with user ID prefix for organization
-        const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 8);
-        const extension = file.name.split(".").pop() || "jpg";
-        const sanitizedType = type?.replace(/[^a-z_]/gi, "") || "document";
-        const filename = `${session.user.id}_${sanitizedType}_${timestamp}_${randomString}.${extension}`;
-
-        // Convert file to buffer and write
+        // Convert file to buffer
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        const filePath = join(uploadDir, filename);
-        await writeFile(filePath, buffer);
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 8);
+        const sanitizedType = type?.replace(/[^a-z_]/gi, "") || "document";
+        const publicId = `${session.user.id}_${sanitizedType}_${timestamp}_${randomString}`;
 
-        // Return the public URL
-        const url = `/uploads/documents/${filename}`;
+        // Determine resource type - PDFs should use 'raw' or 'auto'
+        const resourceType = file.type === 'application/pdf' ? 'raw' : 'image';
+
+        // Upload to Cloudinary
+        const result = await uploadToCloudinary(buffer, {
+            folder: "corecreator/kyc-documents",
+            publicId,
+            resourceType: resourceType as 'image' | 'raw',
+        });
 
         return NextResponse.json({
             success: true,
-            url,
+            url: result.url,
             type: sanitizedType,
             filename: file.name,
-            size: file.size,
+            size: result.size,
+            publicId: result.publicId,
         });
     } catch (error) {
         console.error("Document upload error:", error);
         return NextResponse.json({ error: "Failed to upload document" }, { status: 500 });
     }
 }
+

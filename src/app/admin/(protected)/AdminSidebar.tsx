@@ -32,6 +32,7 @@ import {
     RefreshCw,
 } from "lucide-react";
 import NotificationBell from "@/components/molecules/NotificationBell";
+import { CurrencySwitcher } from "@/components/molecules/CurrencySwitcher";
 
 import { PERMISSIONS } from "@/lib/config/rbac";
 
@@ -167,6 +168,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
 
                     <div className="flex items-center gap-3">
+                        <div className="hidden md:block">
+                            <CurrencySwitcher variant="minimal" className="bg-white border-gray-200 text-gray-700 hover:bg-gray-50" />
+                        </div>
                         <NotificationBell context="admin" />
                         <Link
                             href="/"

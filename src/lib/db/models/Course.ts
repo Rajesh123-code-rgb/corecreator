@@ -79,7 +79,7 @@ export interface ICourse extends Document {
     totalReviews: number;
 
     // Status
-    status: "draft" | "pending" | "published" | "rejected" | "archived";
+    status: "draft" | "pending" | "published" | "rejected" | "archived" | "blocked";
     isPublished: boolean;
     publishedAt?: Date;
     rejectionReason?: string;
@@ -173,7 +173,7 @@ const courseSchema = new Schema<ICourse>(
         totalReviews: { type: Number, default: 0 },
 
         // Status
-        status: { type: String, enum: ["draft", "pending", "published", "rejected", "archived"], default: "draft", index: true },
+        status: { type: String, enum: ["draft", "pending", "published", "rejected", "archived", "blocked"], default: "draft", index: true },
         isPublished: { type: Boolean, default: false },
         publishedAt: { type: Date },
         rejectionReason: { type: String }, // NEW: feedback for authors

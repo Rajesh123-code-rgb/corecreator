@@ -56,7 +56,7 @@ export async function PATCH(
 
         // Status Change Logic
         if (body.status) {
-            // Approval
+            // Approval / Unblock
             if (body.status === "active" || body.status === "published") {
                 body.reviewedAt = new Date();
                 // Set publishedAt if first time
@@ -64,6 +64,10 @@ export async function PATCH(
                 if (product && !product.publishedAt) {
                     body.publishedAt = new Date();
                 }
+            }
+            // Block - no special handling needed, just update status
+            else if (body.status === "blocked") {
+                body.reviewedAt = new Date();
             }
             // Rejection
             else if (body.status === "rejected") {

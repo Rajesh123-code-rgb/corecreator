@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import connectDB from '@/lib/db/mongodb';
 import Workshop from '@/lib/db/models/Workshop';
 import User from '@/lib/db/models/User';
@@ -11,9 +13,26 @@ export async function GET(request: Request) {
         const slug = searchParams.get('slug');
         const limit = searchParams.get('limit');
         const sort = searchParams.get('sort') || 'upcoming';
+        const workshopType = searchParams.get('workshopType');
+        const previewMode = searchParams.get('preview');
 
         // Build query
-        const query: any = { status: 'upcoming' }; // Only show published workshops by default
+        const query: any = {};
+
+        // Handle admin preview mode
+        if (previewMode === "admin") {
+            const session = await getServerSession(authOptions);
+            if (session?.user?.role === "admin") {
+                // Allow admin to view pending and upcoming workshops
+                query.status = { $in: ["pending", "upcoming"] };
+            } else {
+                // Not admin, only show upcoming
+                query.status = 'upcoming';
+            }
+        } else {
+            // Normal users can only see upcoming workshops
+            query.status = 'upcoming';
+        }
 
         if (slug) {
             query.slug = slug;
@@ -23,10 +42,14 @@ export async function GET(request: Request) {
             query.instructor = instructorId;
         }
 
+        if (workshopType && (workshopType === 'online' || workshopType === 'offline')) {
+            query.workshopType = workshopType;
+        }
+
         // Execute query
         let workshopQuery = Workshop.find(query)
             .populate('instructor', 'name avatar bio rating reviews') // Populate instructor details
-            .select('-meetingUrl'); // Exclude meeting URL for public view security
+            .select('-meetingUrl -meetingUserId -meetingPassword'); // Exclude meeting credentials for public view security
 
         // Apply sorting
         switch (sort) {

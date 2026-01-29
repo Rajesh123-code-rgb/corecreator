@@ -28,6 +28,7 @@ import {
     Moon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { CurrencySwitcher } from "@/components/molecules/CurrencySwitcher";
 
 const navigation = [
     {
@@ -145,6 +146,10 @@ export function Header() {
                                 <Moon className={cn("absolute w-5 h-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2", headerIconColor)} />
                             </button>
                         )}
+
+                        <div className="hidden md:block">
+                            <CurrencySwitcher className="w-24 border-none bg-transparent hover:bg-[var(--muted)]" />
+                        </div>
 
                         {/* Search */}
                         <button
@@ -270,26 +275,21 @@ export function Header() {
                 <div className="lg:hidden bg-[var(--background)] border-t border-[var(--border)] animate-fade-in-down">
                     <div className="container-app py-4 space-y-2">
                         {/* Mobile Theme Toggle & Search */}
-                        <div className="flex items-center gap-2 mb-4 px-4 bg-[var(--muted)] rounded-lg p-2">
-                            <Search className="w-5 h-5 text-[var(--muted-foreground)]" />
-                            <input
-                                type="search"
-                                placeholder="Search..."
-                                className="flex-1 bg-transparent border-none focus:outline-none text-sm"
-                            />
-                            {mounted && (
-                                <button
-                                    onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                                    className="p-2 rounded-md hover:bg-[var(--muted)] transition-colors ml-2"
-                                    aria-label="Toggle Theme"
-                                >
-                                    {resolvedTheme === "dark" ? (
-                                        <Sun className="w-5 h-5 text-yellow-500" />
-                                    ) : (
-                                        <Moon className="w-5 h-5 text-[var(--foreground)]" />
-                                    )}
-                                </button>
-                            )}
+                        {mounted && (
+                            <button
+                                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                                className="p-2 rounded-md hover:bg-[var(--muted)] transition-colors ml-2"
+                                aria-label="Toggle Theme"
+                            >
+                                {resolvedTheme === "dark" ? (
+                                    <Sun className="w-5 h-5 text-yellow-500" />
+                                ) : (
+                                    <Moon className="w-5 h-5 text-[var(--foreground)]" />
+                                )}
+                            </button>
+                        )}
+                        <div className="ml-2">
+                            <CurrencySwitcher />
                         </div>
 
                         {/* Navigation Links */}

@@ -14,6 +14,7 @@ import {
     Plus,
 } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface ReturnRequest {
     _id: string;
@@ -39,6 +40,7 @@ export default function UserReturnsPage() {
     const [requests, setRequests] = React.useState<ReturnRequest[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [filter, setFilter] = React.useState("all");
+    const { formatPrice } = useCurrency();
 
     React.useEffect(() => {
         fetchRequests();
@@ -126,8 +128,8 @@ export default function UserReturnsPage() {
                         key={f.id}
                         onClick={() => setFilter(f.id)}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f.id
-                                ? "bg-purple-600 text-white"
-                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                             }`}
                     >
                         {f.label}
@@ -181,7 +183,7 @@ export default function UserReturnsPage() {
                                                 Submitted: {new Date(req.createdAt).toLocaleDateString()}
                                             </p>
                                             <p className="font-semibold text-gray-900">
-                                                ₹{req.refundAmount.toFixed(2)}
+                                                {formatPrice(req.refundAmount)}
                                             </p>
                                         </div>
                                     </div>

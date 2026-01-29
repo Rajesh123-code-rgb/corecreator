@@ -15,6 +15,7 @@ import {
     CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface EligibleOrder {
     _id: string;
@@ -43,6 +44,7 @@ export default function NewReturnRequestPage() {
     const [loading, setLoading] = React.useState(true);
     const [submitting, setSubmitting] = React.useState(false);
     const [success, setSuccess] = React.useState(false);
+    const { formatPrice } = useCurrency();
 
     // Form state
     const [selectedOrder, setSelectedOrder] = React.useState<string>("");
@@ -241,8 +243,8 @@ export default function NewReturnRequestPage() {
                                         <label
                                             key={item.itemId}
                                             className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${selectedItem === item.itemId
-                                                    ? "border-purple-500 bg-purple-50"
-                                                    : "border-gray-200 hover:border-gray-300"
+                                                ? "border-purple-500 bg-purple-50"
+                                                : "border-gray-200 hover:border-gray-300"
                                                 }`}
                                         >
                                             <input
@@ -262,7 +264,7 @@ export default function NewReturnRequestPage() {
                                             )}
                                             <div className="flex-1">
                                                 <p className="font-medium text-gray-900">{item.name}</p>
-                                                <p className="text-sm text-gray-500">Qty: {item.quantity} • ₹{item.price}</p>
+                                                <p className="text-sm text-gray-500">Qty: {item.quantity} • {formatPrice(item.price)}</p>
                                             </div>
                                         </label>
                                     ))}
@@ -282,8 +284,8 @@ export default function NewReturnRequestPage() {
                                 <label
                                     key={type.value}
                                     className={`flex-1 p-4 border rounded-xl cursor-pointer transition-colors ${requestType === type.value
-                                            ? "border-purple-500 bg-purple-50"
-                                            : "border-gray-200 hover:border-gray-300"
+                                        ? "border-purple-500 bg-purple-50"
+                                        : "border-gray-200 hover:border-gray-300"
                                         }`}
                                 >
                                     <input
@@ -309,8 +311,8 @@ export default function NewReturnRequestPage() {
                                 <label
                                     key={option.value}
                                     className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${reason === option.value
-                                            ? "border-purple-500 bg-purple-50"
-                                            : "border-gray-200 hover:border-gray-300"
+                                        ? "border-purple-500 bg-purple-50"
+                                        : "border-gray-200 hover:border-gray-300"
                                         }`}
                                 >
                                     <input

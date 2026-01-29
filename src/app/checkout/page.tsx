@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
+import { Header, Footer } from "@/components/organisms";
 import { useCart } from "@/context";
 import { useSession } from "next-auth/react";
 import {
@@ -188,24 +189,24 @@ export default function CheckoutPage() {
     if (items.length === 0) return null;
 
     return (
-        <div className="min-h-screen bg-[var(--muted)]">
-            <header className="bg-white border-b border-[var(--border)]">
-                <div className="container-app py-4 flex items-center justify-between">
+        <div className="min-h-screen bg-[var(--muted)] flex flex-col">
+            <Header />
+
+            {/* Secure Checkout Bar */}
+            <div className="bg-white border-b border-[var(--border)]">
+                <div className="container-app py-3 flex items-center justify-between">
                     <Link href="/cart" className="flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                         <ChevronLeft className="w-4 h-4" />
                         Back to Cart
-                    </Link>
-                    <Link href="/" className="font-display text-xl font-bold text-[var(--secondary-600)]">
-                        Core Creator
                     </Link>
                     <div className="flex items-center gap-1 text-sm text-green-600">
                         <Lock className="w-4 h-4" />
                         <span>Secure Checkout</span>
                     </div>
                 </div>
-            </header>
+            </div>
 
-            <main className="py-8">
+            <main className="py-8 flex-1">
                 <div className="container-app max-w-6xl">
                     <div className="flex items-center justify-center mb-8">
                         {steps.map((step, index) => (
@@ -323,6 +324,8 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </main>
+
+            <Footer />
         </div>
     );
 }

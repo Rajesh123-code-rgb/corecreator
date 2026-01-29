@@ -12,24 +12,47 @@ import {
     CheckCircle,
     DollarSign,
     Eye,
-    X
+    X,
+    ShieldOff,
+    ShieldCheck,
+    TrendingUp,
+    MapPin,
+    Video,
+    Globe
 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useConfirmModal } from "@/components/molecules";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface Workshop {
     _id: string;
     title: string;
     description?: string;
     slug: string;
+    thumbnail?: string;
     instructorName: string;
-    instructor?: { name: string, email: string };
+    instructorAvatar?: string;
+    instructor?: { _id: string; name: string; email: string; studioProfile?: { name?: string } };
     date: string;
+    duration?: number;
+    workshopType?: "online" | "offline";
+    location?: { country?: string; city?: string; address?: string };
+    meetingUrl?: string;
     price: number;
+    currency?: string;
     capacity: number;
     enrolledCount: number;
-    status: "draft" | "pending" | "upcoming" | "rejected" | "completed" | "cancelled";
+    category?: string;
+    tags?: string[];
+    level?: "beginner" | "intermediate" | "advanced" | "all";
+    requirements?: string[];
+    agenda?: string[];
+    status: "draft" | "pending" | "upcoming" | "rejected" | "completed" | "cancelled" | "blocked";
     rejectionReason?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    submittedAt?: string;
+    reviewedAt?: string;
 }
 
 export default function AdminWorkshopsPage() {
@@ -50,6 +73,7 @@ export default function AdminWorkshopsPage() {
     const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null);
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const confirmModal = useConfirmModal();
+    const { formatPrice } = useCurrency();
 
     // Rejection Modal State
     const [showRejectionModal, setShowRejectionModal] = React.useState(false);
@@ -97,13 +121,13 @@ export default function AdminWorkshopsPage() {
         return () => clearTimeout(timer);
     }, [fetchWorkshops]);
 
-    const handleAction = async (id: string, action: "delete" | "approve" | "reject", reason?: string) => {
+    const handleAction = async (id: string, action: "delete" | "approve" | "reject" | "block" | "unblock", reason?: string) => {
         setActionLoading(id);
         try {
             if (action === "delete") {
                 const res = await fetch(`/api/admin/workshops/${id}`, { method: "DELETE" });
                 if (!res.ok) throw new Error("Delete failed");
-            } else if (action === "approve") {
+            } else if (action === "approve" || action === "unblock") {
                 const res = await fetch(`/api/admin/workshops/${id}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
@@ -117,6 +141,13 @@ export default function AdminWorkshopsPage() {
                     body: JSON.stringify({ status: "rejected", rejectionReason: reason, reviewedAt: new Date() }),
                 });
                 if (!res.ok) throw new Error("Reject failed");
+            } else if (action === "block") {
+                const res = await fetch(`/api/admin/workshops/${id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: "blocked", reviewedAt: new Date() }),
+                });
+                if (!res.ok) throw new Error("Block failed");
             }
             fetchWorkshops();
             setActiveDropdown(null);
@@ -144,6 +175,7 @@ export default function AdminWorkshopsPage() {
             upcoming: "bg-blue-100 text-blue-700",
             completed: "bg-green-100 text-green-700",
             cancelled: "bg-red-100 text-red-700",
+            blocked: "bg-red-100 text-red-700",
             draft: "bg-gray-100 text-gray-700",
             pending: "bg-yellow-100 text-yellow-700",
             rejected: "bg-red-100 text-red-700"
@@ -228,7 +260,7 @@ export default function AdminWorkshopsPage() {
                             />
                         </div>
                         <div className="flex gap-2 flex-wrap">
-                            {["all", "pending", "upcoming", "completed", "cancelled"].map((s) => (
+                            {["all", "pending", "upcoming", "blocked", "completed", "cancelled"].map((s) => (
                                 <button
                                     key={s}
                                     onClick={() => setStatusFilter(s)}
@@ -249,7 +281,7 @@ export default function AdminWorkshopsPage() {
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Workshop</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creator (ID)</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrollment</th>
@@ -274,14 +306,19 @@ export default function AdminWorkshopsPage() {
                                 workshops.map((workshop) => (
                                     <tr key={workshop._id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 font-medium text-gray-900">{workshop.title}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{workshop.instructorName}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm">
+                                                <p className="font-medium text-gray-900">{workshop.instructor?.name || workshop.instructorName}</p>
+                                                <p className="text-xs text-gray-400 font-mono">{workshop.instructor?._id?.slice(-8) || "—"}</p>
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                                 <Calendar className="w-4 h-4 text-gray-400" />
                                                 {new Date(workshop.date).toLocaleDateString()}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-medium">₹{workshop.price}</td>
+                                        <td className="px-6 py-4 font-medium">{formatPrice(workshop.price)}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 <div className="flex-1 h-2 bg-gray-100 rounded-full max-w-[80px] overflow-hidden">
@@ -375,6 +412,18 @@ export default function AdminWorkshopsPage() {
                                 <Eye className="w-4 h-4" /> View Details
                             </button>
 
+                            {(workshop.status === "pending" || workshop.status === "upcoming") && (
+                                <button
+                                    className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2"
+                                    onClick={() => {
+                                        window.open(`/workshops/${workshop.slug}?preview=admin`, '_blank');
+                                        setActiveDropdown(null);
+                                    }}
+                                >
+                                    <TrendingUp className="w-4 h-4" /> View Live
+                                </button>
+                            )}
+
                             {workshop.status === "pending" && (
                                 <>
                                     <div className="my-1 border-t border-gray-50" />
@@ -402,19 +451,39 @@ export default function AdminWorkshopsPage() {
 
                             <div className="my-1 border-t border-gray-50" />
 
-                            <button
-                                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                onClick={() => confirmModal.confirm({
-                                    title: "Delete Workshop",
-                                    message: `Delete "${workshop.title}"? This action cannot be undone.`,
-                                    confirmText: "Delete",
-                                    onConfirm: () => handleAction(workshop._id, "delete"),
-                                })}
-                                disabled={actionLoading === workshop._id}
-                            >
-                                {actionLoading === workshop._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
-                                Delete Workshop
-                            </button>
+                            {/* Block/Activate for upcoming workshops */}
+                            {workshop.status === "upcoming" && (
+                                <button
+                                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    onClick={() => confirmModal.confirm({
+                                        title: "Block Workshop",
+                                        message: `Block "${workshop.title}"? This will hide it from the platform.`,
+                                        confirmText: "Block",
+                                        onConfirm: () => handleAction(workshop._id, "block"),
+                                    })}
+                                    disabled={actionLoading === workshop._id}
+                                >
+                                    {actionLoading === workshop._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldOff className="w-4 h-4" />}
+                                    Block Workshop
+                                </button>
+                            )}
+
+                            {workshop.status === "blocked" && (
+                                <button
+                                    className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 flex items-center gap-2"
+                                    onClick={() => confirmModal.confirm({
+                                        title: "Activate Workshop",
+                                        message: `Activate "${workshop.title}"? This will make it visible on the platform again.`,
+                                        confirmText: "Activate",
+                                        variant: "info",
+                                        onConfirm: () => handleAction(workshop._id, "unblock"),
+                                    })}
+                                    disabled={actionLoading === workshop._id}
+                                >
+                                    {actionLoading === workshop._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                                    Activate Workshop
+                                </button>
+                            )}
                         </div>
                     </>
                 );
@@ -453,58 +522,236 @@ export default function AdminWorkshopsPage() {
             {/* View Workshop Modal */}
             {viewWorkshop && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
-                            <h2 className="text-xl font-bold">Workshop Details</h2>
+                            <div>
+                                <h2 className="text-xl font-bold">Workshop Details</h2>
+                                <p className="text-sm text-gray-500">ID: {viewWorkshop._id}</p>
+                            </div>
                             <button onClick={() => setViewWorkshop(null)} className="text-gray-400 hover:text-gray-600">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
                         <div className="p-6 space-y-6">
-                            <div className="flex flex-col md:flex-row gap-6">
-                                {/* Icon/Image */}
-                                <div className="w-full md:w-1/3 aspect-video bg-purple-50 rounded-xl overflow-hidden flex items-center justify-center">
-                                    <Calendar className="w-16 h-16 text-purple-300" />
-                                </div>
-                                {/* Info */}
-                                <div className="flex-1 space-y-4">
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-gray-900">{viewWorkshop.title}</h3>
-                                        <p className="text-gray-500">Instructor: {viewWorkshop.instructorName}</p>
+                            {/* Top Section: Thumbnail & Basic Info */}
+                            <div className="flex flex-col lg:flex-row gap-6">
+                                {/* Thumbnail */}
+                                <div className="w-full lg:w-2/5 space-y-3">
+                                    <div className="aspect-video bg-purple-50 rounded-xl overflow-hidden flex items-center justify-center">
+                                        {viewWorkshop.thumbnail ? (
+                                            <img src={viewWorkshop.thumbnail} alt={viewWorkshop.title} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Calendar className="w-16 h-16 text-purple-300" />
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-2xl font-bold text-purple-600">
-                                            ₹{viewWorkshop.price}
-                                        </span>
-                                        {getStatusBadge(viewWorkshop.status)}
+                                        {viewWorkshop.workshopType === "online" ? (
+                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center gap-1">
+                                                <Video className="w-3 h-3" /> Online
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full flex items-center gap-1">
+                                                <MapPin className="w-3 h-3" /> Offline
+                                            </span>
+                                        )}
+                                        {viewWorkshop.level && (
+                                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full capitalize">{viewWorkshop.level}</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Basic Info */}
+                                <div className="flex-1 space-y-4">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            {getStatusBadge(viewWorkshop.status)}
+                                            {viewWorkshop.category && (
+                                                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">{viewWorkshop.category}</span>
+                                            )}
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900">{viewWorkshop.title}</h3>
                                     </div>
 
-                                    <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Date</span>
-                                            <span className="font-medium">{new Date(viewWorkshop.date).toLocaleDateString()}</span>
+                                    {/* Pricing */}
+                                    <div className="flex items-baseline gap-3">
+                                        <span className="text-3xl font-bold text-purple-600">
+                                            {formatPrice(viewWorkshop.price)}
+                                        </span>
+                                    </div>
+
+                                    {/* Tags */}
+                                    {viewWorkshop.tags && viewWorkshop.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {viewWorkshop.tags.map((tag, idx) => (
+                                                <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">{tag}</span>
+                                            ))}
                                         </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Instructor Email</span>
-                                            <span className="font-medium">{viewWorkshop.instructor?.email || "N/A"}</span>
+                                    )}
+
+                                    {/* Quick Stats */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Date & Time</p>
+                                            <p className="text-sm font-bold text-gray-900">{new Date(viewWorkshop.date).toLocaleString()}</p>
                                         </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Enrollment</span>
-                                            <span className="font-medium">{viewWorkshop.enrolledCount} / {viewWorkshop.capacity}</span>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Duration</p>
+                                            <p className="text-lg font-bold text-gray-900">
+                                                {viewWorkshop.duration ? `${Math.floor(viewWorkshop.duration / 60)}h ${viewWorkshop.duration % 60}m` : "—"}
+                                            </p>
+                                        </div>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Capacity</p>
+                                            <p className="text-lg font-bold text-gray-900">{viewWorkshop.capacity}</p>
+                                        </div>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Enrolled</p>
+                                            <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                                                {viewWorkshop.enrolledCount}
+                                                <span className="text-xs text-gray-400">/ {viewWorkshop.capacity}</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Location/Meeting Details */}
+                            {viewWorkshop.workshopType === "offline" && viewWorkshop.location && (
+                                <div className="bg-orange-50 rounded-xl p-4">
+                                    <h4 className="font-semibold text-orange-900 mb-3 flex items-center gap-2">
+                                        <MapPin className="w-4 h-4" /> Location
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                        <div>
+                                            <p className="text-orange-700 text-xs">Country</p>
+                                            <p className="font-medium text-gray-900">{viewWorkshop.location.country || "—"}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-orange-700 text-xs">City</p>
+                                            <p className="font-medium text-gray-900">{viewWorkshop.location.city || "—"}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-orange-700 text-xs">Address</p>
+                                            <p className="font-medium text-gray-900">{viewWorkshop.location.address || "—"}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {viewWorkshop.workshopType === "online" && viewWorkshop.meetingUrl && (
+                                <div className="bg-blue-50 rounded-xl p-4">
+                                    <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                                        <Video className="w-4 h-4" /> Meeting Details
+                                    </h4>
+                                    <p className="text-sm text-blue-700">Meeting link is configured for this workshop</p>
+                                </div>
+                            )}
+
+                            {/* Studio/Instructor Details */}
+                            <div className="bg-purple-50 rounded-xl p-4">
+                                <h4 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                    Studio / Instructor Details
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs text-purple-700">Studio Name</p>
+                                        <p className="font-medium text-gray-900">{viewWorkshop.instructor?.studioProfile?.name || viewWorkshop.instructorName || "—"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-purple-700">Instructor Name</p>
+                                        <p className="font-medium text-gray-900">{viewWorkshop.instructor?.name || viewWorkshop.instructorName || "—"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-purple-700">Email</p>
+                                        <p className="font-medium text-gray-900">{viewWorkshop.instructor?.email || "—"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-purple-700">Instructor ID</p>
+                                        <p className="font-medium text-gray-900 font-mono text-sm">{viewWorkshop.instructor?._id || "—"}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Description */}
                             <div>
-                                <h4 className="font-medium text-gray-900 mb-2">Description</h4>
-                                <div className="text-gray-600 text-sm whitespace-pre-wrap">
+                                <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                                <div className="text-gray-600 text-sm whitespace-pre-wrap bg-gray-50 p-4 rounded-lg max-h-40 overflow-y-auto">
                                     {viewWorkshop.description || "No description provided."}
                                 </div>
                             </div>
+
+                            {/* Requirements & Agenda */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {viewWorkshop.requirements && viewWorkshop.requirements.length > 0 && (
+                                    <div className="bg-amber-50 rounded-xl p-4">
+                                        <h4 className="font-semibold text-amber-900 mb-3">Requirements</h4>
+                                        <ul className="space-y-1 text-sm">
+                                            {viewWorkshop.requirements.map((req, idx) => (
+                                                <li key={idx} className="flex items-start gap-2">
+                                                    <span className="text-amber-600">•</span>
+                                                    <span>{req}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {viewWorkshop.agenda && viewWorkshop.agenda.length > 0 && (
+                                    <div className="bg-green-50 rounded-xl p-4">
+                                        <h4 className="font-semibold text-green-900 mb-3">Agenda</h4>
+                                        <ul className="space-y-1 text-sm">
+                                            {viewWorkshop.agenda.map((item, idx) => (
+                                                <li key={idx} className="flex items-start gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Timestamps */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-gray-50 rounded-xl p-4">
+                                {viewWorkshop.createdAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Created</p>
+                                        <p className="font-medium">{new Date(viewWorkshop.createdAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                                {viewWorkshop.updatedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Updated</p>
+                                        <p className="font-medium">{new Date(viewWorkshop.updatedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                                {viewWorkshop.submittedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Submitted</p>
+                                        <p className="font-medium">{new Date(viewWorkshop.submittedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                                {viewWorkshop.reviewedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Reviewed</p>
+                                        <p className="font-medium">{new Date(viewWorkshop.reviewedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Rejection Reason */}
+                            {viewWorkshop.rejectionReason && (
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                    <h4 className="font-semibold text-red-800 mb-1">Rejection Reason</h4>
+                                    <p className="text-red-700 text-sm">{viewWorkshop.rejectionReason}</p>
+                                </div>
+                            )}
                         </div>
                         <div className="p-6 border-t bg-gray-50 flex justify-end gap-3 sticky bottom-0">
                             <Button variant="outline" onClick={() => setViewWorkshop(null)}>Close</Button>
+                            {(viewWorkshop.status === "pending" || viewWorkshop.status === "upcoming") && (
+                                <Button onClick={() => window.open(`/workshops/${viewWorkshop.slug}?preview=admin`, '_blank')}>View Live</Button>
+                            )}
                         </div>
                     </div>
                 </div>

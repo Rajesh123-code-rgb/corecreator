@@ -14,6 +14,7 @@ import {
     DollarSign,
     Clock
 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface ShippingRate {
     name: string;
@@ -45,6 +46,7 @@ export default function AdminShippingPage() {
     });
     const [submitting, setSubmitting] = React.useState(false);
     const confirmModal = useConfirmModal();
+    const { formatPrice, symbol } = useCurrency();
 
     const fetchZones = React.useCallback(async () => {
         try {
@@ -212,7 +214,7 @@ export default function AdminShippingPage() {
                                             <option value="price_based">Price Based</option>
                                         </select>
                                         <div className="flex items-center gap-1">
-                                            <span className="text-sm text-gray-500">₹</span>
+                                            <span className="text-sm text-gray-500">{symbol}</span>
                                             <input
                                                 type="number"
                                                 value={rate.amount}
@@ -304,7 +306,7 @@ export default function AdminShippingPage() {
                                                 {zone.rates.map((rate, i) => (
                                                     <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs">
                                                         <DollarSign className="w-3 h-3" />
-                                                        {rate.name}: {rate.type === "free" ? "Free" : `₹${rate.amount}`}
+                                                        {rate.name}: {rate.type === "free" ? "Free" : formatPrice(rate.amount)}
                                                         <Clock className="w-3 h-3 ml-1" />
                                                         {rate.estimatedDays.min}-{rate.estimatedDays.max}d
                                                     </span>

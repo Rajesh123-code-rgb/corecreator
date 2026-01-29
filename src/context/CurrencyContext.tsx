@@ -8,6 +8,7 @@ interface CurrencyContextType {
     currency: Currency;
     setCurrency: (curr: Currency) => void;
     formatPrice: (amount: number, sourceCurrency?: Currency, options?: Intl.NumberFormatOptions) => string;
+    symbol: string;
 }
 
 // Default/Fallback config
@@ -98,8 +99,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         }).format(convertedAmount);
     };
 
+    const symbol = currencyConfig[currency].symbol;
+
     return (
-        <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+        <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, symbol }}>
             {children}
         </CurrencyContext.Provider>
     );

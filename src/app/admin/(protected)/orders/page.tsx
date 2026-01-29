@@ -22,6 +22,7 @@ import {
     Check,
 } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface OrderItem {
     itemType: "product" | "course" | "workshop";
@@ -111,6 +112,7 @@ interface Order {
 }
 
 export default function AdminOrdersPage() {
+    const { formatPrice } = useCurrency();
     const [orders, setOrders] = React.useState<Order[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [search, setSearch] = React.useState("");
@@ -237,7 +239,7 @@ export default function AdminOrdersPage() {
                             <DollarSign className="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">₹{stats.revenue.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-gray-900">{formatPrice(stats.revenue)}</p>
                             <p className="text-sm text-gray-500">Revenue</p>
                         </div>
                     </div>
@@ -340,7 +342,7 @@ export default function AdminOrdersPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{order.items.length} items</td>
-                                        <td className="px-6 py-4 font-bold text-gray-900">₹{order.total.toFixed(2)}</td>
+                                        <td className="px-6 py-4 font-bold text-gray-900">{formatPrice(order.total)}</td>
                                         <td className="px-6 py-4">{getPaymentBadge(order.paymentStatus)}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
@@ -493,8 +495,8 @@ export default function AdminOrdersPage() {
                                                         )}
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="font-bold">₹{(item.price * item.quantity).toFixed(2)}</p>
-                                                        <p className="text-xs text-gray-500">₹{item.price} each</p>
+                                                        <p className="font-bold">{formatPrice(item.price * item.quantity)}</p>
+                                                        <p className="text-xs text-gray-500">{formatPrice(item.price)} each</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -625,7 +627,7 @@ export default function AdminOrdersPage() {
                                             {selectedOrder.promoCode && (
                                                 <div>
                                                     <p className="text-sm text-gray-500">Promo Code</p>
-                                                    <p className="font-medium">{selectedOrder.promoCode} (-₹{selectedOrder.promoDiscount})</p>
+                                                    <p className="font-medium">{selectedOrder.promoCode} (-{formatPrice(selectedOrder.promoDiscount || 0)})</p>
                                                 </div>
                                             )}
                                         </div>
@@ -633,21 +635,21 @@ export default function AdminOrdersPage() {
                                         <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-500">Subtotal</span>
-                                                <span>₹{selectedOrder.subtotal?.toFixed(2) || "0.00"}</span>
+                                                <span>{formatPrice(selectedOrder.subtotal || 0)}</span>
                                             </div>
                                             {selectedOrder.discount > 0 && (
                                                 <div className="flex justify-between text-sm text-green-600">
                                                     <span>Discount</span>
-                                                    <span>-₹{selectedOrder.discount.toFixed(2)}</span>
+                                                    <span>-{formatPrice(selectedOrder.discount)}</span>
                                                 </div>
                                             )}
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-500">Tax</span>
-                                                <span>₹{selectedOrder.tax?.toFixed(2) || "0.00"}</span>
+                                                <span>{formatPrice(selectedOrder.tax || 0)}</span>
                                             </div>
                                             <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
                                                 <span>Total</span>
-                                                <span>₹{selectedOrder.total.toFixed(2)}</span>
+                                                <span>{formatPrice(selectedOrder.total)}</span>
                                             </div>
                                         </div>
                                     </div>

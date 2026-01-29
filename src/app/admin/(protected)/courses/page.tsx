@@ -14,24 +14,51 @@ import {
     DollarSign,
     Clock,
     TrendingUp,
-    X
+    X,
+    ShieldOff,
+    ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useConfirmModal } from "@/components/molecules";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface Course {
     _id: string;
     title: string;
+    subtitle?: string;
     description?: string;
     slug: string;
     thumbnail: string;
-    instructor?: { name: string, email: string };
+    previewVideo?: string;
+    promoVideo?: string;
+    instructor?: { _id: string; name: string; email: string; studioProfile?: { name?: string } };
     instructorName: string;
+    instructorAvatar?: string;
     price: number;
-    status: "draft" | "pending" | "published" | "rejected" | "archived";
-    createdAt: string;
+    compareAtPrice?: number;
+    currency?: string;
+    category?: string;
+    subcategory?: string;
+    tags?: string[];
+    level?: "beginner" | "intermediate" | "advanced" | "all";
+    language?: string;
+    learningOutcomes?: string[];
+    targetAudience?: string[];
+    prerequisites?: string[];
+    totalDuration?: number;
+    totalLectures?: number;
     totalStudents: number;
+    averageRating?: number;
+    totalReviews?: number;
+    sections?: { title: string; lessons: { title: string }[] }[];
+    status: "draft" | "pending" | "published" | "rejected" | "archived" | "blocked";
+    isPublished?: boolean;
     rejectionReason?: string;
+    createdAt: string;
+    updatedAt?: string;
+    publishedAt?: string;
+    submittedAt?: string;
+    reviewedAt?: string;
 }
 
 export default function AdminCoursesPage() {
@@ -52,6 +79,7 @@ export default function AdminCoursesPage() {
     const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null);
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const confirmModal = useConfirmModal();
+    const { formatPrice } = useCurrency();
 
     // Check for ?create=true query parameter
     React.useEffect(() => {
@@ -97,7 +125,7 @@ export default function AdminCoursesPage() {
     const [rejectionModal, setRejectionModal] = React.useState<{ courseId: string, isOpen: boolean }>({ courseId: "", isOpen: false });
     const [rejectionReason, setRejectionReason] = React.useState("");
 
-    const handleAction = async (courseId: string, action: "approve" | "reject" | "delete") => {
+    const handleAction = async (courseId: string, action: "approve" | "reject" | "delete" | "block" | "unblock") => {
         if (action === "reject") {
             setRejectionModal({ courseId, isOpen: true });
             return;
@@ -105,7 +133,7 @@ export default function AdminCoursesPage() {
         await processAction(courseId, action);
     };
 
-    const processAction = async (courseId: string, action: "approve" | "reject" | "delete", reason?: string) => {
+    const processAction = async (courseId: string, action: "approve" | "reject" | "delete" | "block" | "unblock", reason?: string) => {
         setActionLoading(courseId);
         try {
             let res;
@@ -150,6 +178,7 @@ export default function AdminCoursesPage() {
             published: "bg-green-100 text-green-700",
             pending: "bg-yellow-100 text-yellow-700",
             rejected: "bg-red-100 text-red-700",
+            blocked: "bg-red-100 text-red-700",
             draft: "bg-gray-100 text-gray-700"
         };
         return (
@@ -248,6 +277,7 @@ export default function AdminCoursesPage() {
                                 { id: "all", label: "All" },
                                 { id: "pending", label: "Needs Review" },
                                 { id: "published", label: "Published" },
+                                { id: "blocked", label: "Blocked" },
                                 { id: "draft", label: "Drafts" }
                             ].map((s) => (
                                 <button
@@ -270,7 +300,7 @@ export default function AdminCoursesPage() {
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creator (ID)</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
@@ -310,9 +340,14 @@ export default function AdminCoursesPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{course.instructorName}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm">
+                                                <p className="font-medium text-gray-900">{course.instructor?.name || course.instructorName}</p>
+                                                <p className="text-xs text-gray-400 font-mono">{course.instructor?._id?.slice(-8) || "—"}</p>
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4 font-medium">
-                                            {course.price > 0 ? `₹${course.price}` : <span className="text-green-600 text-xs font-bold uppercase">Free</span>}
+                                            {course.price > 0 ? formatPrice(course.price) : <span className="text-green-600 text-xs font-bold uppercase">Free</span>}
                                         </td>
                                         <td className="px-6 py-4">{getStatusBadge(course.status)}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{course.totalStudents}</td>
@@ -432,7 +467,7 @@ export default function AdminCoursesPage() {
                             <button
                                 className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2"
                                 onClick={() => {
-                                    window.open(`/courses/${course.slug}`, '_blank');
+                                    window.open(`/learn/${course.slug}?preview=admin`, '_blank');
                                     setActiveDropdown(null);
                                 }}
                             >
@@ -441,19 +476,39 @@ export default function AdminCoursesPage() {
 
                             <div className="my-1 border-t border-gray-50" />
 
-                            <button
-                                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                onClick={() => confirmModal.confirm({
-                                    title: "Delete Course",
-                                    message: `Delete "${course.title}"? This action cannot be undone.`,
-                                    confirmText: "Delete",
-                                    onConfirm: () => handleAction(course._id, "delete"),
-                                })}
-                                disabled={actionLoading === course._id}
-                            >
-                                {actionLoading === course._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
-                                Delete Course
-                            </button>
+                            {/* Block/Activate for published courses */}
+                            {course.status === "published" && (
+                                <button
+                                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    onClick={() => confirmModal.confirm({
+                                        title: "Block Course",
+                                        message: `Block "${course.title}"? This will hide it from the platform.`,
+                                        confirmText: "Block",
+                                        onConfirm: () => handleAction(course._id, "block"),
+                                    })}
+                                    disabled={actionLoading === course._id}
+                                >
+                                    {actionLoading === course._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldOff className="w-4 h-4" />}
+                                    Block Course
+                                </button>
+                            )}
+
+                            {course.status === "blocked" && (
+                                <button
+                                    className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 flex items-center gap-2"
+                                    onClick={() => confirmModal.confirm({
+                                        title: "Activate Course",
+                                        message: `Activate "${course.title}"? This will make it visible on the platform again.`,
+                                        confirmText: "Activate",
+                                        variant: "info",
+                                        onConfirm: () => handleAction(course._id, "unblock"),
+                                    })}
+                                    disabled={actionLoading === course._id}
+                                >
+                                    {actionLoading === course._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                                    Activate Course
+                                </button>
+                            )}
                         </div>
                     </>
                 );
@@ -462,73 +517,254 @@ export default function AdminCoursesPage() {
             {/* View Course Modal */}
             {viewCourse && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
-                            <h2 className="text-xl font-bold">Course Details</h2>
+                            <div>
+                                <h2 className="text-xl font-bold">Course Details</h2>
+                                <p className="text-sm text-gray-500">ID: {viewCourse._id}</p>
+                            </div>
                             <button onClick={() => setViewCourse(null)} className="text-gray-400 hover:text-gray-600">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
                         <div className="p-6 space-y-6">
-                            <div className="flex flex-col md:flex-row gap-6">
+                            {/* Top Section: Thumbnail & Basic Info */}
+                            <div className="flex flex-col lg:flex-row gap-6">
                                 {/* Thumbnail */}
-                                <div className="w-full md:w-1/3 aspect-video bg-gray-100 rounded-xl overflow-hidden">
-                                    {viewCourse.thumbnail ? (
-                                        <img src={viewCourse.thumbnail} alt={viewCourse.title} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <BookOpen className="w-12 h-12 text-gray-400" />
-                                        </div>
+                                <div className="w-full lg:w-2/5 space-y-3">
+                                    <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden">
+                                        {viewCourse.thumbnail ? (
+                                            <img src={viewCourse.thumbnail} alt={viewCourse.title} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <BookOpen className="w-12 h-12 text-gray-400" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    {viewCourse.previewVideo && (
+                                        <p className="text-xs text-purple-600">🎬 Preview video available</p>
+                                    )}
+                                    {viewCourse.promoVideo && (
+                                        <p className="text-xs text-blue-600">📢 Promo video available</p>
                                     )}
                                 </div>
-                                {/* Info */}
+
+                                {/* Basic Info */}
                                 <div className="flex-1 space-y-4">
                                     <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            {getStatusBadge(viewCourse.status)}
+                                            {viewCourse.level && (
+                                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full capitalize">{viewCourse.level}</span>
+                                            )}
+                                            {viewCourse.language && (
+                                                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">{viewCourse.language}</span>
+                                            )}
+                                        </div>
                                         <h3 className="text-2xl font-bold text-gray-900">{viewCourse.title}</h3>
-                                        <p className="text-gray-500">Instructor: {viewCourse.instructorName}</p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-2xl font-bold text-purple-600">
-                                            {viewCourse.price > 0 ? `₹${viewCourse.price}` : "Free"}
-                                        </span>
-                                        {getStatusBadge(viewCourse.status)}
+                                        {viewCourse.subtitle && (
+                                            <p className="text-gray-600 mt-1">{viewCourse.subtitle}</p>
+                                        )}
+                                        <p className="text-gray-500">{viewCourse.category}{viewCourse.subcategory ? ` › ${viewCourse.subcategory}` : ""}</p>
                                     </div>
 
-                                    <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Instructor Email</span>
-                                            <span className="font-medium">{viewCourse.instructor?.email || "N/A"}</span>
+                                    {/* Pricing */}
+                                    <div className="flex items-baseline gap-3">
+                                        <span className="text-3xl font-bold text-purple-600">
+                                            {viewCourse.price > 0 ? formatPrice(viewCourse.price) : "Free"}
+                                        </span>
+                                        {viewCourse.compareAtPrice && viewCourse.compareAtPrice > viewCourse.price && (
+                                            <>
+                                                <span className="text-lg text-gray-400 line-through">{formatPrice(viewCourse.compareAtPrice)}</span>
+                                                <span className="text-sm text-green-600 font-medium">
+                                                    {Math.round((1 - viewCourse.price / viewCourse.compareAtPrice) * 100)}% OFF
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* Tags */}
+                                    {viewCourse.tags && viewCourse.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {viewCourse.tags.map((tag, idx) => (
+                                                <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">{tag}</span>
+                                            ))}
                                         </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Students</span>
-                                            <span className="font-medium">{viewCourse.totalStudents}</span>
+                                    )}
+
+                                    {/* Quick Stats */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Students</p>
+                                            <p className="text-lg font-bold text-gray-900">{viewCourse.totalStudents || 0}</p>
                                         </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Created</span>
-                                            <span className="font-medium">{new Date(viewCourse.createdAt).toLocaleDateString()}</span>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Lectures</p>
+                                            <p className="text-lg font-bold text-gray-900">{viewCourse.totalLectures || 0}</p>
+                                        </div>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Duration</p>
+                                            <p className="text-lg font-bold text-gray-900">
+                                                {viewCourse.totalDuration ? `${Math.floor(viewCourse.totalDuration / 60)}h ${viewCourse.totalDuration % 60}m` : "—"}
+                                            </p>
+                                        </div>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                            <p className="text-xs text-gray-500">Rating</p>
+                                            <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                                                {viewCourse.averageRating || 0}
+                                                <span className="text-yellow-400">★</span>
+                                                <span className="text-xs text-gray-400">({viewCourse.totalReviews || 0})</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Studio/Instructor Details */}
+                            <div className="bg-purple-50 rounded-xl p-4">
+                                <h4 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                    Studio / Instructor Details
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs text-purple-700">Studio Name</p>
+                                        <p className="font-medium text-gray-900">{viewCourse.instructor?.studioProfile?.name || viewCourse.instructorName || "—"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-purple-700">Instructor Name</p>
+                                        <p className="font-medium text-gray-900">{viewCourse.instructor?.name || viewCourse.instructorName || "—"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-purple-700">Email</p>
+                                        <p className="font-medium text-gray-900">{viewCourse.instructor?.email || "—"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-purple-700">Instructor ID</p>
+                                        <p className="font-medium text-gray-900 font-mono text-sm">{viewCourse.instructor?._id || "—"}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Description */}
                             <div>
-                                <h4 className="font-medium text-gray-900 mb-2">Description</h4>
-                                <div className="text-gray-600 text-sm whitespace-pre-wrap">
+                                <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                                <div className="text-gray-600 text-sm whitespace-pre-wrap bg-gray-50 p-4 rounded-lg max-h-40 overflow-y-auto">
                                     {viewCourse.description || "No description provided."}
                                 </div>
                             </div>
 
-                            {viewCourse.rejectionReason && (
-                                <div className="p-4 bg-red-50 border border-red-100 rounded-lg">
-                                    <h4 className="font-medium text-red-700 mb-1">Rejection Reason</h4>
-                                    <p className="text-sm text-red-600">{viewCourse.rejectionReason}</p>
+                            {/* Learning Outcomes & Prerequisites */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {viewCourse.learningOutcomes && viewCourse.learningOutcomes.length > 0 && (
+                                    <div className="bg-green-50 rounded-xl p-4">
+                                        <h4 className="font-semibold text-green-900 mb-3">What You'll Learn</h4>
+                                        <ul className="space-y-1 text-sm">
+                                            {viewCourse.learningOutcomes.slice(0, 5).map((outcome, idx) => (
+                                                <li key={idx} className="flex items-start gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                                    <span>{outcome}</span>
+                                                </li>
+                                            ))}
+                                            {viewCourse.learningOutcomes.length > 5 && (
+                                                <li className="text-gray-500">+{viewCourse.learningOutcomes.length - 5} more...</li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                )}
+                                {viewCourse.prerequisites && viewCourse.prerequisites.length > 0 && (
+                                    <div className="bg-amber-50 rounded-xl p-4">
+                                        <h4 className="font-semibold text-amber-900 mb-3">Prerequisites</h4>
+                                        <ul className="space-y-1 text-sm">
+                                            {viewCourse.prerequisites.map((prereq, idx) => (
+                                                <li key={idx} className="flex items-start gap-2">
+                                                    <span className="text-amber-600">•</span>
+                                                    <span>{prereq}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Target Audience */}
+                            {viewCourse.targetAudience && viewCourse.targetAudience.length > 0 && (
+                                <div className="bg-blue-50 rounded-xl p-4">
+                                    <h4 className="font-semibold text-blue-900 mb-3">Who This Course is For</h4>
+                                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                        {viewCourse.targetAudience.map((audience, idx) => (
+                                            <li key={idx} className="flex items-center gap-2">
+                                                <Users className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                                <span>{audience}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             )}
 
+                            {/* Course Content Summary */}
+                            {viewCourse.sections && viewCourse.sections.length > 0 && (
+                                <div>
+                                    <h4 className="font-semibold text-gray-900 mb-3">Course Content ({viewCourse.sections.length} sections)</h4>
+                                    <div className="border rounded-xl divide-y max-h-48 overflow-y-auto">
+                                        {viewCourse.sections.slice(0, 8).map((section, idx) => (
+                                            <div key={idx} className="p-3 flex justify-between items-center">
+                                                <span className="font-medium text-sm">{section.title}</span>
+                                                <span className="text-xs text-gray-500">{section.lessons?.length || 0} lessons</span>
+                                            </div>
+                                        ))}
+                                        {viewCourse.sections.length > 8 && (
+                                            <div className="p-3 text-center text-sm text-gray-500">
+                                                +{viewCourse.sections.length - 8} more sections...
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Timestamps */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-gray-50 rounded-xl p-4">
+                                <div>
+                                    <p className="text-gray-500 text-xs">Created</p>
+                                    <p className="font-medium">{new Date(viewCourse.createdAt).toLocaleString()}</p>
+                                </div>
+                                {viewCourse.updatedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Updated</p>
+                                        <p className="font-medium">{new Date(viewCourse.updatedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                                {viewCourse.submittedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Submitted</p>
+                                        <p className="font-medium">{new Date(viewCourse.submittedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                                {viewCourse.publishedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Published</p>
+                                        <p className="font-medium">{new Date(viewCourse.publishedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                                {viewCourse.reviewedAt && (
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Reviewed</p>
+                                        <p className="font-medium">{new Date(viewCourse.reviewedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Rejection Reason */}
+                            {viewCourse.rejectionReason && (
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                    <h4 className="font-semibold text-red-800 mb-1">Rejection Reason</h4>
+                                    <p className="text-red-700 text-sm">{viewCourse.rejectionReason}</p>
+                                </div>
+                            )}
                         </div>
                         <div className="p-6 border-t bg-gray-50 flex justify-end gap-3 sticky bottom-0">
                             <Button variant="outline" onClick={() => setViewCourse(null)}>Close</Button>
-                            <Button onClick={() => window.open(`/courses/${viewCourse.slug}`, '_blank')}>View Course</Button>
+                            <Button onClick={() => window.open(`/learn/${viewCourse.slug}?preview=admin`, '_blank')}>View Live</Button>
                         </div>
                     </div>
                 </div>

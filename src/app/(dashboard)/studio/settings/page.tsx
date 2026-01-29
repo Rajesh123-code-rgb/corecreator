@@ -471,39 +471,7 @@ export default function SettingsPage() {
                 {/* Right Column: Preferences (4 cols) */}
                 <div className="lg:col-span-4 space-y-8">
                     {/* Currency & Display */}
-                    <Card className="p-6 border-0 shadow-md ring-1 ring-gray-100">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center ring-1 ring-amber-100">
-                                <DollarSign className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h2 className="font-semibold text-gray-900">Currency</h2>
-                                <p className="text-xs text-gray-500">Display preference</p>
-                            </div>
-                        </div>
 
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-3">
-                                {CURRENCIES.map((curr) => (
-                                    <button
-                                        key={curr.code}
-                                        type="button"
-                                        onClick={() => setData({
-                                            ...data,
-                                            preferences: { ...data.preferences, currency: curr.code }
-                                        })}
-                                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-200 ${data.preferences.currency === curr.code
-                                                ? "border-amber-500 bg-amber-50 text-amber-900 shadow-sm ring-1 ring-amber-500/20"
-                                                : "border-gray-100 bg-white hover:bg-gray-50 hover:border-gray-200 text-gray-600"
-                                            }`}
-                                    >
-                                        <span className="text-xl font-bold mb-1">{curr.symbol} {curr.code}</span>
-                                        <span className="text-[10px] uppercase tracking-wide opacity-70 font-medium">{curr.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </Card>
 
                     {/* Notification Settings */}
                     <Card className="p-6 border-0 shadow-md ring-1 ring-gray-100">

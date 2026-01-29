@@ -244,19 +244,7 @@ export default function AdminSettingsPage() {
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">Default Currency</label>
-                                        <select
-                                            value={settings.general?.defaultCurrency || "INR"}
-                                            onChange={(e) => updateField("general", "defaultCurrency", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                                        >
-                                            <option value="INR">INR - Indian Rupee</option>
-                                            <option value="USD">USD - US Dollar</option>
-                                            <option value="EUR">EUR - Euro</option>
-                                            <option value="GBP">GBP - British Pound</option>
-                                        </select>
-                                    </div>
+
                                     <div>
                                         <label className="block text-sm font-medium mb-2">Timezone</label>
                                         <select
@@ -322,7 +310,7 @@ export default function AdminSettingsPage() {
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 mb-4">
                                         <div>
-                                            <label className="block text-sm font-medium mb-2">Minimum Payout Amount (₹)</label>
+                                            <label className="block text-sm font-medium mb-2">Minimum Payout Amount</label>
                                             <input
                                                 type="number"
                                                 value={settings.commission?.minimumPayoutAmount ?? 500}

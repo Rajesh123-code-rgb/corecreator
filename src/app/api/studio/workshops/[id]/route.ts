@@ -39,13 +39,20 @@ export async function GET(
                 price: workshop.price,
                 currency: workshop.currency || "INR",
                 thumbnail: workshop.thumbnail,
+                workshopType: workshop.workshopType || "online",
+                // Online fields
                 meetingUrl: workshop.meetingUrl,
+                meetingUserId: workshop.meetingUserId,
+                meetingPassword: workshop.meetingPassword,
+                // Offline fields
+                location: workshop.location,
                 requirements: workshop.requirements || [],
                 agenda: workshop.agenda || [],
                 category: workshop.category,
                 tags: workshop.tags || [],
                 level: workshop.level,
                 status: workshop.status,
+                rejectionReason: workshop.rejectionReason,
                 createdAt: workshop.createdAt,
                 updatedAt: workshop.updatedAt
             }

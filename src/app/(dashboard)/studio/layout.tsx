@@ -26,6 +26,7 @@ import {
     RefreshCw,
 } from "lucide-react";
 import NotificationBell from "@/components/molecules/NotificationBell";
+import { CurrencySwitcher } from "@/components/molecules/CurrencySwitcher";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -127,6 +128,9 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
                         {creatorNavItems.find((item) => pathname.startsWith(item.href))?.label || "Creator Studio"}
                     </h1>
                     <div className="flex items-center gap-3">
+                        <div className="hidden md:block">
+                            <CurrencySwitcher variant="minimal" className="bg-white border-gray-200 text-gray-700 hover:bg-gray-50" />
+                        </div>
                         <Link href="/studio/courses/new" className="px-4 py-2 rounded-lg gradient-gold text-white text-sm font-medium hover:opacity-90">
                             + New Course
                         </Link>

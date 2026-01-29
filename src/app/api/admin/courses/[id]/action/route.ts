@@ -36,7 +36,7 @@ export async function POST(
 
         let updateQuery: any = {};
 
-        if (action === "approve") {
+        if (action === "approve" || action === "unblock") {
             updateQuery = {
                 status: "published",
                 isPublished: true,
@@ -51,6 +51,11 @@ export async function POST(
                 status: "rejected",
                 isPublished: false,
                 rejectionReason: rejectionReason
+            };
+        } else if (action === "block") {
+            updateQuery = {
+                status: "blocked",
+                isPublished: false
             };
         } else {
             return NextResponse.json({ error: "Invalid action" }, { status: 400 });

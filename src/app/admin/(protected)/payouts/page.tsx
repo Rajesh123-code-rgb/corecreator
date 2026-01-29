@@ -12,6 +12,7 @@ import {
     AlertCircle,
     CreditCard
 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface Studio {
     _id: string;
@@ -44,6 +45,7 @@ interface PayoutSummary {
 }
 
 export default function PayoutsPage() {
+    const { formatPrice } = useCurrency();
     const [studios, setStudios] = React.useState<Studio[]>([]);
     const [payouts, setPayouts] = React.useState<Payout[]>([]);
     const [summary, setSummary] = React.useState<PayoutSummary | null>(null);
@@ -131,8 +133,7 @@ export default function PayoutsPage() {
         s.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(amount);
+
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
@@ -182,7 +183,7 @@ export default function PayoutsPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Pending Payouts</p>
-                            <p className="text-2xl font-bold">{formatCurrency(summary?.pending.total || 0)}</p>
+                            <p className="text-2xl font-bold">{formatPrice(summary?.pending.total || 0)}</p>
                             <p className="text-xs text-gray-400">{summary?.pending.count || 0} pending</p>
                         </div>
                     </div>
@@ -195,7 +196,7 @@ export default function PayoutsPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Processing</p>
-                            <p className="text-2xl font-bold">{formatCurrency(summary?.processing.total || 0)}</p>
+                            <p className="text-2xl font-bold">{formatPrice(summary?.processing.total || 0)}</p>
                             <p className="text-xs text-gray-400">{summary?.processing.count || 0} in progress</p>
                         </div>
                     </div>
@@ -208,7 +209,7 @@ export default function PayoutsPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Paid Out</p>
-                            <p className="text-2xl font-bold">{formatCurrency(summary?.completed.total || 0)}</p>
+                            <p className="text-2xl font-bold">{formatPrice(summary?.completed.total || 0)}</p>
                             <p className="text-xs text-gray-400">{summary?.completed.count || 0} completed</p>
                         </div>
                     </div>
@@ -233,8 +234,8 @@ export default function PayoutsPage() {
                 <button
                     onClick={() => setActiveTab("studios")}
                     className={`pb-3 px-1 border-b-2 font-medium ${activeTab === "studios"
-                            ? "border-purple-600 text-purple-600"
-                            : "border-transparent text-gray-500 hover:text-gray-700"
+                        ? "border-purple-600 text-purple-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     Studio Earnings
@@ -242,8 +243,8 @@ export default function PayoutsPage() {
                 <button
                     onClick={() => setActiveTab("history")}
                     className={`pb-3 px-1 border-b-2 font-medium ${activeTab === "history"
-                            ? "border-purple-600 text-purple-600"
-                            : "border-transparent text-gray-500 hover:text-gray-700"
+                        ? "border-purple-600 text-purple-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     Payout History
@@ -305,16 +306,16 @@ export default function PayoutsPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="font-medium">{formatCurrency(studio.totalSales)}</span>
+                                                <span className="font-medium">{formatPrice(studio.totalSales)}</span>
                                                 <span className="text-sm text-gray-500 ml-1">({studio.orderCount} orders)</span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={studio.pendingPayout > 0 ? "text-yellow-600 font-medium" : "text-gray-400"}>
-                                                    {formatCurrency(studio.pendingPayout)}
+                                                    {formatPrice(studio.pendingPayout)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-green-600">{formatCurrency(studio.totalPaidOut)}</span>
+                                                <span className="text-green-600">{formatPrice(studio.totalPaidOut)}</span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <button
@@ -324,8 +325,8 @@ export default function PayoutsPage() {
                                                     }}
                                                     disabled={!studio.canPayout || processingId === studio._id}
                                                     className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1 ${studio.canPayout
-                                                            ? "bg-purple-600 text-white hover:bg-purple-700"
-                                                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        ? "bg-purple-600 text-white hover:bg-purple-700"
+                                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                                                         }`}
                                                 >
                                                     <CreditCard className="w-4 h-4" />
@@ -373,7 +374,7 @@ export default function PayoutsPage() {
                                                 <p className="text-sm text-gray-500">{payout.seller?.email}</p>
                                             </td>
                                             <td className="px-6 py-4 font-medium">
-                                                {formatCurrency(payout.netEarnings)}
+                                                {formatPrice(payout.netEarnings)}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500 capitalize">
                                                 {payout.paymentMethod.replace("_", " ")}
@@ -424,7 +425,7 @@ export default function PayoutsPage() {
                         <h2 className="text-xl font-bold mb-4">Create Payout</h2>
                         <div className="mb-4">
                             <p className="text-gray-600">Studio: <strong>{selectedStudio.name}</strong></p>
-                            <p className="text-gray-600">Amount: <strong className="text-green-600">{formatCurrency(selectedStudio.pendingPayout)}</strong></p>
+                            <p className="text-gray-600">Amount: <strong className="text-green-600">{formatPrice(selectedStudio.pendingPayout)}</strong></p>
                         </div>
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>

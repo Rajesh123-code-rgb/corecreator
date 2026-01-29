@@ -30,6 +30,18 @@ export async function GET(request: NextRequest) {
 
         const query: any = {};
 
+        const status = searchParams.get("status");
+
+        // Exclude drafts by default - admins shouldn't see studio drafts unless explicitly filtering
+        if (status === "draft") {
+            query.status = "draft";
+        } else if (status && status !== "all") {
+            query.status = status;
+        } else {
+            // Default: exclude drafts
+            query.status = { $ne: "draft" };
+        }
+
         if (search) {
             query.$or = [
                 { title: { $regex: search, $options: "i" } },
@@ -39,6 +51,7 @@ export async function GET(request: NextRequest) {
 
         const [workshops, total] = await Promise.all([
             Workshop.find(query)
+                .populate("instructor", "_id name email studioProfile.name")
                 .sort({ date: 1 }) // Sort by upcoming dates
                 .skip(skip)
                 .limit(limit)

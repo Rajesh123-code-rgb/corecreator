@@ -34,8 +34,14 @@ export async function GET(request: NextRequest) {
 
         const query: any = {};
 
-        if (status && status !== "all") {
+        // Exclude drafts by default - admins shouldn't see studio drafts unless explicitly filtering
+        if (status === "draft") {
+            query.status = "draft";
+        } else if (status && status !== "all") {
             query.status = status;
+        } else {
+            // Default: exclude drafts
+            query.status = { $ne: "draft" };
         }
 
         if (search) {
@@ -51,7 +57,7 @@ export async function GET(request: NextRequest) {
         let total;
 
         const findQuery = Product.find(query)
-            .populate("seller", "name email")
+            .populate("seller", "_id name email studioProfile.name")
             .sort({ createdAt: -1 });
 
         if (!all) {

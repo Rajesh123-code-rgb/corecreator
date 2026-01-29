@@ -22,6 +22,7 @@ import {
     CheckCircle,
     Send,
     AlertTriangle,
+    MapPin,
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 
@@ -82,7 +83,15 @@ export default function EditWorkshopPage() {
         capacity: "20",
         price: "",
         currency: "INR",
+        workshopType: "online" as "online" | "offline",
+        // Online fields
         meetingUrl: "",
+        meetingUserId: "",
+        meetingPassword: "",
+        // Offline fields
+        locationCountry: "",
+        locationCity: "",
+        locationAddress: "",
         category: "",
         level: "all",
         thumbnail: "",
@@ -118,7 +127,15 @@ export default function EditWorkshopPage() {
                     capacity: workshop.capacity?.toString() || "20",
                     price: workshop.price?.toString() || "",
                     currency: workshop.currency || "INR",
+                    workshopType: workshop.workshopType || "online",
+                    // Online fields
                     meetingUrl: workshop.meetingUrl || "",
+                    meetingUserId: workshop.meetingUserId || "",
+                    meetingPassword: workshop.meetingPassword || "",
+                    // Offline fields
+                    locationCountry: workshop.location?.country || "",
+                    locationCity: workshop.location?.city || "",
+                    locationAddress: workshop.location?.address || "",
                     category: workshop.category || "",
                     level: workshop.level || "all",
                     thumbnail: workshop.thumbnail || "",
@@ -191,7 +208,17 @@ export default function EditWorkshopPage() {
                     capacity: parseInt(formData.capacity),
                     price: parseFloat(formData.price) || 0,
                     currency: formData.currency,
+                    workshopType: formData.workshopType,
+                    // Online fields
                     meetingUrl: formData.meetingUrl,
+                    meetingUserId: formData.meetingUserId,
+                    meetingPassword: formData.meetingPassword,
+                    // Offline fields
+                    location: formData.workshopType === "offline" ? {
+                        country: formData.locationCountry,
+                        city: formData.locationCity,
+                        address: formData.locationAddress,
+                    } : null,
                     category: formData.category,
                     level: formData.level,
                     thumbnail: formData.thumbnail,
@@ -610,20 +637,118 @@ export default function EditWorkshopPage() {
                     </Card>
 
                     <Card className="p-6 space-y-6">
-                        <h2 className="font-semibold text-lg border-b border-[var(--border)] pb-4">Virtual Classroom</h2>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Meeting URL</label>
-                            <div className="relative">
-                                <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
-                                <Input
-                                    className="pl-9"
-                                    placeholder="Zoom / Google Meet Link"
-                                    value={formData.meetingUrl}
-                                    onChange={(e) => setFormData({ ...formData, meetingUrl: e.target.value })}
-                                />
+                        <h2 className="font-semibold text-lg border-b border-[var(--border)] pb-4">Workshop Type</h2>
+
+                        {/* Workshop Type Selector */}
+                        <div className="space-y-3">
+                            <label className="text-sm font-medium">Select Workshop Type</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, workshopType: "online" })}
+                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.workshopType === "online"
+                                        ? "border-amber-500 bg-amber-50 text-amber-700"
+                                        : "border-gray-200 hover:border-gray-300"
+                                        }`}
+                                >
+                                    <Video className="w-6 h-6" />
+                                    <span className="font-medium">Online Workshop</span>
+                                    <span className="text-xs text-center text-gray-500">Virtual session via Zoom/Meet</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, workshopType: "offline" })}
+                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.workshopType === "offline"
+                                        ? "border-amber-500 bg-amber-50 text-amber-700"
+                                        : "border-gray-200 hover:border-gray-300"
+                                        }`}
+                                >
+                                    <MapPin className="w-6 h-6" />
+                                    <span className="font-medium">Offline Workshop</span>
+                                    <span className="text-xs text-center text-gray-500">In-person at a physical location</span>
+                                </button>
                             </div>
-                            <p className="text-xs text-[var(--muted-foreground)]">We'll email this link to registered students 1 hour before the session.</p>
                         </div>
+
+                        {/* Online Workshop Fields */}
+                        {formData.workshopType === "online" && (
+                            <div className="space-y-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                <h3 className="font-medium text-blue-900 flex items-center gap-2">
+                                    <Video className="w-4 h-4" />
+                                    Online Meeting Details
+                                </h3>
+                                <div className="space-y-3">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Meeting URL</label>
+                                        <Input
+                                            placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                                            value={formData.meetingUrl}
+                                            onChange={(e) => setFormData({ ...formData, meetingUrl: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Meeting User ID</label>
+                                            <Input
+                                                placeholder="e.g. 123-456-789"
+                                                value={formData.meetingUserId}
+                                                onChange={(e) => setFormData({ ...formData, meetingUserId: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Meeting Password</label>
+                                            <Input
+                                                placeholder="e.g. abc123"
+                                                value={formData.meetingPassword}
+                                                onChange={(e) => setFormData({ ...formData, meetingPassword: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-blue-600">We'll email these details to registered students 1 hour before the session.</p>
+                            </div>
+                        )}
+
+                        {/* Offline Workshop Fields */}
+                        {formData.workshopType === "offline" && (
+                            <div className="space-y-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                                <h3 className="font-medium text-green-900 flex items-center gap-2">
+                                    <MapPin className="w-4 h-4" />
+                                    Workshop Location
+                                </h3>
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Country</label>
+                                            <Input
+                                                placeholder="e.g. India"
+                                                value={formData.locationCountry}
+                                                onChange={(e) => setFormData({ ...formData, locationCountry: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">City</label>
+                                            <Input
+                                                placeholder="e.g. Mumbai"
+                                                value={formData.locationCity}
+                                                onChange={(e) => setFormData({ ...formData, locationCity: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Full Address</label>
+                                        <textarea
+                                            className="w-full p-3 rounded-lg border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                                            rows={3}
+                                            placeholder="Enter the complete venue address..."
+                                            value={formData.locationAddress}
+                                            onChange={(e) => setFormData({ ...formData, locationAddress: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-xs text-green-600">We'll share the venue address with registered students via email.</p>
+                            </div>
+                        )}
                     </Card>
                 </div>
             )}
