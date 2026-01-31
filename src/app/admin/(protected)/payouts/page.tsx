@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import {
     DollarSign,
     Users,
@@ -54,6 +55,7 @@ export default function PayoutsPage() {
     const [searchTerm, setSearchTerm] = React.useState("");
     const [processingId, setProcessingId] = React.useState<string | null>(null);
     const [showPayoutModal, setShowPayoutModal] = React.useState(false);
+    const toast = useToast();
     const [selectedStudio, setSelectedStudio] = React.useState<Studio | null>(null);
 
     const fetchData = React.useCallback(async () => {
@@ -100,7 +102,7 @@ export default function PayoutsPage() {
                 setSelectedStudio(null);
             } else {
                 const error = await res.json();
-                alert(error.error || "Failed to create payout");
+                toast.error(error.error || "Failed to create payout");
             }
         } catch (error) {
             console.error("Failed to create payout:", error);

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button, Input, Textarea } from "@/components/atoms";
-import { X, Image as ImageIcon, Plus } from "lucide-react";
+import { X, Image as ImageIcon, Plus, Upload, Loader2 } from "lucide-react";
 
 interface ProjectLectureEditorProps {
     existingContent: {
@@ -22,6 +22,9 @@ export function ProjectLectureEditor({ existingContent, onContentChange }: Proje
     const [expectedOutcome, setExpectedOutcome] = React.useState(existingContent.expectedOutcome || "");
     const [referenceImages, setReferenceImages] = React.useState<string[]>(existingContent.referenceImages || []);
     const [newImageUrl, setNewImageUrl] = React.useState("");
+    const [isUploading, setIsUploading] = React.useState(false);
+    const [uploadError, setUploadError] = React.useState("");
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
         onContentChange({
@@ -31,10 +34,62 @@ export function ProjectLectureEditor({ existingContent, onContentChange }: Proje
         });
     }, [instructions, expectedOutcome, referenceImages]);
 
-    const addImage = () => {
+    const addImageByUrl = () => {
         if (newImageUrl) {
             setReferenceImages([...referenceImages, newImageUrl]);
             setNewImageUrl("");
+        }
+    };
+
+    const uploadImage = async (file: File) => {
+        // Validate file
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+            setUploadError("Please upload an image file (JPEG, PNG, WebP, GIF)");
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            setUploadError("File size must be less than 10MB");
+            return;
+        }
+
+        setIsUploading(true);
+        setUploadError("");
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", "project-references");
+
+            const response = await fetch("/api/upload/image", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Upload failed");
+            }
+
+            const result = await response.json();
+            setReferenceImages([...referenceImages, result.url]);
+        } catch (error: any) {
+            console.error("Upload error:", error);
+            setUploadError(error.message || "Failed to upload image");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            uploadImage(file);
+        }
+        // Reset input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
     };
 
@@ -68,19 +123,63 @@ export function ProjectLectureEditor({ existingContent, onContentChange }: Proje
 
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Reference Images</label>
-                <div className="flex gap-2 mb-3">
-                    <Input
-                        value={newImageUrl}
-                        onChange={(e) => setNewImageUrl(e.target.value)}
-                        placeholder="Image URL (e.g., https://...)"
+
+                {/* Upload Error */}
+                {uploadError && (
+                    <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm flex items-center justify-between">
+                        <span>{uploadError}</span>
+                        <button onClick={() => setUploadError("")} className="text-red-400 hover:text-red-600">
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
+
+                {/* Upload Options */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                    {/* Upload Button */}
+                    <Button
+
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
                         className="flex-1"
-                    />
-                    <Button onClick={addImage} type="button" variant="outline" disabled={!newImageUrl}>
-                        <Plus className="w-4 h-4 mr-2" /> Add
+                    >
+                        {isUploading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Uploading...
+                            </>
+                        ) : (
+                            <>
+                                <Upload className="w-4 h-4 mr-2" />
+                                Upload Image
+                            </>
+                        )}
                     </Button>
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                    />
+
+                    {/* Or use URL */}
+                    <div className="flex gap-2 flex-1">
+                        <Input
+                            value={newImageUrl}
+                            onChange={(e) => setNewImageUrl(e.target.value)}
+                            placeholder="Or paste image URL..."
+                            className="flex-1"
+                        />
+                        <Button onClick={addImageByUrl} type="button" variant="outline" disabled={!newImageUrl}>
+                            <Plus className="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {referenceImages.map((url, index) => (
                         <div key={index} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
                             <img src={url} alt={`Reference ${index + 1}`} className="w-full h-full object-cover" />
@@ -103,3 +202,4 @@ export function ProjectLectureEditor({ existingContent, onContentChange }: Proje
         </div>
     );
 }
+

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Header, Footer } from "@/components/organisms";
 import { Button, ImageWithFallback } from "@/components/atoms";
-import { Card, CardContent, EnquiryModal } from "@/components/molecules";
+import { Card, CardContent, EnquiryModal, useToast } from "@/components/molecules";
 import { useCart } from "@/context";
 import { useCurrency } from "@/context/CurrencyContext";
 import {
@@ -73,6 +73,7 @@ export default function WorkshopDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
+    const toast = useToast();
 
     useEffect(() => {
         if (slug) {
@@ -134,14 +135,14 @@ export default function WorkshopDetailPage() {
 
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
+        toast.error("Link copied to clipboard!");
     };
 
     const handleInstructorProfile = () => {
         if (workshop.instructor.id) {
             router.push(`/studio/${workshop.instructor.id}`);
         } else {
-            alert("Instructor profile coming soon!");
+            toast.error("Instructor profile coming soon!");
         }
     };
 

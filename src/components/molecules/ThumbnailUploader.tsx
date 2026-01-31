@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon } from "lucide-react";
+import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms";
 
 
@@ -10,6 +10,7 @@ interface ThumbnailUploaderProps {
     existingImage?: { url: string; filename: string };
     className?: string;
     variant?: "default" | "avatar";
+    folder?: string; // Cloudinary folder: "workshops", "courses", "avatars", etc.
 }
 
 export function ThumbnailUploader({
@@ -17,6 +18,7 @@ export function ThumbnailUploader({
     existingImage,
     className = "",
     variant = "default",
+    folder = "thumbnails",
 }: ThumbnailUploaderProps) {
     const [isDragging, setIsDragging] = React.useState(false);
     const [uploadStatus, setUploadStatus] = React.useState<"idle" | "uploading" | "success" | "error">("idle");
@@ -28,7 +30,7 @@ export function ThumbnailUploader({
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const acceptedFormats = ["image/jpeg", "image/png", "image/webp"];
-    const maxSizeMB = 5;
+    const maxSizeMB = 10;
 
     const validateFile = (file: File): string | null => {
         if (!acceptedFormats.includes(file.type)) {
@@ -51,27 +53,47 @@ export function ThumbnailUploader({
         setUploadStatus("uploading");
         setErrorMessage("");
 
+        // Show local preview immediately while uploading
+        const localPreview = URL.createObjectURL(file);
+        setImagePreview(localPreview);
+
         try {
-            // Create preview
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const preview = e.target?.result as string;
-                setImagePreview(preview);
+            // Upload to Cloudinary via our API
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", folder);
 
-                // For now, use the preview as the URL
-                const data = {
-                    url: preview,
-                    filename: file.name,
-                };
+            const response = await fetch("/api/upload/image", {
+                method: "POST",
+                body: formData,
+            });
 
-                setImageData(data);
-                setUploadStatus("success");
-                onUploadComplete(data);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Upload failed");
+            }
+
+            const result = await response.json();
+
+            const data = {
+                url: result.url, // Cloudinary CDN URL
+                filename: file.name,
             };
-            reader.readAsDataURL(file);
-        } catch (error) {
-            setErrorMessage("Failed to upload image");
+
+            // Update preview with actual Cloudinary URL
+            setImagePreview(result.url);
+            setImageData(data);
+            setUploadStatus("success");
+            onUploadComplete(data);
+
+            // Revoke local blob URL
+            URL.revokeObjectURL(localPreview);
+        } catch (error: any) {
+            console.error("Upload error:", error);
+            setErrorMessage(error.message || "Failed to upload image");
             setUploadStatus("error");
+            setImagePreview(null);
+            URL.revokeObjectURL(localPreview);
         }
     };
 

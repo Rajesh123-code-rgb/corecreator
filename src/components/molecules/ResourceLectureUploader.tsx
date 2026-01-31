@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Upload, X, CheckCircle, AlertCircle, File, FileText, Image as ImageIcon } from "lucide-react";
+import { Upload, X, CheckCircle, AlertCircle, File, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms";
 
 interface ResourceFile {
@@ -26,6 +26,7 @@ export function ResourceLectureUploader({
     const [uploadStatus, setUploadStatus] = React.useState<"idle" | "uploading" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = React.useState("");
     const [files, setFiles] = React.useState<ResourceFile[]>(existingFiles);
+    const [uploadProgress, setUploadProgress] = React.useState("");
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const acceptedFormats = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
@@ -48,6 +49,9 @@ export function ResourceLectureUploader({
         setUploadStatus("uploading");
         setErrorMessage("");
 
+        const totalFiles = filesToUpload.length;
+        let uploadedCount = 0;
+
         for (let i = 0; i < filesToUpload.length; i++) {
             const file = filesToUpload[i];
             const validationError = validateFile(file);
@@ -58,37 +62,58 @@ export function ResourceLectureUploader({
             }
 
             try {
-                // For now, use FileReader to preview
-                // In production, upload to cloud storage
-                const reader = new FileReader();
-                await new Promise((resolve) => {
-                    reader.onload = (e) => {
-                        const url = e.target?.result as string;
-                        newFiles.push({
-                            url,
-                            type: file.type.split("/")[1],
-                            name: file.name,
-                            size: file.size,
-                        });
-                        resolve(null);
-                    };
-                    reader.readAsDataURL(file);
+                setUploadProgress(`Uploading ${i + 1} of ${totalFiles}: ${file.name}`);
+
+                // Upload to Cloudinary via our API
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("folder", "course-resources");
+
+                const response = await fetch("/api/upload/image", {
+                    method: "POST",
+                    body: formData,
                 });
-            } catch (error) {
-                validationErrors.push(`${file.name}: Failed to upload`);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Upload failed");
+                }
+
+                const result = await response.json();
+
+                newFiles.push({
+                    url: result.url,
+                    type: file.type.split("/")[1],
+                    name: file.name,
+                    size: file.size,
+                });
+
+                uploadedCount++;
+            } catch (error: any) {
+                console.error("Upload error:", error);
+                validationErrors.push(`${file.name}: ${error.message || "Failed to upload"}`);
             }
         }
 
-        if (validationErrors.length > 0) {
+        setUploadProgress("");
+
+        if (validationErrors.length > 0 && uploadedCount === 0) {
             setErrorMessage(validationErrors.join("\n"));
             setUploadStatus("error");
             return;
         }
 
-        const updatedFiles = [...files, ...newFiles];
-        setFiles(updatedFiles);
-        setUploadStatus("success");
-        onUploadComplete(updatedFiles);
+        if (newFiles.length > 0) {
+            const updatedFiles = [...files, ...newFiles];
+            setFiles(updatedFiles);
+            onUploadComplete(updatedFiles);
+        }
+
+        if (validationErrors.length > 0) {
+            setErrorMessage(`Some files failed:\n${validationErrors.join("\n")}`);
+        }
+
+        setUploadStatus(newFiles.length > 0 ? "success" : "error");
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

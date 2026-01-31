@@ -1,50 +1,95 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
-import { Search, Calendar, User, ArrowRight, Mail } from "lucide-react";
+import { Search, Calendar, User, ArrowRight, Mail, Loader2 } from "lucide-react";
 import Link from "next/link";
+
+interface BlogPost {
+    _id: string;
+    title: string;
+    slug: string;
+    excerpt?: string;
+    coverImage: string;
+    author: {
+        name: string;
+        image?: string;
+    };
+    tags: string[];
+    publishedAt: string;
+}
 
 const categories = ["All", "Art Tips", "Platform Updates", "Creator Stories", "Industry Insights"];
 
-const posts = [
-    {
-        title: "10 Essential Tips for Beginning Watercolor Artists",
-        excerpt: "Start your watercolor journey on the right foot with these fundamental techniques and material recommendations.",
-        image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop",
-        author: "Sarah Mitchell",
-        date: "Jan 12, 2026",
-        category: "Art Tips",
-        slug: "essential-tips-watercolor"
-    },
-    {
-        title: "Introducing New Studio Tools for Sellers",
-        excerpt: "We've vastly improved the analytics dashboard and added new inventory management features for all studio accounts.",
-        image: "https://images.unsplash.com/photo-1661956602116-aa6865609028?w=600&h=400&fit=crop",
-        author: "Core Creator Team",
-        date: "Jan 5, 2026",
-        category: "Platform Updates",
-        slug: "studio-tools-update"
-    },
-    {
-        title: "How Michael Chen Built a Full-Time Career Selling Oil Paintings",
-        excerpt: "An exclusive interview with one of our top sellers on how he grew his collector base and priced his work.",
-        image: "https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&h=400&fit=crop",
-        author: "Emma Rodriguez",
-        date: "Dec 28, 2025",
-        category: "Creator Stories",
-        slug: "michael-chen-story"
-    },
-    {
-        title: "The State of the Online Art Market in 2026",
-        excerpt: "Trends, predictions, and what every digital artist needs to know about the current landscape.",
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop",
-        author: "David Kim",
-        date: "Dec 15, 2025",
-        category: "Industry Insights",
-        slug: "art-market-trends-2026"
-    }
-];
-
 export default function BlogPage() {
+    const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+
+    const fetchPosts = async (pageNum: number = 1, append: boolean = false) => {
+        try {
+            if (pageNum === 1) {
+                setLoading(true);
+            } else {
+                setLoadingMore(true);
+            }
+
+            const params = new URLSearchParams({
+                page: pageNum.toString(),
+                limit: "12",
+            });
+
+            if (selectedCategory !== "All") {
+                params.append("category", selectedCategory);
+            }
+
+            if (searchQuery) {
+                params.append("search", searchQuery);
+            }
+
+            const res = await fetch(`/api/posts?${params}`);
+            const data = await res.json();
+
+            if (res.ok) {
+                if (append) {
+                    setPosts((prev) => [...prev, ...data.posts]);
+                } else {
+                    setPosts(data.posts);
+                }
+                setHasMore(pageNum < data.pagination.totalPages);
+            }
+        } catch (error) {
+            console.error("Failed to fetch posts:", error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    };
+
+    useEffect(() => {
+        setPage(1);
+        fetchPosts(1, false);
+    }, [selectedCategory, searchQuery]);
+
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchPosts(nextPage, true);
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        });
+    };
+
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
@@ -62,6 +107,8 @@ export default function BlogPage() {
                             <input
                                 type="text"
                                 placeholder="Search articles..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)]"
                             />
                         </div>
@@ -73,10 +120,14 @@ export default function BlogPage() {
             <section className="py-8 border-b border-[var(--border)] sticky top-0 bg-[var(--background)] z-10">
                 <div className="container-app overflow-x-auto">
                     <div className="flex gap-4">
-                        {categories.map((cat, i) => (
+                        {categories.map((cat) => (
                             <button
-                                key={i}
-                                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${i === 0 ? "bg-[var(--primary-600)] text-white" : "bg-[var(--secondary-100)] text-[var(--secondary-700)] hover:bg-[var(--secondary-200)]"}`}
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === cat
+                                        ? "bg-[var(--primary-600)] text-white"
+                                        : "bg-[var(--secondary-100)] text-[var(--secondary-700)] hover:bg-[var(--secondary-200)]"
+                                    }`}
                             >
                                 {cat}
                             </button>
@@ -88,33 +139,86 @@ export default function BlogPage() {
             {/* Posts Grid */}
             <section className="py-20">
                 <div className="container-app">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {posts.map((post, i) => (
-                            <Link href={`/blog/${post.slug}`} key={i} className="group block bg-[var(--card)] rounded-2xl overflow-hidden border border-[var(--border)] hover:border-[var(--primary-500)] transition-all hover:shadow-lg">
-                                <div className="relative aspect-video overflow-hidden">
-                                    <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                    <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur text-xs font-bold rounded-full text-[var(--foreground)]">
-                                        {post.category}
-                                    </div>
-                                </div>
-                                <div className="p-6">
-                                    <div className="flex items-center gap-4 text-xs text-[var(--muted-foreground)] mb-3">
-                                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {post.date}</span>
-                                        <span className="flex items-center gap-1"><User className="w-3 h-3" /> {post.author}</span>
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--primary-600)] transition-colors line-clamp-2">{post.title}</h3>
-                                    <p className="text-[var(--muted-foreground)] text-sm mb-4 line-clamp-3">{post.excerpt}</p>
-                                    <div className="flex items-center text-[var(--primary-600)] font-medium text-sm mt-auto">
-                                        Read Article <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <Loader2 className="w-8 h-8 animate-spin text-[var(--secondary-500)]" />
+                        </div>
+                    ) : posts.length === 0 ? (
+                        <div className="text-center py-20">
+                            <h3 className="text-xl font-semibold mb-2">No articles found</h3>
+                            <p className="text-[var(--muted-foreground)]">
+                                {searchQuery
+                                    ? "Try a different search term"
+                                    : "Check back soon for new content!"}
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {posts.map((post) => (
+                                    <Link
+                                        href={`/blog/${post.slug}`}
+                                        key={post._id}
+                                        className="group block bg-[var(--card)] rounded-2xl overflow-hidden border border-[var(--border)] hover:border-[var(--primary-500)] transition-all hover:shadow-lg"
+                                    >
+                                        <div className="relative aspect-video overflow-hidden">
+                                            <img
+                                                src={post.coverImage || "https://placehold.co/600x400?text=Blog+Post"}
+                                                alt={post.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                            {post.tags?.[0] && (
+                                                <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur text-xs font-bold rounded-full text-[var(--foreground)]">
+                                                    {post.tags[0]}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="p-6">
+                                            <div className="flex items-center gap-4 text-xs text-[var(--muted-foreground)] mb-3">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar className="w-3 h-3" /> {formatDate(post.publishedAt)}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <User className="w-3 h-3" /> {post.author.name}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--primary-600)] transition-colors line-clamp-2">
+                                                {post.title}
+                                            </h3>
+                                            {post.excerpt && (
+                                                <p className="text-[var(--muted-foreground)] text-sm mb-4 line-clamp-3">
+                                                    {post.excerpt}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center text-[var(--primary-600)] font-medium text-sm mt-auto">
+                                                Read Article <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
 
-                    <div className="mt-16 text-center">
-                        <Button variant="outline" size="lg">Load More Articles</Button>
-                    </div>
+                            {hasMore && (
+                                <div className="mt-16 text-center">
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        onClick={handleLoadMore}
+                                        disabled={loadingMore}
+                                    >
+                                        {loadingMore ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Loading...
+                                            </>
+                                        ) : (
+                                            "Load More Articles"
+                                        )}
+                                    </Button>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </section>
 

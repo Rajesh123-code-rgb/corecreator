@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 
 interface Product {
     _id: string;
@@ -105,6 +105,7 @@ export default function AdminProductsPage() {
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const [rejectModal, setRejectModal] = React.useState<{ isOpen: boolean; productId: string | null; reason: string }>({ isOpen: false, productId: null, reason: "" });
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     const handleAction = async (id: string, action: "approve" | "reject" | "delete" | "block" | "unblock", reason?: string) => {
         setActionLoading(id);
@@ -140,11 +141,11 @@ export default function AdminProductsPage() {
                 setRejectModal({ isOpen: false, productId: null, reason: "" });
             } else {
                 const data = await res.json();
-                alert(data.error || "Action failed");
+                toast.error(data.error || "Action failed");
             }
         } catch (error) {
             console.error("Action error:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setActionLoading(null);
         }
@@ -232,7 +233,7 @@ export default function AdminProductsPage() {
             document.body.removeChild(link);
         } catch (error) {
             console.error("Export failed:", error);
-            alert("Failed to export products");
+            toast.error("Failed to export products");
         } finally {
             setExportLoading(false);
         }

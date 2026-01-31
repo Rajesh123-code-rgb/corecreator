@@ -21,7 +21,7 @@ import {
     Globe
 } from "lucide-react";
 import { Button } from "@/components/atoms";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import { useCurrency } from "@/context/CurrencyContext";
 
 interface Workshop {
@@ -74,6 +74,7 @@ export default function AdminWorkshopsPage() {
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const confirmModal = useConfirmModal();
     const { formatPrice } = useCurrency();
+    const toast = useToast();
 
     // Rejection Modal State
     const [showRejectionModal, setShowRejectionModal] = React.useState(false);
@@ -153,7 +154,7 @@ export default function AdminWorkshopsPage() {
             setActiveDropdown(null);
         } catch (error) {
             console.error("Action error:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setActionLoading(null);
         }
@@ -161,7 +162,7 @@ export default function AdminWorkshopsPage() {
 
     const submitRejection = () => {
         if (!workshopToReject || !rejectionReason.trim()) {
-            alert("Please provide a rejection reason");
+            toast.error("Please provide a rejection reason");
             return;
         }
         handleAction(workshopToReject._id, "reject", rejectionReason);

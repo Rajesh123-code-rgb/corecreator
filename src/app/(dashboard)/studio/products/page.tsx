@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Button, Input } from "@/components/atoms";
 import { Card } from "@/components/molecules";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import { useCurrency } from "@/context/CurrencyContext";
 
 interface Product {
@@ -46,6 +46,7 @@ export default function StudioProductsPage() {
     const [searchQuery, setSearchQuery] = React.useState("");
     const [statusFilter, setStatusFilter] = React.useState<string>("all");
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     React.useEffect(() => {
         fetchProducts();
@@ -105,7 +106,7 @@ export default function StudioProductsPage() {
 
             if (!res.ok) {
                 console.error("Create product failed:", data);
-                alert(data.error || "Failed to create product");
+                toast.error(data.error || "Failed to create product");
                 return;
             }
 
@@ -114,7 +115,7 @@ export default function StudioProductsPage() {
             }
         } catch (error) {
             console.error("Failed to create draft:", error);
-            alert("An error occurred while creating the product.");
+            toast.error("An error occurred while creating the product.");
         }
     };
 

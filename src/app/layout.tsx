@@ -4,6 +4,7 @@ import { AuthProvider, ThemeProvider } from "@/components/providers";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { CartProvider } from "@/context";
+import { ToastProvider } from "@/components/molecules/Toast";
 import "./globals.css";
 import connectDB from "@/lib/db/mongodb";
 import SystemConfig from "@/lib/db/models/SystemConfig";
@@ -129,7 +130,9 @@ export default async function RootLayout({
                 enableSystem
                 disableTransitionOnChange
               >
-                <CartProvider>{children}</CartProvider>
+                <CartProvider>
+                  <ToastProvider>{children}</ToastProvider>
+                </CartProvider>
               </ThemeProvider>
             </CurrencyProvider>
           </LanguageProvider>

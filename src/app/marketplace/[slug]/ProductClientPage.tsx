@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
-import { Card, CardContent } from "@/components/molecules";
+import { Card, CardContent , useToast } from "@/components/molecules";
 import VariantSelector from "@/components/molecules/VariantSelector";
 import CustomizationInput from "@/components/molecules/CustomizationInput";
 import AddOnsSelector from "@/components/molecules/AddOnsSelector";
@@ -90,6 +90,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
     // Share modal state
     const [showShareModal, setShowShareModal] = useState(false);
     const [copied, setCopied] = useState(false);
+    const toast = useToast();
 
     // Variant, Customization, and Add-on state
     const [selectedVariant, setSelectedVariant] = useState<any>(null);
@@ -167,7 +168,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
         );
 
         if (missingRequired.length > 0) {
-            alert(`Please complete required field: ${missingRequired[0].label}`);
+            toast.error(`Please complete required field: ${missingRequired[0].label}`);
             return;
         }
 

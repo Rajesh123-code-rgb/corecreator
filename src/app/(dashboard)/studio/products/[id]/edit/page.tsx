@@ -20,7 +20,7 @@ import {
     Check
 } from "lucide-react";
 import { Button, Input, Textarea } from "@/components/atoms";
-import { Card } from "@/components/molecules";
+import { Card , useToast } from "@/components/molecules";
 import ProductMediaManager from "@/components/organisms/ProductMediaManager";
 import ProductVariantManager from "@/components/organisms/ProductVariantManager";
 import ProductCustomizationManager from "@/components/organisms/ProductCustomizationManager";
@@ -80,6 +80,7 @@ const TABS = [
 export default function ProductEditPage() {
     const params = useParams();
     const router = useRouter();
+    const toast = useToast();
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState("basics");
@@ -155,10 +156,10 @@ export default function ProductEditPage() {
             if (!res.ok) throw new Error("Failed to save");
 
             // Show toast/notification (placeholder)
-            alert("Product saved successfully!");
+            toast.success("Product saved successfully!");
         } catch (error) {
             console.error("Save error:", error);
-            alert("Failed to save product");
+            toast.error("Failed to save product");
         } finally {
             setSaving(false);
         }
@@ -202,7 +203,7 @@ export default function ProductEditPage() {
             }
         } catch (error) {
             console.error("Submit Error:", error);
-            alert("Failed to submit for review");
+            toast.error("Failed to submit for review");
         } finally {
             setSaving(false);
         }

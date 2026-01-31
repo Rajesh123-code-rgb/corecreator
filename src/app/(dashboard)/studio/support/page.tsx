@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button, Input } from "@/components/atoms";
-import { Card } from "@/components/molecules";
+import { Card, useToast } from "@/components/molecules";
 import {
     Headphones,
     Plus,
@@ -52,6 +52,7 @@ export default function StudioSupportPage() {
     const [selectedTicket, setSelectedTicket] = React.useState<Ticket | null>(null);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [stats, setStats] = React.useState({ open: 0, inProgress: 0, resolved: 0, total: 0 });
+    const toast = useToast();
 
     const [formData, setFormData] = React.useState({
         subject: "",
@@ -81,7 +82,7 @@ export default function StudioSupportPage() {
 
     const handleCreateTicket = async () => {
         if (!formData.subject.trim() || !formData.description.trim()) {
-            alert("Please fill in subject and description");
+            toast.error("Please fill in subject and description");
             return;
         }
 
@@ -99,11 +100,11 @@ export default function StudioSupportPage() {
                 fetchTickets();
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to create ticket");
+                toast.error(data.error || "Failed to create ticket");
             }
         } catch (error) {
             console.error("Error creating ticket:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setIsSubmitting(false);
         }

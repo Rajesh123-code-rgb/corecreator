@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import { Button } from "@/components/atoms";
 import {
     FolderOpen,
@@ -43,6 +44,7 @@ export default function AdminCategoriesPage() {
     const [formData, setFormData] = React.useState({ name: "", type: "product", description: "", image: "" });
     const [submitting, setSubmitting] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
+    const toast = useToast();
     const [deleteConfirm, setDeleteConfirm] = React.useState<{ show: boolean; id: string; name: string }>({ show: false, id: "", name: "" });
 
     const fetchCategories = React.useCallback(async () => {
@@ -113,7 +115,7 @@ export default function AdminCategoriesPage() {
                 fetchCategories();
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to delete");
+                toast.error(data.error || "Failed to delete");
             }
         } catch (error) {
             console.error("Failed to delete category:", error);
@@ -141,14 +143,14 @@ export default function AdminCategoriesPage() {
             const res = await fetch("/api/admin/categories/seed", { method: "POST" });
             if (res.ok) {
                 const data = await res.json();
-                alert(data.message);
+                toast.error(data.message);
                 fetchCategories();
             } else {
-                alert("Failed to seed categories");
+                toast.error("Failed to seed categories");
             }
         } catch (error) {
             console.error("Seed error:", error);
-            alert("Error seeding categories");
+            toast.error("Error seeding categories");
         } finally {
             setSubmitting(false);
         }

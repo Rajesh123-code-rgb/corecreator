@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/atoms";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import {
     Truck,
     Plus,
@@ -47,6 +47,7 @@ export default function AdminShippingPage() {
     const [submitting, setSubmitting] = React.useState(false);
     const confirmModal = useConfirmModal();
     const { formatPrice, symbol } = useCurrency();
+    const toast = useToast();
 
     const fetchZones = React.useCallback(async () => {
         try {
@@ -119,7 +120,7 @@ export default function AdminShippingPage() {
                 fetchZones();
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to delete");
+                toast.error(data.error || "Failed to delete");
             }
         } catch (error) {
             console.error("Failed to delete zone:", error);

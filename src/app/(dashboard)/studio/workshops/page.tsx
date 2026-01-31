@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms";
 import { Card } from "@/components/molecules";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import { Plus, Search, Calendar, Users, Clock, MoreVertical, Edit, Trash2, Loader2, ExternalLink, Eye } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 
@@ -33,6 +33,7 @@ export default function WorkshopsPage() {
     const [deletingId, setDeletingId] = React.useState<string | null>(null);
     const { formatPrice } = useCurrency();
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     const fetchWorkshops = React.useCallback(async () => {
         try {
@@ -69,11 +70,11 @@ export default function WorkshopsPage() {
                 setWorkshops(prev => prev.filter(w => w.id !== workshopId));
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to delete workshop");
+                toast.error(data.error || "Failed to delete workshop");
             }
         } catch (error) {
             console.error("Delete error:", error);
-            alert("Failed to delete workshop");
+            toast.error("Failed to delete workshop");
         } finally {
             setDeletingId(null);
         }
@@ -88,7 +89,7 @@ export default function WorkshopsPage() {
             window.open(url, "_blank");
         } else {
             router.push(`/studio/workshops/${workshop.id}/edit`);
-            alert("Please add a meeting URL in the workshop settings first.");
+            toast.error("Please add a meeting URL in the workshop settings first.");
         }
     };
 

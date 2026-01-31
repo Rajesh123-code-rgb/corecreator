@@ -16,3 +16,5 @@ export { SearchBar } from "./SearchBar";
 export * from "./AuthorCard";
 export * from "./ArticleEngagement";
 export * from "./ConfirmModal";
+export * from "./Toast";
+

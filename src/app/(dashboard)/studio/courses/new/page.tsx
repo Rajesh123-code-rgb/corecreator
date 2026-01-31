@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button, Input } from "@/components/atoms";
-import { Card, VideoUploader, ThumbnailUploader, ArticleLectureEditor, ResourceLectureUploader, ProjectLectureEditor, ProgressChecklist, PreviewButton } from "@/components/molecules";
+import { Card, VideoUploader, ThumbnailUploader, ArticleLectureEditor, ResourceLectureUploader, ProjectLectureEditor, ProgressChecklist, PreviewButton , useToast } from "@/components/molecules";
 import { createCourse } from "../actions";
 import {
     BookOpen,
@@ -56,6 +56,7 @@ const steps = [
 export default function NewCoursePage() {
     const router = useRouter();
     const { data: session, status } = useSession();
+    const toast = useToast();
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isLoading, setIsLoading] = React.useState(false);
     const [courseCategories, setCourseCategories] = React.useState<{ _id: string; name: string; slug: string }[]>([]);
@@ -182,7 +183,7 @@ export default function NewCoursePage() {
 
             // Show errors if any
             if (errors.length > 0) {
-                alert("Please fix the following errors:\n\n" + errors.join("\n"));
+                toast.error("Please fix the following errors:\n\n" + errors.join("\n"));
                 setIsLoading(false);
                 return;
             }
@@ -208,11 +209,11 @@ export default function NewCoursePage() {
                 router.push("/studio/courses");
             } else {
                 console.error("Course creation failed:", result.error);
-                alert(result.error || "Failed to create course");
+                toast.error(result.error || "Failed to create course");
             }
         } catch (error) {
             console.error("Error creating course:", error);
-            alert("An error occurred while creating the course: " + (error instanceof Error ? error.message : "Unknown error"));
+            toast.error("An error occurred while creating the course: " + (error instanceof Error ? error.message : "Unknown error"));
         } finally {
             setIsLoading(false);
         }
@@ -323,10 +324,10 @@ export default function NewCoursePage() {
                     <Button onClick={async () => {
                         const result = await createCourse({ ...formData, status: "pending" });
                         if (result.success) {
-                            alert("Course submitted for review!");
+                            toast.success("Course submitted for review!");
                             router.push("/studio/courses");
                         } else {
-                            alert(result.error || "Failed to submit course");
+                            toast.error(result.error || "Failed to submit course");
                         }
                     }} disabled={isLoading} className="bg-orange-500 hover:bg-orange-600">
                         <Send className="w-4 h-4 mr-2" />

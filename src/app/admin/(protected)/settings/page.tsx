@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import { Button } from "@/components/atoms";
 import {
     Save,
@@ -84,6 +85,7 @@ interface PlatformSettings {
 
 export default function AdminSettingsPage() {
     const router = useRouter();
+    const toast = useToast();
     const [activeSection, setActiveSection] = React.useState("general");
     const [settings, setSettings] = React.useState<PlatformSettings>({});
     const [loading, setLoading] = React.useState(true);
@@ -128,7 +130,7 @@ export default function AdminSettingsPage() {
                 setTimeout(() => setSaveStatus("idle"), 3000);
             } else {
                 const error = await res.json();
-                alert(error.error || "Failed to save settings");
+                toast.error(error.error || "Failed to save settings");
                 setSaveStatus("error");
             }
         } catch (error) {
@@ -628,6 +630,7 @@ function TeamAccessSettings() {
     const [newAdmin, setNewAdmin] = React.useState({ name: "", email: "", password: "", adminRole: "content" });
     const [actionLoading, setActionLoading] = React.useState<string | null>(null);
     const [editingMember, setEditingMember] = React.useState<any | null>(null);
+    const toast = useToast();
 
     React.useEffect(() => {
         fetchTeam();
@@ -662,7 +665,7 @@ function TeamAccessSettings() {
                 setNewAdmin({ name: "", email: "", password: "", adminRole: "content" });
             } else {
                 const err = await res.json();
-                alert(err.error || "Failed to add admin");
+                toast.error(err.error || "Failed to add admin");
             }
         } catch (error) {
             console.error("Add admin error:", error);
@@ -686,7 +689,7 @@ function TeamAccessSettings() {
                 setEditingMember(null);
             } else {
                 const err = await res.json();
-                alert(err.error || "Failed to update role");
+                toast.error(err.error || "Failed to update role");
             }
         } catch (error) {
             console.error("Update role error:", error);
@@ -706,7 +709,7 @@ function TeamAccessSettings() {
                 await fetchTeam();
             } else {
                 const err = await res.json();
-                alert(err.error || "Failed to revoke access");
+                toast.error(err.error || "Failed to revoke access");
             }
         } catch (error) {
             console.error("Revoke error:", error);

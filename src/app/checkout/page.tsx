@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
@@ -57,6 +58,7 @@ export default function CheckoutPage() {
     const { data: session } = useSession();
     const { items, subtotal, clearCart, discount, promoCode } = useCart();
     const { formatPrice } = useCurrency();
+    const toast = useToast();
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isProcessing, setIsProcessing] = React.useState(false);
 
@@ -100,7 +102,7 @@ export default function CheckoutPage() {
 
     const handlePayment = async () => {
         if (!window.Razorpay) {
-            alert("Razorpay SDK failed to load. Are you online?");
+            toast.error("Razorpay SDK failed to load. Are you online?");
             return;
         }
 
@@ -162,7 +164,7 @@ export default function CheckoutPage() {
                         clearCart();
                         router.push("/checkout/success");
                     } else {
-                        alert("Payment verification failed");
+                        toast.error("Payment verification failed");
                         setIsProcessing(false);
                     }
                 },
@@ -181,7 +183,7 @@ export default function CheckoutPage() {
 
         } catch (error) {
             console.error("Payment failed:", error);
-            alert("Payment failed. Please try again.");
+            toast.error("Payment failed. Please try again.");
             setIsProcessing(false);
         }
     };

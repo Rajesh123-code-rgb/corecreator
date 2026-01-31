@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search,
@@ -37,6 +38,7 @@ interface User {
 export default function AdminUsersPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const toast = useToast();
     const [users, setUsers] = React.useState<User[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [actionLoading, setActionLoading] = React.useState<string | null>(null);
@@ -118,11 +120,11 @@ export default function AdminUsersPage() {
                 setUsers(prev => prev.map(u => u._id === userId ? { ...u, ...data.user } : u));
             } else {
                 const err = await res.json();
-                alert(err.error || "Action failed");
+                toast.error(err.error || "Action failed");
             }
         } catch (error) {
             console.error("Action error:", error);
-            alert("Failed to perform action");
+            toast.error("Failed to perform action");
         } finally {
             setActionLoading(null);
         }
@@ -417,11 +419,11 @@ export default function AdminUsersPage() {
                                             window.location.href = "/";
                                         } else {
                                             const err = await res.json();
-                                            alert(err.error || "Impersonation failed");
+                                            toast.error(err.error || "Impersonation failed");
                                         }
                                     } catch (error) {
                                         console.error("Impersonation error:", error);
-                                        alert("Failed to login as user");
+                                        toast.error("Failed to login as user");
                                     } finally {
                                         setActionLoading(null);
                                         setActiveDropdown(null);

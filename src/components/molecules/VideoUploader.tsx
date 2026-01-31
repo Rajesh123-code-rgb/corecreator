@@ -218,7 +218,10 @@ export function VideoUploader({
             {videoPreview && uploadStatus === "success" ? (
                 // Video Preview
                 <div className="relative border border-[var(--border)] rounded-xl overflow-hidden bg-black">
-                    {(videoData?.filename.startsWith("YouTube:") || videoData?.url.includes("youtube.com") || videoData?.url.includes("youtu.be")) ? (
+                    {(videoData?.url.includes("youtube.com") ||
+                        videoData?.url.includes("youtu.be") ||
+                        videoData?.url.includes("mediadelivery.net") ||
+                        videoData?.url.includes("iframe.mediadelivery.net")) ? (
                         <iframe
                             src={videoPreview}
                             className="w-full aspect-video"

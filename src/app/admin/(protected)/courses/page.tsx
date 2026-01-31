@@ -19,7 +19,7 @@ import {
     ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/atoms";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import { useCurrency } from "@/context/CurrencyContext";
 
 interface Course {
@@ -80,6 +80,7 @@ export default function AdminCoursesPage() {
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const confirmModal = useConfirmModal();
     const { formatPrice } = useCurrency();
+    const toast = useToast();
 
     // Check for ?create=true query parameter
     React.useEffect(() => {
@@ -158,11 +159,11 @@ export default function AdminCoursesPage() {
                 }
             } else {
                 const err = await res.json();
-                alert(err.error || "Action failed");
+                toast.error(err.error || "Action failed");
             }
         } catch (error) {
             console.error("Action error:", error);
-            alert("Failed to perform action");
+            toast.error("Failed to perform action");
         } finally {
             setActionLoading(null);
         }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useToast } from "@/components/molecules";
 import { useParams, useRouter } from "next/navigation";
 import { Header, Footer } from "@/components/organisms";
 import { Button, Input, ImageWithFallback } from "@/components/atoms";
@@ -27,6 +28,7 @@ export default function WorkshopCheckoutPage() {
     const [loading, setLoading] = useState(true);
     const [seats, setSeats] = useState(1);
     const [isProcessing, setIsProcessing] = useState(false);
+    const toast = useToast();
 
     // Form State
     const [formData, setFormData] = useState({
@@ -72,7 +74,7 @@ export default function WorkshopCheckoutPage() {
         // Simulate Payment Processing
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        alert(`Payment Successful! Registered ${seats} seat(s) for ${workshop?.title}.`);
+        toast.error(`Payment Successful! Registered ${seats} seat(s) for ${workshop?.title}.`);
         setIsProcessing(false);
         router.push("/checkout/success"); // Or a dedicated success page
     };

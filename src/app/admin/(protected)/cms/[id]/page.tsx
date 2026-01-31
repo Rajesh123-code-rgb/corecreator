@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button, Input } from "@/components/atoms";
 import { Card } from "@/components/molecules";
 
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import { Loader2, ArrowLeft, Save, Trash2, Eye } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,7 @@ export default function EditPostPage(props: PageProps) {
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     const [post, setPost] = React.useState({
         title: "",
@@ -69,7 +70,7 @@ export default function EditPostPage(props: PageProps) {
                     metaDescription: data.post.metaDescription || "",
                 });
             } else {
-                alert("Failed to fetch post");
+                toast.error("Failed to fetch post");
                 router.push("/admin/cms");
             }
         } catch (error) {
@@ -90,13 +91,13 @@ export default function EditPostPage(props: PageProps) {
             });
 
             if (res.ok) {
-                alert("Post saved successfully!");
+                toast.success("Post saved successfully!");
             } else {
                 throw new Error("Failed to save");
             }
         } catch (error) {
             console.error("Save error:", error);
-            alert("Failed to save changes");
+            toast.error("Failed to save changes");
         } finally {
             setSaving(false);
         }
@@ -113,7 +114,7 @@ export default function EditPostPage(props: PageProps) {
             }
         } catch (error) {
             console.error("Delete error:", error);
-            alert("Failed to delete post");
+            toast.error("Failed to delete post");
         }
     };
 

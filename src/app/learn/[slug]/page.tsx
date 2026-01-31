@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Header, Footer, ReviewsSection } from "@/components/organisms";
 import { Button } from "@/components/atoms";
-import { Card, CardContent } from "@/components/molecules";
+import { Card, CardContent , useToast } from "@/components/molecules";
 import { useCart } from "@/context";
 import {
     Star,
@@ -91,6 +91,7 @@ export default function CourseDetailPage() {
     const router = useRouter();
     const { addItem } = useCart();
     const { formatPrice } = useCurrency();
+    const toast = useToast();
 
     // Course State
     const [course, setCourse] = React.useState<Course | null>(null);
@@ -162,7 +163,7 @@ export default function CourseDetailPage() {
     };
 
     const handleFeatureComingSoon = (feature: string) => {
-        alert(`${feature} feature coming soon!`);
+        toast.error(`${feature} feature coming soon!`);
     };
 
     if (loading) {

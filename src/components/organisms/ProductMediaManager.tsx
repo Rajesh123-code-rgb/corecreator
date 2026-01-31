@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Upload, X, Star, Image as ImageIcon, Trash2, Plus, Camera } from "lucide-react";
+import { Upload, X, Star, Image as ImageIcon, Trash2, Plus, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { Card } from "@/components/molecules";
 
@@ -19,35 +19,95 @@ interface ProductMediaManagerProps {
 export default function ProductMediaManager({ images, onChange }: ProductMediaManagerProps) {
     const featuredInputRef = React.useRef<HTMLInputElement>(null);
     const galleryInputRef = React.useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = React.useState(false);
+    const [uploadError, setUploadError] = React.useState<string | null>(null);
 
     // Get featured (primary) image
     const featuredImage = images.find(img => img.isPrimary);
     const galleryImages = images.filter(img => !img.isPrimary);
 
+    // Upload image to Cloudinary
+    const uploadImage = async (file: File): Promise<string | null> => {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", "products");
+
+            const res = await fetch("/api/upload/image", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || "Upload failed");
+            }
+
+            const data = await res.json();
+            return data.url;
+        } catch (error: any) {
+            console.error("Image upload error:", error);
+            setUploadError(error.message || "Failed to upload image");
+            return null;
+        }
+    };
+
     const handleFeaturedUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const newImage: ProductImage = {
-                url: URL.createObjectURL(file),
-                isPrimary: true,
-                alt: file.name
-            };
+            setUploading(true);
+            setUploadError(null);
 
-            // Replace existing primary or add as primary
-            const updatedImages = images.filter(img => !img.isPrimary);
-            onChange([newImage, ...updatedImages]);
+            const url = await uploadImage(file);
+
+            if (url) {
+                const newImage: ProductImage = {
+                    url,
+                    isPrimary: true,
+                    alt: file.name
+                };
+
+                // Replace existing primary or add as primary
+                const updatedImages = images.filter(img => !img.isPrimary);
+                onChange([newImage, ...updatedImages]);
+            }
+
+            setUploading(false);
+            // Reset input
+            if (featuredInputRef.current) {
+                featuredInputRef.current.value = "";
+            }
         }
     };
 
     const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            const newImages: ProductImage[] = Array.from(e.target.files).map(file => ({
-                url: URL.createObjectURL(file),
-                isPrimary: false,
-                alt: file.name
-            }));
+            setUploading(true);
+            setUploadError(null);
 
-            onChange([...images, ...newImages]);
+            const files = Array.from(e.target.files);
+            const uploadedImages: ProductImage[] = [];
+
+            for (const file of files) {
+                const url = await uploadImage(file);
+                if (url) {
+                    uploadedImages.push({
+                        url,
+                        isPrimary: false,
+                        alt: file.name
+                    });
+                }
+            }
+
+            if (uploadedImages.length > 0) {
+                onChange([...images, ...uploadedImages]);
+            }
+
+            setUploading(false);
+            // Reset input
+            if (galleryInputRef.current) {
+                galleryInputRef.current.value = "";
+            }
         }
     };
 
@@ -80,6 +140,24 @@ export default function ProductMediaManager({ images, onChange }: ProductMediaMa
 
     return (
         <div className="space-y-6">
+            {/* Upload Error Alert */}
+            {uploadError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
+                    <span>{uploadError}</span>
+                    <button onClick={() => setUploadError(null)} className="text-red-500 hover:text-red-700">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
+
+            {/* Uploading Indicator */}
+            {uploading && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Uploading image(s)... Please wait.</span>
+                </div>
+            )}
+
             {/* Section 1: Featured Image */}
             <Card className="p-6">
                 <div className="mb-4">

@@ -3,13 +3,14 @@
 import * as React from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
-import { Card, ThumbnailUploader, VideoUploader, ProgressChecklist, PreviewButton } from "@/components/molecules";
+import { Card, ThumbnailUploader, VideoUploader, ProgressChecklist, PreviewButton , useToast } from "@/components/molecules";
 import Link from "next/link";
 import { ArrowLeft, Save, X, Plus, Send, AlertTriangle } from "lucide-react";
 
 export default function EditCoursePage() {
     const router = useRouter();
     const params = useParams();
+    const toast = useToast();
     const courseId = params.id as string;
 
     const [isLoading, setIsLoading] = React.useState(true);
@@ -183,11 +184,11 @@ export default function EditCoursePage() {
                 });
                 router.push("/studio/courses");
             } else {
-                alert("Failed to update course");
+                toast.error("Failed to update course");
             }
         } catch (error) {
             console.error("Error updating course:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setIsSaving(false);
         }
@@ -205,14 +206,14 @@ export default function EditCoursePage() {
             if (res.ok) {
                 const updated = await res.json();
                 setCourse(updated);
-                alert("Course submitted for review!");
+                toast.success("Course submitted for review!");
             } else {
                 const err = await res.json();
-                alert(err.error || "Failed to submit for review");
+                toast.error(err.error || "Failed to submit for review");
             }
         } catch (error) {
             console.error("Error submitting for review:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setIsSubmittingForReview(false);
         }

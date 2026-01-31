@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import { Button } from "@/components/atoms";
 import {
     ToggleLeft,
@@ -22,6 +23,7 @@ export default function SystemSettingsPage() {
     });
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
+    const toast = useToast();
     const [status, setStatus] = React.useState<"idle" | "success" | "error">("idle");
 
     React.useEffect(() => {
@@ -59,11 +61,11 @@ export default function SystemSettingsPage() {
             if (!res.ok) {
                 // Revert on failure
                 setConfigs(prev => ({ ...prev, [key]: !newValue }));
-                alert("Failed to update setting");
+                toast.error("Failed to update setting");
             }
         } catch (error) {
             setConfigs(prev => ({ ...prev, [key]: !newValue }));
-            alert("Network error");
+            toast.error("Network error");
         }
     };
 

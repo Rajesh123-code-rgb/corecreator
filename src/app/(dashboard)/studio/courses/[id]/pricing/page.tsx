@@ -3,13 +3,14 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
-import { Card } from "@/components/molecules";
+import { Card , useToast } from "@/components/molecules";
 import Link from "next/link";
 import { ArrowLeft, Save, DollarSign, Percent } from "lucide-react";
 
 export default function CoursePricingPage() {
     const params = useParams();
     const router = useRouter();
+    const toast = useToast();
     const courseId = params.id as string;
 
     const [isLoading, setIsLoading] = React.useState(true);
@@ -65,11 +66,11 @@ export default function CoursePricingPage() {
             if (res.ok) {
                 router.push("/studio/courses");
             } else {
-                alert("Failed to update pricing");
+                toast.error("Failed to update pricing");
             }
         } catch (error) {
             console.error("Error updating pricing:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setIsSaving(false);
         }

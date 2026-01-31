@@ -18,7 +18,7 @@ import {
     X
 } from "lucide-react";
 import { Button } from "@/components/atoms";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 
 import RichTextEditor from "@/components/molecules/RichTextEditor";
 import { ThumbnailUploader } from "@/components/molecules/ThumbnailUploader";
@@ -48,6 +48,7 @@ export default function AdminCMSPage() {
     const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null);
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     // Check for ?create=true query parameter
     React.useEffect(() => {
@@ -100,11 +101,13 @@ export default function AdminCMSPage() {
                     const res = await fetch(`/api/admin/cms/posts/${id}`, { method: "DELETE" });
                     if (res.ok) {
                         fetchPosts();
+                        toast.success("Post deleted successfully");
                     } else {
-                        alert("Failed to delete post");
+                        toast.error("Failed to delete post");
                     }
                 } catch (error) {
                     console.error("Delete error:", error);
+                    toast.error("Failed to delete post");
                 }
             },
         });
@@ -378,11 +381,11 @@ export default function AdminCMSPage() {
                                     router.push(`/admin/cms/${data.post._id}`);
                                 } else {
                                     const errorData = await res.json();
-                                    alert(errorData.error || "Failed to create post");
+                                    toast.error(errorData.error || "Failed to create post");
                                 }
                             } catch (error) {
                                 console.error("Failed to create post:", error);
-                                alert("An unexpected error occurred");
+                                toast.error("An unexpected error occurred");
                             } finally {
                                 setCreateLoading(false);
                             }

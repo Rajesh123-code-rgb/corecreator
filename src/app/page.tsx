@@ -4,7 +4,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import Link from "next/link";
 import Image from "next/image";
 import { Button, ImageWithFallback } from "@/components/atoms";
-import { Card, CardContent } from "@/components/molecules";
+import { Card, CardContent, useToast } from "@/components/molecules";
 import { Header, Footer } from "@/components/organisms";
 import {
   ArrowRight,
@@ -117,6 +117,7 @@ import { courseCategories } from "@/lib/courseCategories";
 
 export default function HomePage() {
   const { formatPrice } = useCurrency();
+  const toast = useToast();
   const [featuredArtworks, setFeaturedArtworks] = useState<FeaturedProduct[]>([]);
   const [loadingArtworks, setLoadingArtworks] = useState(true);
   const [topCourses, setTopCourses] = useState<TopRatedCourse[]>([]);
@@ -198,7 +199,7 @@ export default function HomePage() {
 
       if (res.status === 401) {
         // Redirect to login
-        alert('Please login to add items to your wishlist');
+        toast.error("Please login to add items to your wishlist");
         window.location.href = '/login?returnUrl=' + encodeURIComponent(window.location.pathname);
         return;
       }
@@ -218,11 +219,11 @@ export default function HomePage() {
       } else {
         const errorData = await res.json();
         console.error('Wishlist error:', errorData);
-        alert(errorData.message || 'Failed to update wishlist');
+        toast.error(errorData.message || 'Failed to update wishlist');
       }
     } catch (error) {
       console.error('Wishlist toggle error:', error);
-      alert('Network error. Please try again.');
+      toast.error("Network error. Please try again.");
     }
   };
 

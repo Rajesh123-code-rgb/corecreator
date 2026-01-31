@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/atoms";
-import { Card, CardContent } from "@/components/molecules";
+import { Card, CardContent , useToast } from "@/components/molecules";
 import { Award, Download, Loader2, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -20,6 +20,7 @@ export default function CertificatesPage() {
     const { t } = useLanguage();
     const [certificates, setCertificates] = React.useState<Certificate[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const toast = useToast();
 
     React.useEffect(() => {
         const fetchCertificates = async () => {
@@ -41,7 +42,7 @@ export default function CertificatesPage() {
 
     const handleDownload = (certId: string, courseTitle: string) => {
         // In a real app, this would trigger a PDF download from an API
-        alert(`Downloading certificate ${certId} for "${courseTitle}"... (This is a demo)`);
+        toast.error(`Downloading certificate ${certId} for "${courseTitle}"... (This is a demo)`);
     };
 
     if (loading) {

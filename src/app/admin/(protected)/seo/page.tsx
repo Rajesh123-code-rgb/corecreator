@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/atoms";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import {
     Globe,
     FileText,
@@ -29,6 +29,7 @@ export default function SeoDashboardPage() {
         keywords: ""
     });
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     React.useEffect(() => {
         // Fetch current configuration
@@ -106,12 +107,12 @@ export default function SeoDashboardPage() {
         try {
             const res = await fetch("/api/admin/seo/sitemap", { method: "POST" });
             if (res.ok) {
-                alert("Sitemap generation triggered successfully!");
+                toast.success("Sitemap generation triggered successfully!");
             } else {
-                alert("Failed to trigger sitemap generation");
+                toast.error("Failed to trigger sitemap generation");
             }
         } catch (error) {
-            alert("Network error");
+            toast.error("Network error");
         } finally {
             setSaving(false);
         }
@@ -149,12 +150,12 @@ export default function SeoDashboardPage() {
             if (res.ok) {
                 await fetchRedirects();
                 setNewRedirect({ source: "", destination: "", permanent: true });
-                alert("Redirect added successfully!");
+                toast.success("Redirect added successfully!");
             } else {
-                alert("Failed to add redirect");
+                toast.error("Failed to add redirect");
             }
         } catch (error) {
-            alert("Error adding redirect");
+            toast.error("Error adding redirect");
         } finally {
             setSaving(false);
         }
@@ -169,10 +170,10 @@ export default function SeoDashboardPage() {
             if (res.ok) {
                 await fetchRedirects();
             } else {
-                alert("Failed to delete redirect");
+                toast.error("Failed to delete redirect");
             }
         } catch (error) {
-            alert("Error deleting redirect");
+            toast.error("Error deleting redirect");
         } finally {
             setSaving(false);
         }
@@ -183,7 +184,7 @@ export default function SeoDashboardPage() {
         if (!file) return;
 
         if (file.type !== "text/xml" && !file.name.endsWith(".xml")) {
-            alert("Please upload a valid .xml file");
+            toast.error("Please upload a valid .xml file");
             return;
         }
 
@@ -198,15 +199,15 @@ export default function SeoDashboardPage() {
             });
 
             if (res.ok) {
-                alert("Sitemap uploaded successfully!");
+                toast.success("Sitemap uploaded successfully!");
                 // Clear input
                 e.target.value = "";
             } else {
                 const data = await res.json();
-                alert(data.error || "Failed to upload sitemap");
+                toast.error(data.error || "Failed to upload sitemap");
             }
         } catch (error) {
-            alert("Upload failed");
+            toast.error("Upload failed");
             console.error(error);
         } finally {
             setSaving(false);

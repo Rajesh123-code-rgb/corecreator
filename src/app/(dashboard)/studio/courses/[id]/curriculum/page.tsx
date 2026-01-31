@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
-import { Card, VideoUploader, ArticleLectureEditor, ResourceLectureUploader, ProjectLectureEditor } from "@/components/molecules";
+import { Card, VideoUploader, ArticleLectureEditor, ResourceLectureUploader, ProjectLectureEditor , useToast } from "@/components/molecules";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, ChevronDown, ChevronUp, Save, Video, FileText, File, CheckCircle, GripVertical, Briefcase } from "lucide-react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
@@ -36,6 +36,7 @@ interface Section {
 export default function CourseCurriculumPage() {
     const params = useParams();
     const router = useRouter();
+    const toast = useToast();
     const courseId = params.id as string;
 
     const [isLoading, setIsLoading] = React.useState(true);
@@ -219,11 +220,11 @@ export default function CourseCurriculumPage() {
             if (res.ok) {
                 router.push("/studio/courses");
             } else {
-                alert("Failed to update curriculum");
+                toast.error("Failed to update curriculum");
             }
         } catch (error) {
             console.error("Error updating curriculum:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setIsSaving(false);
         }

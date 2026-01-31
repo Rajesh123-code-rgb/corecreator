@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSession } from "next-auth/react";
-import { Card, CardContent } from "@/components/molecules";
+import { Card, CardContent , useToast } from "@/components/molecules";
 import { Button, Input } from "@/components/atoms";
 import { Loader2, Upload, CheckCircle, AlertCircle, Shield } from "lucide-react";
 import Image from "next/image";
@@ -28,6 +28,7 @@ export default function StudioVerificationPage() {
     const [idProof, setIdProof] = React.useState<File | null>(null);
     const [addressProof, setAddressProof] = React.useState<File | null>(null);
     const [previews, setPreviews] = React.useState({ id: "", address: "" });
+    const toast = useToast();
 
     React.useEffect(() => {
         // In a real app, fetch current KYC status from API
@@ -97,7 +98,7 @@ export default function StudioVerificationPage() {
             }
 
             if (documents.length < 2) {
-                alert("Please upload both ID proof and address proof");
+                toast.error("Please upload both ID proof and address proof");
                 setLoading(false);
                 return;
             }
@@ -129,11 +130,11 @@ export default function StudioVerificationPage() {
                 update(); // Update session to reflect new status if needed
             } else {
                 const error = await res.json();
-                alert(error.error || "Submission failed");
+                toast.error(error.error || "Submission failed");
             }
         } catch (error) {
             console.error("Verification submit error:", error);
-            alert(error instanceof Error ? error.message : "An error occurred");
+            toast.error(error instanceof Error ? error.message : "An error occurred");
         } finally {
             setLoading(false);
         }

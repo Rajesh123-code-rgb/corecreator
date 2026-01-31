@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/atoms";
-import { Card } from "@/components/molecules";
+import { Card , useToast } from "@/components/molecules";
 import { Save, User, CreditCard, Bell, DollarSign, Plus, Trash2, Building2, Smartphone } from "lucide-react";
 import { useCurrency, type Currency } from "@/context/CurrencyContext";
 import { ThumbnailUploader } from "@/components/molecules/ThumbnailUploader";
@@ -68,6 +68,7 @@ export default function SettingsPage() {
 
     // Payout Method Form State
     const [showAddPayout, setShowAddPayout] = React.useState(false);
+    const toast = useToast();
     const [newPayout, setNewPayout] = React.useState<Partial<PayoutMethod>>({ type: "bank_account", details: {}, isDefault: false });
 
     React.useEffect(() => {
@@ -125,13 +126,13 @@ export default function SettingsPage() {
                 if (data.preferences.currency) {
                     setCurrency(data.preferences.currency as Currency);
                 }
-                alert("Settings saved successfully!");
+                toast.success("Settings saved successfully!");
             } else {
-                alert("Failed to save settings.");
+                toast.error("Failed to save settings.");
             }
         } catch (error) {
             console.error("Error saving profile", error);
-            alert("An error occurred while saving.");
+            toast.error("An error occurred while saving.");
         } finally {
             setSaving(false);
         }
@@ -143,12 +144,12 @@ export default function SettingsPage() {
         // Basic validation
         if (newPayout.type === "bank_account") {
             if (!newPayout.details.accountNumber || !newPayout.details.ifsc) {
-                alert("Please fill in Account Number and IFSC");
+                toast.error("Please fill in Account Number and IFSC");
                 return;
             }
         } else {
             if (!newPayout.details.upiId) {
-                alert("Please fill in UPI ID");
+                toast.error("Please fill in UPI ID");
                 return;
             }
         }

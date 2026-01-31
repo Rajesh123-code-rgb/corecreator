@@ -53,14 +53,13 @@ postSchema.index({ status: 1 });
 postSchema.index({ createdAt: -1 });
 
 // Generate slug
-postSchema.pre("save", function (next: any) {
+postSchema.pre("save", function () {
     if (!this.slug && this.title) {
         this.slug = this.title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)/g, "");
     }
-    next();
 });
 
 const Post: Model<IPost> = mongoose.models.Post || mongoose.model<IPost>("Post", postSchema);

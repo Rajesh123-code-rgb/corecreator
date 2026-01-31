@@ -4,7 +4,7 @@ import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
-import { useConfirmModal } from "@/components/molecules";
+import { useConfirmModal, useToast } from "@/components/molecules";
 import {
     Tag,
     Plus,
@@ -52,6 +52,7 @@ export default function AdminPromoCodesPage() {
     const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null);
     const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; right: number } | null>(null);
     const confirmModal = useConfirmModal();
+    const toast = useToast();
 
     // Create/Edit State
     const [showCreateModal, setShowCreateModal] = React.useState(false);
@@ -143,11 +144,11 @@ export default function AdminPromoCodesPage() {
                 fetchPromoCodes();
             } else {
                 const err = await res.json();
-                alert(err.error || "Failed to save promo code");
+                toast.error(err.error || "Failed to save promo code");
             }
         } catch (error) {
             console.error("Save error:", error);
-            alert("Failed to save promo code");
+            toast.error("Failed to save promo code");
         } finally {
             setCreateLoading(false);
         }

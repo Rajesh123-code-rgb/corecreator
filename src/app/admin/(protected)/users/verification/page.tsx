@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/molecules";
 import { Button } from "@/components/atoms";
 import {
     Loader2,
@@ -45,6 +46,7 @@ export default function KycVerificationPage() {
     const [rejectionReason, setRejectionReason] = React.useState("");
     const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("pending");
     const [searchQuery, setSearchQuery] = React.useState("");
+    const toast = useToast();
 
     const fetchUsers = React.useCallback(async (status: StatusFilter) => {
         setLoading(true);
@@ -71,7 +73,7 @@ export default function KycVerificationPage() {
     const handleAction = async (action: "approve" | "reject") => {
         if (!selectedUser) return;
         if (action === "reject" && !rejectionReason) {
-            alert("Please provide a rejection reason");
+            toast.error("Please provide a rejection reason");
             return;
         }
 
@@ -109,7 +111,7 @@ export default function KycVerificationPage() {
                 fetchUsers(statusFilter);
             }
         } catch (error) {
-            alert("Action failed");
+            toast.error("Action failed");
         } finally {
             setProcessing(null);
         }
