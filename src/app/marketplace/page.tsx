@@ -38,6 +38,10 @@ interface Product {
     reviewCount?: number;
     category: string;
     isFeatured?: boolean;
+    shipping?: {
+        isFreeShipping?: boolean;
+        shippingPrice?: number;
+    };
 }
 
 interface CategoryItem {
@@ -197,7 +201,10 @@ function MarketplaceContent() {
             price: product.price,
             quantity: 1,
             image: product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || "",
-            seller: product.seller.name
+            seller: product.seller.name,
+            // Include shipping data for checkout calculation
+            shippingPrice: product.shipping?.shippingPrice || 0,
+            isFreeShipping: product.shipping?.isFreeShipping || false,
         });
     };
 

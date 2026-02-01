@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
-import { Card, CardContent , useToast } from "@/components/molecules";
+import { Card, CardContent, useToast } from "@/components/molecules";
 import VariantSelector from "@/components/molecules/VariantSelector";
 import CustomizationInput from "@/components/molecules/CustomizationInput";
 import AddOnsSelector from "@/components/molecules/AddOnsSelector";
@@ -181,6 +181,9 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
             quantity: quantity,
             image: activeImage,
             seller: product.seller?.name || "Studio",
+            // Include shipping data from product
+            shippingPrice: product.shipping?.shippingPrice || 0,
+            isFreeShipping: product.shipping?.isFreeShipping || false,
         };
 
         // Add variant info if selected

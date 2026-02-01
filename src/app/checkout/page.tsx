@@ -56,7 +56,7 @@ declare global {
 export default function CheckoutPage() {
     const router = useRouter();
     const { data: session } = useSession();
-    const { items, subtotal, clearCart, discount, promoCode } = useCart();
+    const { items, subtotal, clearCart, discount, promoCode, shippingTotal } = useCart();
     const { formatPrice } = useCurrency();
     const toast = useToast();
     const [currentStep, setCurrentStep] = React.useState(0);
@@ -75,7 +75,9 @@ export default function CheckoutPage() {
         country: ""
     });
 
-    const shipping = subtotal > 100 ? 0 : 15;
+    // Use shippingTotal from cart (calculated from product shipping prices)
+    // Courses and workshops have 0 shipping
+    const shipping = shippingTotal;
     const tax = subtotal * 0.08;
     const total = subtotal + shipping + tax - discount;
 

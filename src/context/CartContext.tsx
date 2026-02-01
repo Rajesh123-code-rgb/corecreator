@@ -4,13 +4,16 @@ import * as React from "react";
 
 interface CartItem {
     id: string;
-    type: "product" | "course";
+    type: "product" | "course" | "workshop";
     name: string;
     price: number;
     quantity: number;
     image: string;
     seller?: string;
     instructor?: string;
+    // Shipping fields (only for physical products)
+    shippingPrice?: number;
+    isFreeShipping?: boolean;
 }
 
 interface CartContextType {
@@ -23,6 +26,7 @@ interface CartContextType {
     removePromo: () => void;
     itemCount: number;
     subtotal: number;
+    shippingTotal: number; // Calculated from product shipping prices
     discount: number;
     promoCode: string | null;
     total: number;
@@ -104,7 +108,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const total = Math.max(0, subtotal - discount);
+
+    // Calculate shipping: 0 for courses/workshops, use shippingPrice for products
+    const shippingTotal = items.reduce((sum, item) => {
+        // Courses and workshops are digital - no shipping
+        if (item.type === "course" || item.type === "workshop") return sum;
+        // Free shipping products
+        if (item.isFreeShipping) return sum;
+        // Add shipping price per quantity
+        return sum + (item.shippingPrice || 0) * item.quantity;
+    }, 0);
+
+    const total = Math.max(0, subtotal + shippingTotal - discount);
 
     return (
         <CartContext.Provider
@@ -118,6 +133,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 removePromo,
                 itemCount,
                 subtotal,
+                shippingTotal,
                 discount,
                 promoCode,
                 total

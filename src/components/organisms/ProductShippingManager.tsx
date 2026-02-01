@@ -108,18 +108,21 @@ export default function ProductShippingManager({
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        handleUpdate("freeShipping", true);
-                                        handleUpdate("shippingPrice", 0);
+                                        onChange({
+                                            ...shipping,
+                                            freeShipping: true,
+                                            shippingPrice: 0
+                                        });
                                     }}
                                     className={`p-4 rounded-xl border-2 text-left transition-all ${shipping.freeShipping
-                                            ? "border-green-500 bg-green-50"
-                                            : "border-gray-200 hover:border-gray-300"
+                                        ? "border-green-500 bg-green-50"
+                                        : "border-gray-200 hover:border-gray-300"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shipping.freeShipping
-                                                ? "border-green-500 bg-green-500"
-                                                : "border-gray-300"
+                                            ? "border-green-500 bg-green-500"
+                                            : "border-gray-300"
                                             }`}>
                                             {shipping.freeShipping && (
                                                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -135,16 +138,16 @@ export default function ProductShippingManager({
                                 {/* Add Shipping Charges Option */}
                                 <button
                                     type="button"
-                                    onClick={() => handleUpdate("freeShipping", false)}
+                                    onClick={() => onChange({ ...shipping, freeShipping: false })}
                                     className={`p-4 rounded-xl border-2 text-left transition-all ${shipping.freeShipping === false
-                                            ? "border-amber-500 bg-amber-50"
-                                            : "border-gray-200 hover:border-gray-300"
+                                        ? "border-amber-500 bg-amber-50"
+                                        : "border-gray-200 hover:border-gray-300"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shipping.freeShipping === false
-                                                ? "border-amber-500 bg-amber-500"
-                                                : "border-gray-300"
+                                            ? "border-amber-500 bg-amber-500"
+                                            : "border-gray-300"
                                             }`}>
                                             {shipping.freeShipping === false && (
                                                 <div className="w-2 h-2 bg-white rounded-full"></div>

@@ -36,6 +36,10 @@ interface Product {
     reviewCount?: number;
     category: string;
     isFeatured?: boolean;
+    shipping?: {
+        isFreeShipping?: boolean;
+        shippingPrice?: number;
+    };
 }
 
 export default function CategoryProductList({ categorySlug }: { categorySlug: string }) {
@@ -88,7 +92,10 @@ export default function CategoryProductList({ categorySlug }: { categorySlug: st
             price: product.price,
             quantity: 1,
             image: product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || "",
-            seller: product.seller.name
+            seller: product.seller.name,
+            // Include shipping data for checkout calculation
+            shippingPrice: product.shipping?.shippingPrice || 0,
+            isFreeShipping: product.shipping?.isFreeShipping || false,
         });
     };
 
