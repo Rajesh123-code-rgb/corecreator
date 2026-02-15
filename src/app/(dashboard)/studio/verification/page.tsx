@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSession } from "next-auth/react";
-import { Card, CardContent , useToast } from "@/components/molecules";
+import { Card, CardContent, useToast } from "@/components/molecules";
 import { Button, Input } from "@/components/atoms";
 import { Loader2, Upload, CheckCircle, AlertCircle, Shield } from "lucide-react";
 import Image from "next/image";
@@ -64,23 +64,39 @@ export default function StudioVerificationPage() {
         setLoading(true);
 
         try {
+            // Helper function to safely parse JSON from a response
+            const safeParseJSON = async (res: Response) => {
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    console.error("Non-JSON response received:", text.substring(0, 200));
+                    throw new Error("Server returned an unexpected response. Please try again later.");
+                }
+            };
+
             // Helper function to upload a single document
             const uploadDocument = async (file: File, type: string): Promise<string> => {
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("type", type);
 
-                const res = await fetch("/api/upload/document", {
-                    method: "POST",
-                    body: formData
-                });
-
-                if (!res.ok) {
-                    const error = await res.json();
-                    throw new Error(error.error || "Upload failed");
+                let res: Response;
+                try {
+                    res = await fetch("/api/upload/document", {
+                        method: "POST",
+                        body: formData
+                    });
+                } catch (networkError) {
+                    throw new Error("Network error while uploading document. Please check your internet connection.");
                 }
 
-                const data = await res.json();
+                const data = await safeParseJSON(res);
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Document upload failed. Please try again.");
+                }
+
                 return data.url;
             };
 
@@ -88,11 +104,13 @@ export default function StudioVerificationPage() {
             const documents = [];
 
             if (idProof) {
+                toast.success("Uploading ID proof...");
                 const idUrl = await uploadDocument(idProof, "id_proof");
                 documents.push({ type: "id_proof", url: idUrl, verified: false });
             }
 
             if (addressProof) {
+                toast.success("Uploading address proof...");
                 const addressUrl = await uploadDocument(addressProof, "address_proof");
                 documents.push({ type: "address_proof", url: addressUrl, verified: false });
             }
@@ -102,6 +120,8 @@ export default function StudioVerificationPage() {
                 setLoading(false);
                 return;
             }
+
+            toast.success("Submitting verification...");
 
             const payload = {
                 documents,
@@ -119,22 +139,32 @@ export default function StudioVerificationPage() {
                 }
             };
 
-            const res = await fetch("/api/studio/verification/submit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
+            let res: Response;
+            try {
+                res = await fetch("/api/studio/verification/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+            } catch (networkError) {
+                throw new Error("Network error while submitting verification. Please check your internet connection.");
+            }
+
+            const result = await safeParseJSON(res);
 
             if (res.ok) {
                 setStatus("pending");
+                toast.success("Verification submitted successfully!");
                 update(); // Update session to reflect new status if needed
             } else {
-                const error = await res.json();
-                toast.error(error.error || "Submission failed");
+                toast.error(result.error || "Submission failed. Please try again.");
             }
         } catch (error) {
             console.error("Verification submit error:", error);
-            toast.error(error instanceof Error ? error.message : "An error occurred");
+            const message = error instanceof Error
+                ? error.message
+                : "An unexpected error occurred. Please try again later.";
+            toast.error(message);
         } finally {
             setLoading(false);
         }

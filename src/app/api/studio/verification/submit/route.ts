@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         const { documents, personalDetails, address } = body;
 
         if (!documents || !Array.isArray(documents) || documents.length === 0) {
-            return NextResponse.json({ error: "Documents required" }, { status: 400 });
+            return NextResponse.json({ error: "Please upload your verification documents before submitting." }, { status: 400 });
         }
 
         await connectDB();
@@ -94,6 +94,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "KYC Submitted", status: updatedUser?.kyc?.status });
     } catch (error) {
         console.error("KYC Submit Error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Something went wrong while submitting your verification. Please try again later." }, { status: 500 });
     }
 }
