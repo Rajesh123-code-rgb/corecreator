@@ -75,29 +75,55 @@ export default function StudioVerificationPage() {
                 }
             };
 
-            // Helper function to upload a single document
+            // Helper function to upload a document directly to Cloudinary (bypasses server body limits)
             const uploadDocument = async (file: File, type: string): Promise<string> => {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("type", type);
-
-                let res: Response;
+                // Step 1: Get signed upload credentials from our server (tiny JSON request)
+                let signRes: Response;
                 try {
-                    res = await fetch("/api/upload/document", {
+                    signRes = await fetch("/api/upload/sign", {
                         method: "POST",
-                        body: formData
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ type })
                     });
-                } catch (networkError) {
-                    throw new Error("Network error while uploading document. Please check your internet connection.");
+                } catch {
+                    throw new Error("Network error. Please check your internet connection and try again.");
                 }
 
-                const data = await safeParseJSON(res);
-
-                if (!res.ok) {
-                    throw new Error(data.error || "Document upload failed. Please try again.");
+                const signData = await safeParseJSON(signRes);
+                if (!signRes.ok) {
+                    throw new Error(signData.error || "Failed to prepare upload. Please try again.");
                 }
 
-                return data.url;
+                // Step 2: Upload file directly from browser to Cloudinary (no server involved)
+                const cloudinaryForm = new FormData();
+                cloudinaryForm.append("file", file);
+                cloudinaryForm.append("api_key", signData.apiKey);
+                cloudinaryForm.append("timestamp", signData.timestamp.toString());
+                cloudinaryForm.append("signature", signData.signature);
+                cloudinaryForm.append("folder", signData.folder);
+                cloudinaryForm.append("public_id", signData.publicId);
+
+                const resourceType = file.type === "application/pdf" ? "raw" : "image";
+                const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signData.cloudName}/${resourceType}/upload`;
+
+                let uploadRes: Response;
+                try {
+                    uploadRes = await fetch(cloudinaryUrl, {
+                        method: "POST",
+                        body: cloudinaryForm
+                    });
+                } catch {
+                    throw new Error("Failed to upload document. Please check your internet connection.");
+                }
+
+                if (!uploadRes.ok) {
+                    const errData = await uploadRes.json().catch(() => ({}));
+                    console.error("Cloudinary upload error:", errData);
+                    throw new Error("Document upload failed. Please try a smaller file or different format.");
+                }
+
+                const uploadData = await uploadRes.json();
+                return uploadData.secure_url;
             };
 
             // Upload both documents
