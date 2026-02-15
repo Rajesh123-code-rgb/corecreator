@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { v2 as cloudinary } from "cloudinary";
-
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+import crypto from "crypto";
 
 export async function POST(request: Request) {
     try {
@@ -17,6 +10,23 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 { error: "Please log in to upload documents." },
                 { status: 401 }
+            );
+        }
+
+        // Validate environment variables
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const apiKey = process.env.CLOUDINARY_API_KEY;
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+        if (!cloudName || !apiKey || !apiSecret) {
+            console.error("Missing Cloudinary env vars:", {
+                hasCloudName: !!cloudName,
+                hasApiKey: !!apiKey,
+                hasApiSecret: !!apiSecret
+            });
+            return NextResponse.json(
+                { error: "Upload service is not configured. Please contact support." },
+                { status: 500 }
             );
         }
 
@@ -29,25 +39,32 @@ export async function POST(request: Request) {
         const folder = "corecreator/kyc-documents";
         const publicId = `${session.user.id}_${sanitizedType}_${timestamp}_${randomString}`;
 
-        // Generate signature for authenticated upload
-        const paramsToSign = {
-            timestamp,
+        // Generate signature manually (avoids dependency on cloudinary SDK bundling)
+        // Cloudinary signature = SHA1(alphabetically sorted params + api_secret)
+        const params: Record<string, string> = {
             folder,
             public_id: publicId,
+            timestamp: timestamp.toString(),
         };
 
-        const signature = cloudinary.utils.api_sign_request(
-            paramsToSign,
-            process.env.CLOUDINARY_API_SECRET!
-        );
+        // Sort params alphabetically and create the string to sign
+        const sortedParams = Object.keys(params)
+            .sort()
+            .map(key => `${key}=${params[key]}`)
+            .join("&");
+
+        const signature = crypto
+            .createHash("sha1")
+            .update(sortedParams + apiSecret)
+            .digest("hex");
 
         return NextResponse.json({
             signature,
-            timestamp,
+            timestamp: timestamp.toString(),
             folder,
             publicId,
-            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-            apiKey: process.env.CLOUDINARY_API_KEY,
+            cloudName,
+            apiKey,
         });
     } catch (error) {
         console.error("Upload signature error:", error);

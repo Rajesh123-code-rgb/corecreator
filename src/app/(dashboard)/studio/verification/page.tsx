@@ -119,7 +119,12 @@ export default function StudioVerificationPage() {
                 if (!uploadRes.ok) {
                     const errData = await uploadRes.json().catch(() => ({}));
                     console.error("Cloudinary upload error:", errData);
-                    throw new Error("Document upload failed. Please try a smaller file or different format.");
+                    const cloudinaryMsg = errData?.error?.message || "";
+                    throw new Error(
+                        cloudinaryMsg
+                            ? `Upload error: ${cloudinaryMsg}`
+                            : "Document upload failed. Please try a smaller file or different format."
+                    );
                 }
 
                 const uploadData = await uploadRes.json();
