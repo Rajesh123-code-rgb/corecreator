@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
         await connectDB();
 
-        const updateData: any = {
+        const setFields: any = {
             "kyc.status": "pending",
             "kyc.submittedAt": new Date(),
             "kyc.documents": documents,
@@ -30,8 +30,8 @@ export async function POST(req: Request) {
 
         // Update profile details if provided
         if (personalDetails) {
-            if (personalDetails.name) updateData["name"] = personalDetails.name;
-            if (personalDetails.phone) updateData["profile.phone"] = personalDetails.phone;
+            if (personalDetails.name) setFields["name"] = personalDetails.name;
+            if (personalDetails.phone) setFields["profile.phone"] = personalDetails.phone;
         }
 
         // Add studio address
@@ -41,23 +41,43 @@ export async function POST(req: Request) {
                 $pull: { addresses: { type: "work" } }
             });
 
-            updateData["$push"] = {
-                addresses: {
-                    type: "work",
-                    street: address.street,
-                    city: address.city,
-                    state: address.state,
-                    zipCode: address.zipCode,
-                    country: address.country,
-                    isDefault: true
-                }
-            };
+            // Use $set and $push together properly structured
+            const updatedUser = await User.findByIdAndUpdate(
+                session.user.id,
+                {
+                    $set: setFields,
+                    $push: {
+                        addresses: {
+                            type: "work",
+                            street: address.street,
+                            city: address.city,
+                            state: address.state,
+                            zipCode: address.zipCode,
+                            country: address.country,
+                            isDefault: true
+                        }
+                    }
+                },
+                { new: true }
+            );
+
+            // Audit Log
+            await logAudit({
+                userId: session.user.id,
+                action: "KYC_SUBMITTED",
+                resource: "User",
+                resourceId: session.user.id,
+                description: "Studio KYC documents submitted for verification",
+                severity: "info"
+            });
+
+            return NextResponse.json({ message: "KYC Submitted", status: updatedUser?.kyc?.status });
         }
 
-        // Update User KYC status and details
+        // No address provided — just update KYC fields
         const updatedUser = await User.findByIdAndUpdate(
             session.user.id,
-            updateData,
+            { $set: setFields },
             { new: true }
         );
 
