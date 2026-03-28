@@ -399,7 +399,7 @@ export default function CourseCurriculumPage() {
                                                                                                     duration: lesson.videoDuration || 0,
                                                                                                     filename: lesson.videoFilename || "video.mp4"
                                                                                                 } : undefined}
-                                                                                                maxSizeMB={500}
+                                                                                                maxSizeMB={1024}
                                                                                             />
                                                                                         )}
 

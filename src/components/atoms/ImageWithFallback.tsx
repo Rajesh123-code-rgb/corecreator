@@ -13,7 +13,10 @@ export const ImageWithFallback = ({
     className,
     ...props
 }: ImageWithFallbackProps) => {
-    const [imgSrc, setImgSrc] = useState(src);
+    // If src is empty/undefined, skip straight to fallback —
+    // browsers don't fire onError for empty string src, causing alt text to show
+    const isValidSrc = typeof src === "string" && src.trim() !== "";
+    const [imgSrc, setImgSrc] = useState(isValidSrc ? src : fallbackSrc);
     const [errored, setErrored] = useState(false);
 
     return (
@@ -21,7 +24,10 @@ export const ImageWithFallback = ({
             src={errored ? fallbackSrc : imgSrc}
             alt={alt}
             onError={() => {
-                setErrored(true);
+                if (!errored) {
+                    setErrored(true);
+                    setImgSrc(fallbackSrc);
+                }
             }}
             className={className}
             {...props}

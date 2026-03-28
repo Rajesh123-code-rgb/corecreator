@@ -14,7 +14,7 @@ interface VideoUploaderProps {
 export function VideoUploader({
     onUploadComplete,
     existingVideo,
-    maxSizeMB = 500,
+    maxSizeMB = 1024,
     className = "",
 }: VideoUploaderProps) {
     const [isDragging, setIsDragging] = React.useState(false);

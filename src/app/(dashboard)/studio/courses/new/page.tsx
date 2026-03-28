@@ -622,7 +622,7 @@ export default function NewCoursePage() {
                                                                                     duration: lessonData.videoDuration || 0,
                                                                                     filename: lessonData.videoFilename || "video.mp4"
                                                                                 } : undefined}
-                                                                                maxSizeMB={500}
+                                                                                maxSizeMB={1024}
                                                                             />
                                                                         </>
                                                                     )}

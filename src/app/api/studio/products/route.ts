@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
                 views: 0, // Views tracking not implemented yet
                 price: product.price,
                 currency: product.currency || "INR",
-                thumbnail: product.images?.[0]?.url || product.images?.[0] || "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=100&h=60&fit=crop",
+                thumbnail: product.images?.[0]?.url || "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=100&h=60&fit=crop",
                 slug: product.slug,
                 sku: product.sku || "-",
                 stock: product.quantity || 0,

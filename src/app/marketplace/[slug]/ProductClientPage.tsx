@@ -64,7 +64,9 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
     const { addItem } = useCart();
     const { formatPrice } = useCurrency();
     const [activeImage, setActiveImage] = useState(
-        product.images.find((i: any) => i.isPrimary)?.url || product.images[0]?.url
+        product.images?.find((i: any) => i.isPrimary)?.url ||
+        product.images?.[0]?.url ||
+        "/placeholder.png"
     );
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
@@ -324,9 +326,10 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                         <div className="space-y-4">
                             <div className="relative aspect-square rounded-2xl overflow-hidden bg-[var(--muted)]">
                                 <img
-                                    src={activeImage}
+                                    src={activeImage || "/placeholder.png"}
                                     alt={product.name}
                                     className="w-full h-full object-cover transition-opacity duration-300"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.png"; }}
                                 />
                             </div>
                             <div className="grid grid-cols-4 gap-3">
@@ -336,7 +339,12 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                         onClick={() => setActiveImage(img.url)}
                                         className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${activeImage === img.url ? "border-[var(--secondary-500)] ring-2 ring-[var(--secondary-500)]/30" : "border-transparent hover:border-[var(--border)]"}`}
                                     >
-                                        <img src={img.url} alt="" className="w-full h-full object-cover" />
+                                        <img
+                                            src={img.url || "/placeholder.png"}
+                                            alt=""
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.png"; }}
+                                        />
                                     </button>
                                 ))}
                             </div>

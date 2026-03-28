@@ -50,6 +50,7 @@ export async function PATCH(
         // Security: Prevent updating seller field
         delete body.seller;
         delete body.sellerName;
+        delete body.id; // Remove frontend `id` alias — not a schema field
 
         // Logic for handling status changes
         if (body.status === 'pending') {
@@ -57,10 +58,27 @@ export async function PATCH(
             body.rejectionReason = undefined; // Clear previous rejection reason
         }
 
+        // Safety guard: strip any blob:// or invalid URLs from images array
+        // Blob URLs are temporary browser-only references — never persist them to DB
+        if (Array.isArray(body.images)) {
+            body.images = body.images.filter((img: any) => {
+                if (!img?.url) return false;
+                if (img.url.startsWith('blob:')) {
+                    console.warn('[Product PATCH] Rejected blob URL in images array:', img.url.substring(0, 60));
+                    return false;
+                }
+                if (!img.url.startsWith('http://') && !img.url.startsWith('https://')) {
+                    console.warn('[Product PATCH] Rejected non-http URL in images array:', img.url.substring(0, 60));
+                    return false;
+                }
+                return true;
+            });
+        }
+
         const product = await Product.findOneAndUpdate(
             { _id: id, seller: session.user.id },
             { $set: body },
-            { new: true, runValidators: true }
+            { new: true }  // No runValidators — allows partial draft saves without failing required-field checks
         );
 
         if (!product) {

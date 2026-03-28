@@ -9,8 +9,8 @@ import {
     getBunnyThumbnailUrl
 } from "@/lib/bunnystream";
 
-// Maximum file size: 500MB
-const MAX_FILE_SIZE = 500 * 1024 * 1024;
+// Maximum file size: 1GB
+const MAX_FILE_SIZE = 1024 * 1024 * 1024;
 
 // Allowed video types
 const ALLOWED_TYPES = [
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         // Validate file size
         if (file.size > MAX_FILE_SIZE) {
             return NextResponse.json({
-                error: "File too large. Maximum size is 500MB"
+                error: "File too large. Maximum size is 1GB"
             }, { status: 400 });
         }
 
@@ -116,7 +116,7 @@ async function handleLocalUpload(request: NextRequest) {
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-        return NextResponse.json({ error: "File too large. Maximum size is 500MB" }, { status: 400 });
+        return NextResponse.json({ error: "File too large. Maximum size is 1GB" }, { status: 400 });
     }
 
     // Create upload directory

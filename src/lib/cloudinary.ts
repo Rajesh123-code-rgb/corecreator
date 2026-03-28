@@ -34,12 +34,13 @@ export async function uploadToCloudinary(
                 folder: options.folder,
                 public_id: options.publicId,
                 resource_type: options.resourceType || 'auto',
-                // Allow PDF and images
-                allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+                // Allow standard image formats
+                allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'],
             },
             (error, result) => {
                 if (error) {
-                    reject(error);
+                    console.error('[Cloudinary] Upload error:', error.message, error.http_code);
+                    reject(new Error(`Cloudinary upload failed: ${error.message}`));
                 } else if (result) {
                     resolve({
                         url: result.secure_url,
@@ -48,7 +49,7 @@ export async function uploadToCloudinary(
                         size: result.bytes,
                     });
                 } else {
-                    reject(new Error('Upload failed with no result'));
+                    reject(new Error('Cloudinary upload failed with no result'));
                 }
             }
         );

@@ -385,7 +385,8 @@ function MarketplaceContent() {
                                             <div className={`relative overflow-hidden ${viewMode === "list" ? "w-48 h-full flex-shrink-0" : "aspect-square"}`}>
                                                 <Link href={`/marketplace/${product.slug}`} className="block w-full h-full cursor-pointer">
                                                     <ImageWithFallback
-                                                        src={product.images.find(i => i.isPrimary)?.url || product.images[0]?.url || ""}
+                                                        src={product.images?.find(i => i.isPrimary)?.url || product.images?.[0]?.url || "/placeholder.png"}
+                                                        fallbackSrc="/placeholder.png"
                                                         alt={product.name}
                                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                     />

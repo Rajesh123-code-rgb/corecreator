@@ -5,7 +5,7 @@
  * - FREE encoding/transcoding
  * - Global CDN delivery
  * - HLS adaptive streaming
- * - Direct uploads up to 500MB
+ * - Direct uploads up to 1GB
  * 
  * Environment Variables Required:
  * - BUNNY_STREAM_API_KEY: Your Stream API key
