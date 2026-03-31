@@ -84,8 +84,8 @@ export default async function StudioPage(props: PageProps) {
             },
             studioProfile: { name: mockData.name } // Fallback for header logic
         };
-    } else if (seller.role !== "studio") {
-        // If valid user but not a creator role, just 404 as before
+    } else if (seller.role !== "studio" && seller.role !== "admin") {
+        // If valid user but not a creator or admin role, just 404 as before
         notFound();
     }
 

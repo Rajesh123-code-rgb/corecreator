@@ -1,0 +1,702 @@
+[
+  {
+    "no": "1",
+    "name": "Ocean Wave Resin Art | Blue Tidal Wall Décor",
+    "category": "Resin Art",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "2",
+    "name": "Resin Geode Coaster Set | Gold-Flecked Agate Design",
+    "category": "Resin Art",
+    "price_raw": "₹799",
+    "price": 799.0
+  },
+  {
+    "no": "3",
+    "name": "Resin River Table Bookmark | Wooden Inlay",
+    "category": "Resin Art",
+    "price_raw": "₹349",
+    "price": 349.0
+  },
+  {
+    "no": "4",
+    "name": "Resin Tray with Dried Flowers | Boho Jewellery Organiser",
+    "category": "Resin Art",
+    "price_raw": "₹1,099",
+    "price": 1099.0
+  },
+  {
+    "no": "5",
+    "name": "Resin Keychain | Galaxy Glitter Charm",
+    "category": "Resin Art",
+    "price_raw": "₹199",
+    "price": 199.0
+  },
+  {
+    "no": "6",
+    "name": "Resin Phone Stand | Marble-Effect Desk Accessory",
+    "category": "Resin Art",
+    "price_raw": "₹649",
+    "price": 649.0
+  },
+  {
+    "no": "7",
+    "name": "Abstract Resin Canvas | Alcohol Ink Pour Painting",
+    "category": "Resin Art",
+    "price_raw": "₹1,799",
+    "price": 1799.0
+  },
+  {
+    "no": "8",
+    "name": "Resin Serving Platter | Terrazzo Pattern",
+    "category": "Resin Art",
+    "price_raw": "₹1,599",
+    "price": 1599.0
+  },
+  {
+    "no": "9",
+    "name": "Resin Bookend Set | Abstract Mountain Design",
+    "category": "Resin Art",
+    "price_raw": "₹1,199",
+    "price": 1199.0
+  },
+  {
+    "no": "10",
+    "name": "Resin Night Light | Deep Ocean Lamp",
+    "category": "Resin Art",
+    "price_raw": "₹1,499",
+    "price": 1499.0
+  },
+  {
+    "no": "11",
+    "name": "Resin Jewellery Dish | Lotus Bloom Design",
+    "category": "Resin Art",
+    "price_raw": "₹549",
+    "price": 549.0
+  },
+  {
+    "no": "12",
+    "name": "Resin Wall Clock | Fluid Art Dial",
+    "category": "Resin Art",
+    "price_raw": "₹2,199",
+    "price": 2199.0
+  },
+  {
+    "no": "13",
+    "name": "Boho Macramé Wall Hanging | Natural Cotton Fringe",
+    "category": "Macramé",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "14",
+    "name": "Macramé Plant Hanger | Triple Tier Holder",
+    "category": "Macramé",
+    "price_raw": "₹649",
+    "price": 649.0
+  },
+  {
+    "no": "15",
+    "name": "Macramé Table Runner | Boho Dining Décor",
+    "category": "Macramé",
+    "price_raw": "₹1,199",
+    "price": 1199.0
+  },
+  {
+    "no": "16",
+    "name": "Macramé Dreamcatcher | Feather & Crystal Accents",
+    "category": "Macramé",
+    "price_raw": "₹749",
+    "price": 749.0
+  },
+  {
+    "no": "17",
+    "name": "Macramé Clutch Bag | Handwoven Evening Purse",
+    "category": "Macramé",
+    "price_raw": "₹1,499",
+    "price": 1499.0
+  },
+  {
+    "no": "18",
+    "name": "Macramé Feather Wall Art | Sunset Ombre Fringe",
+    "category": "Macramé",
+    "price_raw": "₹1,099",
+    "price": 1099.0
+  },
+  {
+    "no": "19",
+    "name": "Macramé Coaster Set | Diamond Knot Design",
+    "category": "Macramé",
+    "price_raw": "₹499",
+    "price": 499.0
+  },
+  {
+    "no": "20",
+    "name": "Macramé Swing Chair | Outdoor Hammock Seat",
+    "category": "Macramé",
+    "price_raw": "₹3,999",
+    "price": 3999.0
+  },
+  {
+    "no": "21",
+    "name": "Macramé Mirror Frame | Boho Sunburst Design",
+    "category": "Macramé",
+    "price_raw": "₹1,699",
+    "price": 1699.0
+  },
+  {
+    "no": "22",
+    "name": "Macramé Curtain Tie-Back Set | Tassel Style",
+    "category": "Macramé",
+    "price_raw": "₹599",
+    "price": 599.0
+  },
+  {
+    "no": "23",
+    "name": "Macramé Baby Mobile | Cloud & Star Theme",
+    "category": "Macramé",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "24",
+    "name": "Macramé Lantern Cover | Jute-Wrapped Candle Holder",
+    "category": "Macramé",
+    "price_raw": "₹449",
+    "price": 449.0
+  },
+  {
+    "no": "25",
+    "name": "Quilled Mandala Wall Art | Handcrafted Paper Medallion",
+    "category": "Paper Quilling",
+    "price_raw": "₹1,499",
+    "price": 1499.0
+  },
+  {
+    "no": "26",
+    "name": "Quilled Name Plate Frame | Personalised Gift",
+    "category": "Paper Quilling",
+    "price_raw": "₹999",
+    "price": 999.0
+  },
+  {
+    "no": "27",
+    "name": "Quilled Peacock Art | Indian Motif Wall Décor",
+    "category": "Paper Quilling",
+    "price_raw": "₹2,199",
+    "price": 2199.0
+  },
+  {
+    "no": "28",
+    "name": "Quilled Greeting Cards Set | Floral Occasion Cards",
+    "category": "Paper Quilling",
+    "price_raw": "₹499",
+    "price": 499.0
+  },
+  {
+    "no": "29",
+    "name": "Quilled Butterfly Mobile | Nursery Decoration",
+    "category": "Paper Quilling",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "30",
+    "name": "Quilled Portrait Frame | Anniversary Gift",
+    "category": "Paper Quilling",
+    "price_raw": "₹2,999",
+    "price": 2999.0
+  },
+  {
+    "no": "31",
+    "name": "Quilled Taj Mahal | Iconic Indian Landmark Art",
+    "category": "Paper Quilling",
+    "price_raw": "₹3,499",
+    "price": 3499.0
+  },
+  {
+    "no": "32",
+    "name": "Quilled Diwali Décor Set | Diyas & Rangoli Motifs",
+    "category": "Paper Quilling",
+    "price_raw": "₹799",
+    "price": 799.0
+  },
+  {
+    "no": "33",
+    "name": "Quilled Bookmark Set | Garden Flower Collection",
+    "category": "Paper Quilling",
+    "price_raw": "₹299",
+    "price": 299.0
+  },
+  {
+    "no": "34",
+    "name": "Quilled Tree of Life | Inspirational Wall Hanging",
+    "category": "Paper Quilling",
+    "price_raw": "₹2,499",
+    "price": 2499.0
+  },
+  {
+    "no": "35",
+    "name": "Madhubani Floral Painting | Handpainted Bihar Folk Art",
+    "category": "Painting",
+    "price_raw": "₹1,899",
+    "price": 1899.0
+  },
+  {
+    "no": "36",
+    "name": "Tanjore Painting | Lord Ganesha Gold Embossed",
+    "category": "Painting",
+    "price_raw": "₹4,499",
+    "price": 4499.0
+  },
+  {
+    "no": "37",
+    "name": "Warli Tribal Art Canvas | Village Life Scene",
+    "category": "Painting",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "38",
+    "name": "Watercolour Botanical Print | Pressed Herb Collection",
+    "category": "Painting",
+    "price_raw": "₹999",
+    "price": 999.0
+  },
+  {
+    "no": "39",
+    "name": "Gond Art Painting | Sacred Tiger in Forest",
+    "category": "Painting",
+    "price_raw": "₹2,199",
+    "price": 2199.0
+  },
+  {
+    "no": "40",
+    "name": "Acrylic Abstract Cityscape | Mumbai at Night",
+    "category": "Painting",
+    "price_raw": "₹2,999",
+    "price": 2999.0
+  },
+  {
+    "no": "41",
+    "name": "Pattachitra Painting | Odisha Dance of Lord Jagannath",
+    "category": "Painting",
+    "price_raw": "₹3,299",
+    "price": 3299.0
+  },
+  {
+    "no": "42",
+    "name": "Hand-Painted Silk Scarf | Floral Batik Design",
+    "category": "Painting",
+    "price_raw": "₹1,799",
+    "price": 1799.0
+  },
+  {
+    "no": "43",
+    "name": "Pichwai Painting | Radha-Krishna Under Kadamba Tree",
+    "category": "Painting",
+    "price_raw": "₹5,999",
+    "price": 5999.0
+  },
+  {
+    "no": "44",
+    "name": "Miniature Portrait | Mughal Style on Ivory Paper",
+    "category": "Painting",
+    "price_raw": "₹2,799",
+    "price": 2799.0
+  },
+  {
+    "no": "45",
+    "name": "Handthrown Ceramic Mug | Blue Glaze Artisan Cup",
+    "category": "Pottery",
+    "price_raw": "₹699",
+    "price": 699.0
+  },
+  {
+    "no": "46",
+    "name": "Terracotta Planter Set | Rustic Herb Pots",
+    "category": "Pottery",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "47",
+    "name": "Blue Pottery Vase | Jaipur Floral Design",
+    "category": "Pottery",
+    "price_raw": "₹1,499",
+    "price": 1499.0
+  },
+  {
+    "no": "48",
+    "name": "Handmade Ceramic Dinner Plate | Speckled Earth Tones",
+    "category": "Pottery",
+    "price_raw": "₹1,099",
+    "price": 1099.0
+  },
+  {
+    "no": "49",
+    "name": "Khurja Pottery Serving Bowl | Traditional Blue & White",
+    "category": "Pottery",
+    "price_raw": "₹799",
+    "price": 799.0
+  },
+  {
+    "no": "50",
+    "name": "Ceramic Planter with Drainage Saucer | Minimalist White",
+    "category": "Pottery",
+    "price_raw": "₹1,199",
+    "price": 1199.0
+  },
+  {
+    "no": "51",
+    "name": "Ceramic Chai Kulhad Set | Authentic Clay Tea Cups",
+    "category": "Pottery",
+    "price_raw": "₹599",
+    "price": 599.0
+  },
+  {
+    "no": "52",
+    "name": "Handthrown Vase | Rustic Ash Glaze",
+    "category": "Pottery",
+    "price_raw": "₹1,399",
+    "price": 1399.0
+  },
+  {
+    "no": "53",
+    "name": "Ceramic Incense Holder | Lotus Leaf Design",
+    "category": "Pottery",
+    "price_raw": "₹449",
+    "price": 449.0
+  },
+  {
+    "no": "54",
+    "name": "Decorative Ceramic Pot | Madhubani Painted Earthenware",
+    "category": "Pottery",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "55",
+    "name": "Handmade Clay Ganesha Idol | Eco-Friendly Festival Murti",
+    "category": "Clay Moulding",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "56",
+    "name": "Clay Fridge Magnet Set | Indian Food Miniatures",
+    "category": "Clay Moulding",
+    "price_raw": "₹499",
+    "price": 499.0
+  },
+  {
+    "no": "57",
+    "name": "Handcrafted Clay Diyas | Decorative Diwali Set",
+    "category": "Clay Moulding",
+    "price_raw": "₹599",
+    "price": 599.0
+  },
+  {
+    "no": "58",
+    "name": "Clay Wall Hanging | Tribal Mask Face",
+    "category": "Clay Moulding",
+    "price_raw": "₹1,099",
+    "price": 1099.0
+  },
+  {
+    "no": "59",
+    "name": "Polymer Clay Earrings | Botanical Leaf Studs",
+    "category": "Clay Moulding",
+    "price_raw": "₹349",
+    "price": 349.0
+  },
+  {
+    "no": "60",
+    "name": "Clay Nameplate | Home Door Décor",
+    "category": "Clay Moulding",
+    "price_raw": "₹849",
+    "price": 849.0
+  },
+  {
+    "no": "61",
+    "name": "Clay Hanging Planter | Geometric Face Pot",
+    "category": "Clay Moulding",
+    "price_raw": "₹799",
+    "price": 799.0
+  },
+  {
+    "no": "62",
+    "name": "Clay Jewellery Holder | Hands Sculpture Ring Stand",
+    "category": "Clay Moulding",
+    "price_raw": "₹699",
+    "price": 699.0
+  },
+  {
+    "no": "63",
+    "name": "Handmade Lokta Paper Journal | Floral Batik Cover",
+    "category": "Handmade Notebooks & Journals",
+    "price_raw": "₹699",
+    "price": 699.0
+  },
+  {
+    "no": "64",
+    "name": "Leather-Bound Travel Journal | Embossed Mandala Cover",
+    "category": "Handmade Notebooks & Journals",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "65",
+    "name": "Handmade Recycled Paper Notebook | Block Print Cover",
+    "category": "Handmade Notebooks & Journals",
+    "price_raw": "₹399",
+    "price": 399.0
+  },
+  {
+    "no": "66",
+    "name": "Fabric-Covered Recipe Journal | Kitchen Companion",
+    "category": "Handmade Notebooks & Journals",
+    "price_raw": "₹599",
+    "price": 599.0
+  },
+  {
+    "no": "67",
+    "name": "Deckle-Edge Watercolour Sketchbook | 200 GSM Cold Press",
+    "category": "Handmade Notebooks & Journals",
+    "price_raw": "₹1,099",
+    "price": 1099.0
+  },
+  {
+    "no": "68",
+    "name": "Personalised Hardcover Diary | Foil-Stamped Name",
+    "category": "Handmade Notebooks & Journals",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "69",
+    "name": "Hand Block-Printed Cotton Bedsheet | Sanganeri Floral",
+    "category": "Block Print Textiles",
+    "price_raw": "₹1,999",
+    "price": 1999.0
+  },
+  {
+    "no": "70",
+    "name": "Ajrakh Block-Printed Stole | Indigo & Red Geometric",
+    "category": "Block Print Textiles",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "71",
+    "name": "Kalamkari Wall Tapestry | Mahabharata Battle Scene",
+    "category": "Kalamkari",
+    "price_raw": "₹3,999",
+    "price": 3999.0
+  },
+  {
+    "no": "72",
+    "name": "Dhokra Brass Elephant Figurine | Tribal Solid Cast",
+    "category": "Dhokra Craft",
+    "price_raw": "₹1,799",
+    "price": 1799.0
+  },
+  {
+    "no": "73",
+    "name": "Bamboo Organiser Basket | Handwoven Office Desk Set",
+    "category": "Bamboo & Cane Craft",
+    "price_raw": "₹1,199",
+    "price": 1199.0
+  },
+  {
+    "no": "74",
+    "name": "Bidriware Vase | Silver Inlay Floral Design",
+    "category": "Bidriware",
+    "price_raw": "₹4,999",
+    "price": 4999.0
+  },
+  {
+    "no": "75",
+    "name": "Phulkari Embroidered Dupatta | Punjabi Silk Floss",
+    "category": "Phulkari Embroidery",
+    "price_raw": "₹2,499",
+    "price": 2499.0
+  },
+  {
+    "no": "76",
+    "name": "Channapatna Wooden Spinning Top Set | Natural Lacquer",
+    "category": "Channapatna Toys",
+    "price_raw": "₹499",
+    "price": 499.0
+  },
+  {
+    "no": "77",
+    "name": "Kantha Embroidered Cushion Cover | Bengal Running Stitch",
+    "category": "Kantha Embroidery",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "78",
+    "name": "Carved Sheesham Wood Serving Tray | Peacock Design",
+    "category": "Woodcraft",
+    "price_raw": "₹1,899",
+    "price": 1899.0
+  },
+  {
+    "no": "79",
+    "name": "Chikankari Embroidered Kurti | Lucknow White-on-White",
+    "category": "Chikankari Embroidery",
+    "price_raw": "₹2,999",
+    "price": 2999.0
+  },
+  {
+    "no": "80",
+    "name": "Kashmiri Papier-Mâché Jewellery Box | Chinar Leaf Design",
+    "category": "Papier-Mâché",
+    "price_raw": "₹1,699",
+    "price": 1699.0
+  },
+  {
+    "no": "81",
+    "name": "Brass Puja Thali Set | Handcrafted Engraved Design",
+    "category": "Brass Craft",
+    "price_raw": "₹2,299",
+    "price": 2299.0
+  },
+  {
+    "no": "82",
+    "name": "Terracotta Jewellery Set | Ethnic Necklace & Earrings",
+    "category": "Terracotta Jewellery",
+    "price_raw": "₹799",
+    "price": 799.0
+  },
+  {
+    "no": "83",
+    "name": "Handmade Crochet Baby Blanket | Pastel Granny Square",
+    "category": "Crochet",
+    "price_raw": "₹1,799",
+    "price": 1799.0
+  },
+  {
+    "no": "84",
+    "name": "Hand-Embroidered Hoop Art | Botanical Wildflowers",
+    "category": "Embroidery",
+    "price_raw": "₹1,199",
+    "price": 1199.0
+  },
+  {
+    "no": "85",
+    "name": "Handloom Ikat Saree | Pochampally Double Ikat",
+    "category": "Weaving",
+    "price_raw": "₹8,999",
+    "price": 8999.0
+  },
+  {
+    "no": "86",
+    "name": "Hand-Stitched Leather Wallet | Embossed Indian Motif",
+    "category": "Leather Craft",
+    "price_raw": "₹1,599",
+    "price": 1599.0
+  },
+  {
+    "no": "87",
+    "name": "Soapstone Elephant | Hand-Carved Décor Figurine",
+    "category": "Stone Carving",
+    "price_raw": "₹1,199",
+    "price": 1199.0
+  },
+  {
+    "no": "88",
+    "name": "Madhubani Painted Coaster Set | Fish & Lotus Motifs",
+    "category": "Madhubani Crafts",
+    "price_raw": "₹799",
+    "price": 799.0
+  },
+  {
+    "no": "89",
+    "name": "Dokra Tribal Necklace | Bell Pendant Statement Piece",
+    "category": "Dokra Tribal Jewellery",
+    "price_raw": "₹1,099",
+    "price": 1099.0
+  },
+  {
+    "no": "90",
+    "name": "Clay Surahi | Traditional Cooling Water Pot",
+    "category": "Surahi & Matka",
+    "price_raw": "₹699",
+    "price": 699.0
+  },
+  {
+    "no": "91",
+    "name": "Shibori Tie-Dye Tote Bag | Indigo Cotton Canvas",
+    "category": "Tie & Dye",
+    "price_raw": "₹899",
+    "price": 899.0
+  },
+  {
+    "no": "92",
+    "name": "Coconut Shell Bowl Set | Handpolished Eco Serveware",
+    "category": "Coconut Shell Craft",
+    "price_raw": "₹999",
+    "price": 999.0
+  },
+  {
+    "no": "93",
+    "name": "Meenakari Gold-Plated Jhumka Earrings | Rajasthani Enamel",
+    "category": "Meenakari Jewellery",
+    "price_raw": "₹1,299",
+    "price": 1299.0
+  },
+  {
+    "no": "94",
+    "name": "Banarasi Silk Bookmark | Zari-Woven Collectible",
+    "category": "Silk Weaving",
+    "price_raw": "₹399",
+    "price": 399.0
+  },
+  {
+    "no": "95",
+    "name": "Kutchi Patchwork Table Cloth | Mirror Work & Embroidery",
+    "category": "Patchwork Craft",
+    "price_raw": "₹2,199",
+    "price": 2199.0
+  },
+  {
+    "no": "96",
+    "name": "Handwoven Cane Wall Shelf | Bamboo Frame Storage",
+    "category": "Cane & Reed Craft",
+    "price_raw": "₹2,499",
+    "price": 2499.0
+  },
+  {
+    "no": "97",
+    "name": "Hand-Painted Fabric Lampshade | Madhubani Motifs",
+    "category": "Fabric Craft",
+    "price_raw": "₹1,899",
+    "price": 1899.0
+  },
+  {
+    "no": "98",
+    "name": "Seashell Wind Chime | Coastal Boho Décor",
+    "category": "Seashell Craft",
+    "price_raw": "₹699",
+    "price": 699.0
+  },
+  {
+    "no": "99",
+    "name": "Dried Flower & Seed Art Frame | Botanica Wall Décor",
+    "category": "Seed Craft",
+    "price_raw": "₹1,499",
+    "price": 1499.0
+  },
+  {
+    "no": "100",
+    "name": "Handmade Gift Hamper Box | Indian Art & Craft Sampler",
+    "category": "Mixed Media",
+    "price_raw": "₹2,999",
+    "price": 2999.0
+  }
+]
