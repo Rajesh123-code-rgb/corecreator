@@ -21,11 +21,13 @@ import {
     Loader2,
     Plus,
     ShieldOff,
-    ShieldCheck
+    ShieldCheck,
+    Upload
 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useConfirmModal, useToast } from "@/components/molecules";
+import BulkUploadModal from "@/components/organisms/BulkUploadModal";
 
 interface Product {
     _id: string;
@@ -98,6 +100,8 @@ export default function AdminProductsPage() {
     const [stats, setStats] = React.useState({ total: 0, active: 0, pending: 0, totalValue: 0 });
     const [showCreateModal, setShowCreateModal] = React.useState(false);
     const [exportLoading, setExportLoading] = React.useState(false);
+    const [showBulkUpload, setShowBulkUpload] = React.useState(false);
+    const [categoryList, setCategoryList] = React.useState<string[]>([]);
 
     // Action States
     const [viewProduct, setViewProduct] = React.useState<Product | null>(null);
@@ -106,6 +110,18 @@ export default function AdminProductsPage() {
     const [rejectModal, setRejectModal] = React.useState<{ isOpen: boolean; productId: string | null; reason: string }>({ isOpen: false, productId: null, reason: "" });
     const confirmModal = useConfirmModal();
     const toast = useToast();
+
+    // Fetch category names for bulk upload autocomplete
+    React.useEffect(() => {
+        fetch("/api/categories?type=product")
+            .then((r) => r.ok ? r.json() : null)
+            .then((data) => {
+                if (data?.categories) {
+                    setCategoryList(data.categories.map((c: any) => c.name));
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     const handleAction = async (id: string, action: "approve" | "reject" | "delete" | "block" | "unblock", reason?: string) => {
         setActionLoading(id);
@@ -263,10 +279,20 @@ export default function AdminProductsPage() {
                     <h1 className="text-2xl font-bold text-gray-900">Product Management</h1>
                     <p className="text-gray-500 mt-1">Manage marketplace listings and approvals</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={handleExport} disabled={exportLoading}>
-                    {exportLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-                    Export
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={handleExport} disabled={exportLoading}>
+                        {exportLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                        Export
+                    </Button>
+                    <Button
+                        size="sm"
+                        onClick={() => setShowBulkUpload(true)}
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Bulk Upload
+                    </Button>
+                </div>
             </div>
 
             {/* Stats Cards */}
@@ -1001,6 +1027,17 @@ export default function AdminProductsPage() {
                 </div>
             )}
             {confirmModal.ConfirmModalElement}
+
+            {/* Bulk Upload Modal */}
+            <BulkUploadModal
+                isOpen={showBulkUpload}
+                onClose={() => setShowBulkUpload(false)}
+                onSuccess={() => {
+                    fetchProducts();
+                    toast.success("Products uploaded successfully!");
+                }}
+                categories={categoryList}
+            />
         </div>
     );
 }

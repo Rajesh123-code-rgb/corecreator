@@ -8,15 +8,17 @@ import {
     Search,
     Trash2,
     AlertTriangle,
-    Check,
-    Info
+    Info,
+    Clock,
+    XCircle,
+    ShieldCheck
 } from "lucide-react";
 import { Button, Input, Textarea } from "@/components/atoms";
 import { Card } from "@/components/molecules";
 
 interface ProductSettingsProps {
     settings: {
-        status: "draft" | "pending" | "active" | "sold" | "archived";
+        status: "draft" | "pending" | "active" | "sold" | "archived" | "rejected";
         isFeatured: boolean;
         metaTitle?: string;
         metaDescription?: string;
@@ -53,51 +55,110 @@ export default function ProductSettingsManager({
         }
     };
 
-    const togglePublish = () => {
-        const newStatus = settings.status === "active" ? "draft" : "active";
-        handleUpdate("status", newStatus);
+    // Status display config — no direct publish allowed for creators
+    const statusConfig: Record<string, {
+        icon: React.ReactNode;
+        label: string;
+        description: string;
+        color: string;
+        bg: string;
+    }> = {
+        draft: {
+            icon: <EyeOff className="w-5 h-5 text-gray-500" />,
+            label: "Draft",
+            description: "Only you can see this product. Submit it for admin review to make it live.",
+            color: "text-gray-700",
+            bg: "bg-gray-100",
+        },
+        pending: {
+            icon: <Clock className="w-5 h-5 text-yellow-600" />,
+            label: "Pending Review",
+            description: "Your product is under admin review. You cannot edit it until reviewed.",
+            color: "text-yellow-700",
+            bg: "bg-yellow-100",
+        },
+        active: {
+            icon: <Globe className="w-5 h-5 text-green-600" />,
+            label: "Published",
+            description: "Your product is live and visible to buyers on the marketplace.",
+            color: "text-green-700",
+            bg: "bg-green-100",
+        },
+        rejected: {
+            icon: <XCircle className="w-5 h-5 text-red-600" />,
+            label: "Rejected",
+            description: "Admin has rejected this product. Review the feedback at the top of the page and resubmit.",
+            color: "text-red-700",
+            bg: "bg-red-100",
+        },
+        sold: {
+            icon: <ShieldCheck className="w-5 h-5 text-blue-600" />,
+            label: "Sold",
+            description: "This product has been sold and is no longer available.",
+            color: "text-blue-700",
+            bg: "bg-blue-100",
+        },
+        archived: {
+            icon: <EyeOff className="w-5 h-5 text-gray-400" />,
+            label: "Archived",
+            description: "This product is archived and not visible on the marketplace.",
+            color: "text-gray-600",
+            bg: "bg-gray-100",
+        },
     };
+
+    const currentStatus = statusConfig[settings.status] || statusConfig.draft;
 
     return (
         <div className="space-y-8">
-            {/* Visibility Section */}
+
+            {/* Visibility / Status — Read-Only for Creators */}
             <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Eye className="w-5 h-5 text-amber-600" />
-                    Visibility
+                    Listing Status
                 </h3>
 
                 <div className="space-y-4">
-                    {/* Status Toggle */}
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                        <div className="flex items-center gap-3">
-                            {settings.status === "active" ? (
-                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                    <Globe className="w-5 h-5 text-green-600" />
-                                </div>
-                            ) : (
-                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <EyeOff className="w-5 h-5 text-gray-500" />
-                                </div>
-                            )}
+                    {/* Current Status Display */}
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${currentStatus.bg}`}>
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/70">
+                            {currentStatus.icon}
+                        </div>
+                        <div>
+                            <p className={`font-semibold ${currentStatus.color}`}>{currentStatus.label}</p>
+                            <p className={`text-sm opacity-80 ${currentStatus.color}`}>{currentStatus.description}</p>
+                        </div>
+                    </div>
+
+                    {/* How-to publish guidance for draft / rejected */}
+                    {(settings.status === "draft" || settings.status === "rejected") && (
+                        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                             <div>
-                                <p className="font-medium">
-                                    {settings.status === "active" ? "Published" : "Draft"}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    {settings.status === "active"
-                                        ? "Your product is visible to buyers"
-                                        : "Only you can see this product"}
+                                <p className="text-sm font-semibold text-amber-800">How to publish your product</p>
+                                <p className="text-sm text-amber-700 mt-1">
+                                    All products must pass admin review before going live on the marketplace. Use the
+                                    <span className="font-semibold"> "Submit for Approval"</span> button at the
+                                    top of this page to send your product for review.
                                 </p>
                             </div>
                         </div>
-                        <Button
-                            onClick={togglePublish}
-                            variant={settings.status === "active" ? "outline" : "secondary"}
-                        >
-                            {settings.status === "active" ? "Unpublish" : "Publish Now"}
-                        </Button>
-                    </div>
+                    )}
+
+                    {/* Pending-review note */}
+                    {settings.status === "pending" && (
+                        <div className="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                            <Clock className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                            <div>
+                                <p className="text-sm font-semibold text-yellow-800">Review in Progress</p>
+                                <p className="text-sm text-yellow-700 mt-1">
+                                    Our team is reviewing your submission. You will be notified once a decision is made.
+                                    Editing is disabled while the product is pending.
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Card>
 
@@ -183,7 +244,7 @@ export default function ProductSettingsManager({
                     <div className="space-y-4">
                         <div className="p-4 bg-red-100 border border-red-200 rounded-lg">
                             <p className="text-red-800 font-medium mb-2">
-                                Are you sure you want to delete "{productName}"?
+                                Are you sure you want to delete &quot;{productName}&quot;?
                             </p>
                             <p className="text-sm text-red-700">
                                 This action is permanent and cannot be undone. All product data, images, and variants will be lost.
@@ -192,7 +253,7 @@ export default function ProductSettingsManager({
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Type "DELETE" to confirm
+                                Type &quot;DELETE&quot; to confirm
                             </label>
                             <Input
                                 value={deleteConfirmText}
@@ -225,11 +286,11 @@ export default function ProductSettingsManager({
                 )}
             </Card>
 
-            {/* Info Note */}
+            {/* General Info */}
             <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl text-sm text-blue-800">
                 <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <p>
-                    Changes to settings are saved automatically when you click "Save Changes" at the top of the page.
+                    Changes to settings are saved when you click &quot;Save Changes&quot; at the top of the page.
                 </p>
             </div>
         </div>
