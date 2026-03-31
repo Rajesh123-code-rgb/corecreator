@@ -49,7 +49,7 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-generate slug
-productSchema.pre("save", function (next: () => void) {
+productSchema.pre("save", function (next: any) {
     if (!this.slug) {
         this.slug = (this as any).name
             .toLowerCase()
