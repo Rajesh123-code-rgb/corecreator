@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
             size: "1024x1024",
         });
 
-        const dallEUrl = response.data[0].url;
+        const dallEUrl = response?.data?.[0]?.url;
 
         if (!dallEUrl) {
             throw new Error("Failed to retrieve image URL from OpenAI");

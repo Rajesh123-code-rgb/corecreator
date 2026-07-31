@@ -123,3 +123,9 @@ export default function GoogleTranslate({ id = "google_translate_element", class
         </>
     );
 }
+
+declare global {
+    interface Window {
+        google: any;
+    }
+}
