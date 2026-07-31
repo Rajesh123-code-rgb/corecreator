@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/atoms";
 import { SearchBar } from "@/components/molecules";
 import { useCart } from "@/context";
+import { GoogleTranslate } from "@/components/atoms";
 import {
     Menu,
     X,
@@ -147,7 +148,8 @@ export function Header() {
                             </button>
                         )}
 
-                        <div className="hidden md:block">
+                        <div className="hidden md:block flex items-center gap-2">
+                            <GoogleTranslate />
                             <CurrencySwitcher className="w-24 border-none bg-transparent hover:bg-[var(--muted)]" />
                         </div>
 
@@ -288,7 +290,8 @@ export function Header() {
                                 )}
                             </button>
                         )}
-                        <div className="ml-2">
+                        <div className="ml-2 flex flex-col gap-2">
+                            <GoogleTranslate />
                             <CurrencySwitcher />
                         </div>
 
