@@ -73,6 +73,14 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // Send Welcome Email
+        try {
+            const { sendWelcomeEmail } = await import("@/lib/email/brevo");
+            await sendWelcomeEmail(user.name, user.email);
+        } catch (emailError) {
+            console.error("Failed to send welcome email:", emailError);
+        }
+
         // Trigger notification for Admins if new user is a Studio
         if (role === "studio") {
             try {

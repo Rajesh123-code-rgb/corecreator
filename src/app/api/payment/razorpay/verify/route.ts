@@ -76,6 +76,44 @@ export async function POST(request: NextRequest) {
                         console.error("Failed to increment promo usage:", err);
                     }
                 }
+
+                // Get User details for email
+                try {
+                    const User = (await import("@/lib/db/models/User")).default;
+                    const dbUser = await User.findById(order.user);
+                    if (dbUser) {
+                        // Send Order Confirmation Email
+                        const { sendOrderConfirmationEmail } = await import("@/lib/email/brevo");
+                        await sendOrderConfirmationEmail(order, dbUser.name, dbUser.email);
+                        
+                        // Send In-App Notification (Buyer)
+                        const { createNotification } = await import("@/lib/db/models/Notification");
+                        await createNotification({
+                            recipientId: dbUser._id,
+                            recipientModel: "User",
+                            type: "order_placed",
+                            title: "Payment Successful",
+                            message: `Your payment for order #${order.orderNumber} was successful.`,
+                            data: { link: `/user/orders/${order._id}` }
+                        });
+                        
+                        // Send In-App Notifications (Sellers/Studios)
+                        // Group by sellerId
+                        const sellerIds = new Set(order.items.map((i: any) => i.sellerId?.toString()).filter(Boolean));
+                        for (const sellerId of sellerIds) {
+                           await createNotification({
+                               recipientId: sellerId as unknown as any,
+                               recipientModel: "User",
+                               type: "order_placed",
+                               title: "New Order Received",
+                               message: `You have a new order (from #${order.orderNumber}).`,
+                               data: { link: `/studio/orders` }
+                           });
+                        }
+                    }
+                } catch (err) {
+                    console.error("Failed to send order notifications:", err);
+                }
             }
         }
 
