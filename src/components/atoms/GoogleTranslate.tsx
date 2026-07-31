@@ -7,38 +7,39 @@ import React, { useEffect, useState } from "react";
  * Global Google Translate Widget Injection
  * Loads strictly on the client side to avoid HTML mismatch errors during SSR/SSG.
  */
-export default function GoogleTranslate() {
+export default function GoogleTranslate({ id = "google_translate_element" }: { id?: string }) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        window.googleTranslateElementInit = () => {
+        // Expose a unique init function for this specific instance
+        const initFuncName = `googleTranslateElementInit_${id}`;
+        
+        (window as any)[initFuncName] = () => {
             if (window.google?.translate?.TranslateElement) {
                 new window.google.translate.TranslateElement(
                     {
                         pageLanguage: "en",
-                        includedLanguages: "en,es,fr,de,hi,zh-CN,ja,ar,ru,ko", // Add/Remove as needed
+                        includedLanguages: "en,es,fr,de,hi,zh-CN,ja,ar,ru,ko",
                         layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
                         autoDisplay: false
                     },
-                    "google_translate_element"
+                    id
                 );
             }
         };
-    }, []);
+    }, [id]);
 
-    // Hiding generic google translate DOM spam while preserving functionality
-    // (We wrap in a div that is safely managed client side)
     if (!mounted) return null;
 
     return (
         <>
             <div 
-                id="google_translate_element" 
-                className="hidden lg:inline-block relative z-[9999]"
+                id={id} 
+                className="inline-block relative z-[50]"
             ></div>
             <Script
-                src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+                src={`//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit_${id}`}
                 strategy="afterInteractive"
             />
             {/* Custom CSS overrides to clean up the widget design and hide the upper banner */}

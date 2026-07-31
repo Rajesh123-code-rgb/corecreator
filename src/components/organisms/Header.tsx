@@ -148,8 +148,8 @@ export function Header() {
                             </button>
                         )}
 
-                        <div className="hidden md:block flex items-center gap-2">
-                            <GoogleTranslate />
+                        <div className="hidden md:flex items-center gap-2">
+                            <GoogleTranslate id="google_translate_desktop" />
                             <CurrencySwitcher className="w-24 border-none bg-transparent hover:bg-[var(--muted)]" />
                         </div>
 
@@ -291,7 +291,7 @@ export function Header() {
                             </button>
                         )}
                         <div className="ml-2 flex flex-col gap-2">
-                            <GoogleTranslate />
+                            <GoogleTranslate id="google_translate_mobile" />
                             <CurrencySwitcher />
                         </div>
 
