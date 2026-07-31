@@ -100,7 +100,6 @@ const returnRequestSchema = new Schema<IReturnRequest>(
 );
 
 // Indexes
-returnRequestSchema.index({ requestNumber: 1 });
 returnRequestSchema.index({ order: 1 });
 returnRequestSchema.index({ user: 1 });
 returnRequestSchema.index({ "item.sellerId": 1 });

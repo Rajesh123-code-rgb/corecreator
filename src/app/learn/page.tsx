@@ -18,6 +18,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
+import { fetchWithTimeout } from "@/lib/utils/fetchWithTimeout";
 
 interface Instructor {
     _id: string;
@@ -68,6 +69,7 @@ function LearnContent() {
     // State
     const [courses, setCourses] = React.useState<Course[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState(false);
     const [totalPages, setTotalPages] = React.useState(0);
     const [totalResults, setTotalResults] = React.useState(0);
     const [searchTerm, setSearchTerm] = React.useState(searchParam);
@@ -77,7 +79,7 @@ function LearnContent() {
     React.useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch("/api/categories?type=course");
+                const res = await fetchWithTimeout("/api/categories?type=course");
                 if (res.ok) {
                     const data = await res.json();
                     setCourseCategories(data.categories || []);
@@ -96,6 +98,7 @@ function LearnContent() {
 
     const fetchCourses = React.useCallback(async () => {
         setLoading(true);
+        setError(false);
         try {
             const params = new URLSearchParams();
             if (categoryParam && categoryParam !== "all") params.set("category", categoryParam);
@@ -106,16 +109,21 @@ function LearnContent() {
             params.set("limit", "12");
             params.set("sort", sortParam);
 
-            const res = await fetch(`/api/courses?${params.toString()}`);
+            const res = await fetchWithTimeout(`/api/courses?${params.toString()}`);
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
             const data = await res.json();
 
             if (data.courses) {
                 setCourses(data.courses);
-                setTotalPages(data.pagination.pages);
-                setTotalResults(data.pagination.total);
+                setTotalPages(data.pagination?.pages || 0);
+                setTotalResults(data.pagination?.total || 0);
             }
-        } catch (error) {
-            console.error("Failed to fetch courses:", error);
+        } catch (err) {
+            console.error("Failed to fetch courses:", err);
+            setError(true);
+            setCourses([]);
         } finally {
             setLoading(false);
         }
@@ -317,6 +325,18 @@ function LearnContent() {
                             {loading ? (
                                 <div className="flex justify-center py-20">
                                     <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                                </div>
+                            ) : error ? (
+                                <div className="text-center py-16 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                                    <BookOpen className="w-12 h-12 mx-auto text-red-500 mb-3" />
+                                    <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">Unable to load courses</h3>
+                                    <p className="text-red-600/80 dark:text-red-300 text-sm mt-1 mb-4">There was an issue connecting to the server. Please check your connection and try again.</p>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => fetchCourses()}
+                                    >
+                                        Try Again
+                                    </Button>
                                 </div>
                             ) : courses.length > 0 ? (
                                 <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">

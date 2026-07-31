@@ -110,7 +110,6 @@ const workshopSchema = new Schema<IWorkshop>(
 
 // Indexes
 workshopSchema.index({ title: "text", description: "text", tags: "text" });
-workshopSchema.index({ date: 1 });
 
 // Generate slug before validation
 workshopSchema.pre("validate", function () {

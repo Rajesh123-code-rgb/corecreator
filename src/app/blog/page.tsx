@@ -5,6 +5,7 @@ import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
 import { Search, Calendar, User, ArrowRight, Mail, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { fetchWithTimeout } from "@/lib/utils/fetchWithTimeout";
 
 interface BlogPost {
     _id: string;
@@ -25,6 +26,7 @@ const categories = ["All", "Art Tips", "Platform Updates", "Creator Stories", "I
 export default function BlogPage() {
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
@@ -35,6 +37,7 @@ export default function BlogPage() {
         try {
             if (pageNum === 1) {
                 setLoading(true);
+                setError(false);
             } else {
                 setLoadingMore(true);
             }
@@ -52,19 +55,24 @@ export default function BlogPage() {
                 params.append("search", searchQuery);
             }
 
-            const res = await fetch(`/api/posts?${params}`);
+            const res = await fetchWithTimeout(`/api/posts?${params}`);
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
             const data = await res.json();
 
-            if (res.ok) {
-                if (append) {
-                    setPosts((prev) => [...prev, ...data.posts]);
-                } else {
-                    setPosts(data.posts);
-                }
-                setHasMore(pageNum < data.pagination.totalPages);
+            if (append) {
+                setPosts((prev) => [...prev, ...(data.posts || [])]);
+            } else {
+                setPosts(data.posts || []);
             }
-        } catch (error) {
-            console.error("Failed to fetch posts:", error);
+            setHasMore(pageNum < (data.pagination?.totalPages || 0));
+        } catch (err) {
+            console.error("Failed to fetch posts:", err);
+            if (pageNum === 1) {
+                setError(true);
+                setPosts([]);
+            }
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -142,6 +150,15 @@ export default function BlogPage() {
                     {loading ? (
                         <div className="flex justify-center py-20">
                             <Loader2 className="w-8 h-8 animate-spin text-[var(--secondary-500)]" />
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-16 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                            <Calendar className="w-12 h-12 text-red-500 mx-auto mb-3" />
+                            <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">Unable to load articles</h3>
+                            <p className="text-red-600/80 dark:text-red-300 text-sm mt-1 mb-4">There was an issue connecting to the server. Please try again.</p>
+                            <Button variant="outline" onClick={() => fetchPosts(1, false)}>
+                                Try Again
+                            </Button>
                         </div>
                     ) : posts.length === 0 ? (
                         <div className="text-center py-20">

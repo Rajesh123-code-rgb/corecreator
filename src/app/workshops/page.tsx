@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCurrency } from "@/context/CurrencyContext";
+import { fetchWithTimeout } from "@/lib/utils/fetchWithTimeout";
 
 // Types
 interface Instructor {
@@ -49,6 +50,7 @@ export default function WorkshopsListingPage() {
     const { formatPrice } = useCurrency();
     const [workshops, setWorkshops] = useState<Workshop[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCountry, setSelectedCountry] = useState("");
     const [selectedCity, setSelectedCity] = useState("");
@@ -65,6 +67,7 @@ export default function WorkshopsListingPage() {
 
     const fetchWorkshops = async () => {
         setLoading(true);
+        setError(false);
         try {
             const params = new URLSearchParams();
             if (selectedCountry) params.append("country", selectedCountry);
@@ -72,36 +75,35 @@ export default function WorkshopsListingPage() {
             if (selectedType) params.append("workshopType", selectedType);
             if (sortOption) params.append("sort", sortOption);
 
-            const res = await fetch(`/api/workshops?${params.toString()}`);
-            const data: Workshop[] = await res.json();
-            setWorkshops(data);
-
-            // Extract unique countries and cities from ALL data (ideally should be from a separate meta-data endpoint, but simplifying here based on loaded data for now, or determining from initial load)
-            // For better UX, we'll extract from the current fetched data or a separate initial fetch. 
-            // Let's extracting from the data for now.
-            if (countries.length === 0) {
-                // Initial load to get all locations logic could go here, but for now we'll just derive from what we have or hardcode popular ones if needed.
-                // Better approach: reset filters -> fetch all -> extract unique.
+            const res = await fetchWithTimeout(`/api/workshops?${params.toString()}`);
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
             }
-
-        } catch (error) {
-            console.error("Failed to fetch workshops:", error);
+            const data: Workshop[] = await res.json();
+            setWorkshops(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Failed to fetch workshops:", err);
+            setError(true);
+            setWorkshops([]);
         } finally {
             setLoading(false);
         }
     };
 
-    // Helper to get unique values for dropdowns (naively from current view or pre-defined)
-    // In a real app, you'd fetch "available filters" from an API. 
-    // We will simulate this by extracting from a raw fetch of all workshops on mount
     useEffect(() => {
         const loadFilters = async () => {
-            const res = await fetch('/api/workshops');
-            const data: Workshop[] = await res.json();
-            const uniqueCountries = Array.from(new Set(data.map(w => w.location?.country || w.country).filter(Boolean))).sort();
-            const uniqueCities = Array.from(new Set(data.map(w => w.location?.city || w.city).filter(Boolean))).sort();
-            setCountries(uniqueCountries as string[]);
-            setCities(uniqueCities as string[]);
+            try {
+                const res = await fetchWithTimeout('/api/workshops');
+                if (!res.ok) return;
+                const data: Workshop[] = await res.json();
+                if (!Array.isArray(data)) return;
+                const uniqueCountries = Array.from(new Set(data.map(w => w.location?.country || w.country).filter(Boolean))).sort();
+                const uniqueCities = Array.from(new Set(data.map(w => w.location?.city || w.city).filter(Boolean))).sort();
+                setCountries(uniqueCountries as string[]);
+                setCities(uniqueCities as string[]);
+            } catch (err) {
+                console.error("Failed to load filters:", err);
+            }
         };
         loadFilters();
     }, []);
@@ -240,6 +242,15 @@ export default function WorkshopsListingPage() {
                         <div className="text-center py-20">
                             <div className="animate-spin w-8 h-8 border-4 border-[var(--primary-600)] border-t-transparent rounded-full mx-auto mb-4"></div>
                             <p>Loading workshops...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-16 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                            <Calendar className="w-12 h-12 text-red-500 mx-auto mb-3" />
+                            <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">Unable to load workshops</h3>
+                            <p className="text-red-600/80 dark:text-red-300 text-sm mt-1 mb-4">There was an issue connecting to the server. Please try again.</p>
+                            <Button variant="outline" onClick={() => fetchWorkshops()}>
+                                Try Again
+                            </Button>
                         </div>
                     ) : filteredWorkshops.length > 0 ? (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -80,7 +80,6 @@ const promoCodeSchema = new Schema<IPromoCode>(
     { timestamps: true }
 );
 
-promoCodeSchema.index({ code: 1 });
 promoCodeSchema.index({ isActive: 1, startDate: 1, endDate: 1 });
 
 const PromoCode: Model<IPromoCode> =

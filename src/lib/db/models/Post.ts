@@ -48,8 +48,6 @@ const postSchema = new Schema<IPost>(
 );
 
 // Indexes
-postSchema.index({ slug: 1 });
-postSchema.index({ status: 1 });
 postSchema.index({ createdAt: -1 });
 
 // Generate slug

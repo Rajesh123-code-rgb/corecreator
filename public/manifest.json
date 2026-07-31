@@ -1,0 +1,22 @@
+{
+  "name": "Core Creator",
+  "short_name": "CoreCreator",
+  "description": "Multi-vendor marketplace and learning platform for the art community",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1D4ED8",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "start_url": "/",
+  "orientation": "portrait"
+}

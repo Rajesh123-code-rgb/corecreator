@@ -116,7 +116,9 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="theme-color" content="#2563eb" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1D4ED8" />
+        <link rel="apple-touch-icon" href="/icon.png" />
       </head>
       <body
         className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased`}
