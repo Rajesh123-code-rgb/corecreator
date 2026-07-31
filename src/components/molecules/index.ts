@@ -17,4 +17,4 @@ export * from "./AuthorCard";
 export * from "./ArticleEngagement";
 export * from "./ConfirmModal";
 export * from "./Toast";
-
+export { default as AIGeneratorButton } from "./AIGeneratorButton";

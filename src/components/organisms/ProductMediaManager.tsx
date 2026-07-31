@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Upload, X, Star, Image as ImageIcon, Trash2, Plus, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms";
-import { Card } from "@/components/molecules";
+import { Card, AIGeneratorButton } from "@/components/molecules";
 
 interface ProductImage {
     url: string;
@@ -13,10 +13,12 @@ interface ProductImage {
 
 interface ProductMediaManagerProps {
     images: ProductImage[];
+    productTitle?: string;
+    productDescription?: string;
     onChange: (images: ProductImage[]) => void;
 }
 
-export default function ProductMediaManager({ images, onChange }: ProductMediaManagerProps) {
+export default function ProductMediaManager({ images, productTitle = "", productDescription = "", onChange }: ProductMediaManagerProps) {
     const featuredInputRef = React.useRef<HTMLInputElement>(null);
     const galleryInputRef = React.useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = React.useState(false);
@@ -165,9 +167,21 @@ export default function ProductMediaManager({ images, onChange }: ProductMediaMa
                         <Star className="w-5 h-5 text-amber-500" />
                         Featured Image
                     </h3>
-                    <p className="text-sm text-gray-500">
-                        This is the main image that appears in search results and your product card
-                    </p>
+                    <div className="flex items-start justify-between">
+                        <p className="text-sm text-gray-500">
+                            This is the main image that appears in search results and your product card
+                        </p>
+                        <AIGeneratorButton 
+                            title={productTitle} 
+                            description={productDescription}
+                            type="product"
+                            onImageGenerated={(url) => {
+                                const newImage = { url, isPrimary: true, alt: productTitle };
+                                const updatedImages = images.filter(img => !img.isPrimary);
+                                onChange([newImage, ...updatedImages]);
+                            }}
+                        />
+                    </div>
                 </div>
 
                 {featuredImage ? (

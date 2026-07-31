@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button, Input } from "@/components/atoms";
-import { Card, VideoUploader, ThumbnailUploader, ArticleLectureEditor, ResourceLectureUploader, ProjectLectureEditor, ProgressChecklist, PreviewButton , useToast } from "@/components/molecules";
+import { Card, VideoUploader, ThumbnailUploader, ArticleLectureEditor, ResourceLectureUploader, ProjectLectureEditor, ProgressChecklist, PreviewButton , useToast, AIGeneratorButton } from "@/components/molecules";
 import { createCourse } from "../actions";
 import {
     BookOpen,
@@ -683,10 +683,21 @@ export default function NewCoursePage() {
                             currentStep === 2 && (
                                 <div className="space-y-6">
                                     <div className="space-y-4">
-                                        <h3 className="font-medium">Course Thumbnail</h3>
-                                        <p className="text-sm text-[var(--muted-foreground)]">
-                                            Upload a high-quality thumbnail that represents your course
-                                        </p>
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <h3 className="font-medium">Course Thumbnail</h3>
+                                                <p className="text-sm text-[var(--muted-foreground)]">
+                                                    Upload a high-quality thumbnail that represents your course
+                                                </p>
+                                            </div>
+                                            <AIGeneratorButton 
+                                                title={formData.title} 
+                                                description={formData.description}
+                                                type="course"
+                                                onImageGenerated={(url) => setFormData({ ...formData, thumbnail: url })}
+                                                onError={(err) => toast.error(err)}
+                                            />
+                                        </div>
                                         <ThumbnailUploader
                                             onUploadComplete={(imageData) => setFormData({ ...formData, thumbnail: imageData.url })}
                                             existingImage={formData.thumbnail ? { url: formData.thumbnail, filename: "thumbnail.jpg" } : undefined}

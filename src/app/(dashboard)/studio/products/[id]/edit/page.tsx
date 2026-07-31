@@ -507,6 +507,8 @@ export default function ProductEditPage() {
                     {activeTab === "media" && (
                         <ProductMediaManager
                             images={product.images || []}
+                            productTitle={product.name}
+                            productDescription={product.description}
                             onChange={(images) => handleUpdate("images", images)}
                         />
                     )}

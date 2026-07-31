@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
-import { Card, ThumbnailUploader, VideoUploader, ProgressChecklist, PreviewButton , useToast } from "@/components/molecules";
+import { Card, ThumbnailUploader, VideoUploader, ProgressChecklist, PreviewButton , useToast, AIGeneratorButton } from "@/components/molecules";
 import Link from "next/link";
 import { ArrowLeft, Save, X, Plus, Send, AlertTriangle } from "lucide-react";
 
@@ -466,7 +466,16 @@ export default function EditCoursePage() {
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium mb-2">Course Thumbnail *</label>
+                                <div className="flex items-start justify-between">
+                                    <label className="block text-sm font-medium mb-2">Course Thumbnail *</label>
+                                    <AIGeneratorButton 
+                                        title={formData.title} 
+                                        description={formData.description}
+                                        type="course"
+                                        onImageGenerated={(url) => setFormData({ ...formData, thumbnail: url })}
+                                        onError={(err) => toast.error(err)}
+                                    />
+                                </div>
                                 <ThumbnailUploader
                                     onUploadComplete={(imageData) => setFormData({ ...formData, thumbnail: imageData.url })}
                                     existingImage={formData.thumbnail ? { url: formData.thumbnail, filename: '' } : undefined}
