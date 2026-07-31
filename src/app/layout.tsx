@@ -6,6 +6,7 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import { CartProvider } from "@/context";
 import { ToastProvider } from "@/components/molecules/Toast";
 import "./globals.css";
+import GoogleAnalytics from "@/components/atoms/GoogleAnalytics";
 import connectDB from "@/lib/db/mongodb";
 import SystemConfig from "@/lib/db/models/SystemConfig";
 
@@ -123,6 +124,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased`}
       >
+        <GoogleAnalytics />
         <AuthProvider>
           <LanguageProvider>
             <CurrencyProvider>

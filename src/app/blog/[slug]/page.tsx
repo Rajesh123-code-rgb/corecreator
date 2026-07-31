@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import dbConnect from "@/lib/db/mongodb";
 import Post from "@/lib/db/models/Post";
 import { Metadata } from "next";
+import JsonLd from "@/components/atoms/JsonLd";
 
 // Force dynamic rendering since we are fetching data from DB
 export const dynamic = "force-dynamic";
@@ -34,8 +35,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: post.metaTitle || post.title,
         description: post.metaDescription || post.excerpt,
         openGraph: {
+            title: post.metaTitle || post.title,
+            description: post.metaDescription || post.excerpt,
             images: [post.coverImage],
+            type: "article",
+            publishedTime: post.publishedAt?.toString() || post.createdAt?.toString(),
+            authors: [(post.author as any)?.name || "Core Creator"],
         },
+        twitter: {
+            card: "summary_large_image",
+            title: post.metaTitle || post.title,
+            description: post.metaDescription || post.excerpt,
+            images: [post.coverImage],
+        }
     };
 }
 
@@ -65,8 +77,32 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     const wordCount = postData.content ? postData.content.replace(/<[^>]*>/g, "").split(/\s+/).length : 0;
     const readTime = Math.ceil(wordCount / 200) || 5;
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": postData.title,
+        "image": [postData.coverImage],
+        "datePublished": postData.publishedAt || postData.createdAt,
+        "dateModified": postData.updatedAt || postData.createdAt,
+        "author": [{
+            "@type": "Person",
+            "name": author.name,
+            "url": `${process.env.NEXT_PUBLIC_APP_URL}/author/${author.id}`
+        }],
+        "publisher": {
+            "@type": "Organization",
+            "name": "Core Creator",
+            "logo": {
+                "@type": "ImageObject",
+                "url": `${process.env.NEXT_PUBLIC_APP_URL}/icon.png`
+            }
+        },
+        "description": postData.excerpt
+    };
+
     return (
         <div className="min-h-screen bg-[var(--background)]">
+            <JsonLd data={jsonLd} />
             <Header />
 
             <article className="pt-24 pb-20">

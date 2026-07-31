@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import connectDB from "@/lib/db/mongodb";
 import Product from "@/lib/db/models/Product";
 import ProductClientPage from "./ProductClientPage";
+import JsonLd from "@/components/atoms/JsonLd";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -30,5 +31,60 @@ export default async function ProductDetailPage(props: PageProps) {
     const product = JSON.parse(JSON.stringify(productDoc));
     const relatedProducts = JSON.parse(JSON.stringify(relatedProductsDocs));
 
-    return <ProductClientPage product={product} relatedProducts={relatedProducts} />;
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "image": product.images ? product.images.map((img: any) => img.url) : [],
+        "description": product.description,
+        "sku": product._id,
+        "brand": {
+            "@type": "Brand",
+            "name": product.seller?.name || "Core Creator"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": `${process.env.NEXT_PUBLIC_APP_URL}/marketplace/${product.slug}`,
+            "priceCurrency": "USD",
+            "price": product.price,
+            "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+        },
+        ...(product.rating ? {
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": product.rating,
+                "reviewCount": product.reviews?.length || 1
+            }
+        } : {})
+    };
+
+    return (
+        <>
+            <JsonLd data={jsonLd} />
+            <ProductClientPage product={product} relatedProducts={relatedProducts} />
+        </>
+    );
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<import("next").Metadata> {
+    const { slug } = await params;
+    await connectDB();
+    const product = await Product.findOne({ slug }).select("name description images").lean();
+
+    if (!product) return { title: "Product Not Found | Core Creator" };
+
+    let imageUrl = "";
+    if (product.images && product.images.length > 0) {
+        imageUrl = product.images[0].url;
+    }
+
+    return {
+        title: `${product.name} | Core Creator Marketplace`,
+        description: product.description.substring(0, 160),
+        openGraph: {
+            title: product.name,
+            description: product.description.substring(0, 160),
+            images: imageUrl ? [{ url: imageUrl }] : [],
+        }
+    };
 }
