@@ -4,10 +4,6 @@ import { authOptions } from "@/lib/auth";
 import OpenAI from "openai";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
@@ -24,6 +20,11 @@ export async function POST(request: NextRequest) {
         if (!process.env.OPENAI_API_KEY) {
             return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 503 });
         }
+
+        const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        });
+
 
         // Construct a highly detailed prompt based on the type completely automatically
         const basePrompt = `Create an image for a ${type === 'course' ? 'professional e-learning course' : 'high-end e-commerce physical product'}.`;
