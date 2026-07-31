@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
             prompt: enhancedPrompt.substring(0, 4000), // OpenAI limit is 4000 chars
             n: 1,
             size: "1024x1024",
-            response_format: "url",
         });
 
         const dallEUrl = response.data[0].url;
