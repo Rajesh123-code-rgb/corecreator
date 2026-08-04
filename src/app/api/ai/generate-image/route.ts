@@ -19,15 +19,16 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
 }
 
 // ---------------------------------------------------------------------------
-// Tier 1: Pollinations AI
+// Tier 1: Pollinations AI with Title & Description Subject-First Prompt
 // ---------------------------------------------------------------------------
 async function generateWithPollinations(prompt: string): Promise<Buffer | null> {
     const seed = Math.floor(Math.random() * 1000000);
-    const cleanPrompt = encodeURIComponent(prompt.substring(0, 200));
+    // Include full subject details in clean prompt up to 400 chars
+    const cleanPrompt = encodeURIComponent(prompt.substring(0, 400));
     const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?nologo=true&seed=${seed}`;
 
     try {
-        console.log("[AI] Trying Pollinations AI...");
+        console.log(`[AI] Trying Pollinations AI with prompt: "${prompt.substring(0, 80)}..."`);
         const res = await fetchWithTimeout(url, {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -78,39 +79,84 @@ async function generateWithOpenAI(prompt: string): Promise<Buffer | null> {
 }
 
 // ---------------------------------------------------------------------------
-// Tier 3: Curated Ultra-HD Creative Photography Engine (Guaranteed 100% Uptime)
+// Tier 3: Keyword-Tailored High-Definition Creative Photography Engine
 // ---------------------------------------------------------------------------
-const PRODUCT_STUDIO_IMAGES = [
+const TOPIC_IMAGE_MAP: Record<string, string[]> = {
+    resin: [
+        "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85",
+    ],
+    flower: [
+        "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85",
+    ],
+    paint: [
+        "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=1200&q=85",
+    ],
+    watercolo: [
+        "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=85",
+    ],
+    ceramic: [
+        "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=85",
+    ],
+    pottery: [
+        "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=85",
+    ],
+    jewel: [
+        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
+    ],
+    textile: [
+        "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=1200&q=85",
+    ],
+    digital: [
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85",
+    ],
+    course: [
+        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=85",
+    ],
+};
+
+const GENERAL_PRODUCT_IMAGES = [
     "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85",
     "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=85",
     "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=85",
     "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85",
 ];
 
-const COURSE_BANNER_IMAGES = [
+const GENERAL_COURSE_IMAGES = [
     "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=85",
     "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=85",
     "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=1200&q=85",
-    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=85",
 ];
 
-async function generateCuratedImage(title: string, type: string): Promise<Buffer> {
-    console.log(`[AI] Generating high-definition creative photography for ${type}: "${title}"`);
-    const pool = type === "course" ? COURSE_BANNER_IMAGES : PRODUCT_STUDIO_IMAGES;
+async function generateTailoredImage(title: string, description: string, type: string): Promise<Buffer> {
+    const text = `${title} ${description}`.toLowerCase();
+    let selectedUrl: string | null = null;
 
-    // Hash title + timestamp so re-generating creates variation
-    let hash = Date.now();
-    for (let i = 0; i < title.length; i++) {
-        hash = (hash << 5) - hash + title.charCodeAt(i);
-        hash |= 0;
+    // Check keyword topic matcher
+    for (const [key, urls] of Object.entries(TOPIC_IMAGE_MAP)) {
+        if (text.includes(key)) {
+            console.log(`[AI] Tailored topic match for keyword "${key}" in "${title}"`);
+            const hash = Array.from(text).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            selectedUrl = urls[Math.abs(hash) % urls.length];
+            break;
+        }
     }
-    const selectedUrl = pool[Math.abs(hash) % pool.length];
 
+    if (!selectedUrl) {
+        const pool = type === "course" ? GENERAL_COURSE_IMAGES : GENERAL_PRODUCT_IMAGES;
+        let hash = Date.now();
+        for (let i = 0; i < title.length; i++) {
+            hash = (hash << 5) - hash + title.charCodeAt(i);
+            hash |= 0;
+        }
+        selectedUrl = pool[Math.abs(hash) % pool.length];
+    }
+
+    console.log(`[AI] Fetching tailored photography image: ${selectedUrl}`);
     const res = await fetchWithTimeout(selectedUrl, {}, 8000);
     if (!res.ok) {
         throw new Error(`Failed to fetch base image: ${res.statusText}`);
@@ -134,18 +180,22 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Title is required" }, { status: 400 });
         }
 
-        const basePrompt = `Create an image for a ${type === "course"
-            ? "professional e-learning course"
-            : "high-end e-commerce physical product"}.`;
-        const stylingPrompt = type === "course"
-            ? "Clean, vibrant, engaging course thumbnail. Visuals represent the topic strongly. No text."
-            : "Highly realistic studio photography of the product on a clean aesthetic background. No text.";
-        const prompt = `${basePrompt} Title: "${title}". Description: "${description || title}". ${stylingPrompt} Professional lighting, high definition.`;
+        // Build subject-first prompt
+        const subjectDetails = description && description.trim().length > 3
+            ? `"${title}" - ${description.trim()}`
+            : `"${title}"`;
+
+        const styleDetails = type === "course"
+            ? "professional online course thumbnail banner, clear artistic visual representation, highly detailed"
+            : "studio product photography, clean minimalist aesthetic background, 8k resolution, professional studio lighting, realistic details";
+
+        const prompt = `${subjectDetails}. ${styleDetails}. No text or words.`;
+        console.log(`[AI] Generating tailored image for ${type}: ${prompt}`);
 
         let imageBuffer: Buffer | null = null;
         let engineUsed = "";
 
-        // 1. Try Pollinations AI
+        // 1. Try Pollinations AI with subject-first prompt
         imageBuffer = await generateWithPollinations(prompt);
         if (imageBuffer) engineUsed = "pollinations";
 
@@ -155,10 +205,10 @@ export async function POST(request: NextRequest) {
             if (imageBuffer) engineUsed = "openai";
         }
 
-        // 3. Guaranteed High-Definition Creative Photography Engine
+        // 3. Guaranteed Keyword-Tailored Photography Engine
         if (!imageBuffer) {
-            imageBuffer = await generateCuratedImage(title, type || "product");
-            engineUsed = "studio-curated";
+            imageBuffer = await generateTailoredImage(title, description || "", type || "product");
+            engineUsed = "tailored-curated";
         }
 
         // Upload image buffer to Cloudinary for permanent hosting
