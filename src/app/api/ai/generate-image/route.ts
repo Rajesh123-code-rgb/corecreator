@@ -4,43 +4,60 @@ import { authOptions } from "@/lib/auth";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
 // ---------------------------------------------------------------------------
-// Pollinations AI API – Supports gpt-image-1, gpt-image-2, flux, turbo
-// Free, fast, high-quality, no API key required
+// Helper fetch with AbortController timeout
 // ---------------------------------------------------------------------------
-const POLLINATIONS_MODELS = ["gpt-image-1", "gpt-image-2", "flux", "turbo"];
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 12000): Promise<Response> {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+        });
+        return response;
+    } finally {
+        clearTimeout(id);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Pollinations AI API – Supports flux, turbo (Free, fast, high quality)
+// ---------------------------------------------------------------------------
+const POLLINATIONS_MODELS = ["flux", "turbo"];
 
 async function generateWithPollinations(prompt: string): Promise<Buffer> {
     const seed = Math.floor(Math.random() * 1000000);
-    const encodedPrompt = encodeURIComponent(prompt);
+    // Keep prompt concise for optimal performance
+    const cleanPrompt = prompt.substring(0, 300);
+    const encodedPrompt = encodeURIComponent(cleanPrompt);
 
     for (const model of POLLINATIONS_MODELS) {
         try {
             console.log(`[AI] Trying Pollinations model: ${model}`);
             const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=${model}&width=1024&height=1024&nologo=true&seed=${seed}`;
 
-            const res = await fetch(url, {
+            const res = await fetchWithTimeout(url, {
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 },
-            });
+            }, 12000);
 
             if (res.ok) {
                 const arrayBuffer = await res.arrayBuffer();
                 const buffer = Buffer.from(arrayBuffer);
-                // Ensure we received a valid image (> 5KB)
-                if (buffer.length > 5000) {
+                if (buffer.length > 3000) {
                     console.log(`[AI] Pollinations model ${model} succeeded! (${buffer.length} bytes)`);
                     return buffer;
                 }
             } else {
                 console.warn(`[AI] Pollinations model ${model} returned HTTP ${res.status}`);
             }
-        } catch (err) {
-            console.warn(`[AI] Pollinations model ${model} error:`, err);
+        } catch (err: any) {
+            console.warn(`[AI] Pollinations model ${model} error/timeout:`, err?.message || err);
         }
     }
 
-    throw new Error("Pollinations AI models (gpt-image-1, gpt-image-2, flux) were unavailable.");
+    throw new Error("Pollinations AI service timed out.");
 }
 
 // ---------------------------------------------------------------------------
@@ -61,7 +78,7 @@ async function generateWithHuggingFace(prompt: string): Promise<Buffer> {
     for (const model of HF_MODELS) {
         console.log(`[AI] Trying Hugging Face model: ${model}`);
         try {
-            const res = await fetch(
+            const res = await fetchWithTimeout(
                 `https://api-inference.huggingface.co/models/${model}`,
                 {
                     method: "POST",
@@ -69,19 +86,18 @@ async function generateWithHuggingFace(prompt: string): Promise<Buffer> {
                     body: JSON.stringify({
                         inputs: prompt,
                         parameters: {
-                            num_inference_steps: 30,
+                            num_inference_steps: 25,
                             guidance_scale: 7.5,
                             width: 1024,
                             height: 1024,
                         },
                         options: { wait_for_model: true },
                     }),
-                }
+                },
+                15000
             );
 
-            if (!res.ok) {
-                continue;
-            }
+            if (!res.ok) continue;
 
             const contentType = res.headers.get("content-type") || "";
             if (!contentType.startsWith("image/")) {
@@ -91,8 +107,8 @@ async function generateWithHuggingFace(prompt: string): Promise<Buffer> {
 
             const arrayBuffer = await res.arrayBuffer();
             return Buffer.from(arrayBuffer);
-        } catch (err) {
-            console.warn(`[AI] HF model ${model} threw:`, err);
+        } catch (err: any) {
+            console.warn(`[AI] HF model ${model} error:`, err?.message || err);
         }
     }
 
@@ -100,7 +116,7 @@ async function generateWithHuggingFace(prompt: string): Promise<Buffer> {
 }
 
 // ---------------------------------------------------------------------------
-// OpenAI DALL-E – Optional fallback
+// OpenAI DALL-E – Optional fallback if key has active image quota
 // ---------------------------------------------------------------------------
 async function generateWithOpenAI(prompt: string): Promise<Buffer> {
     if (!process.env.OPENAI_API_KEY) throw new Error("No OpenAI key");
@@ -119,11 +135,11 @@ async function generateWithOpenAI(prompt: string): Promise<Buffer> {
             const url = response?.data?.[0]?.url;
             if (!url) throw new Error("No URL returned");
 
-            const imgRes = await fetch(url);
+            const imgRes = await fetchWithTimeout(url, {}, 10000);
             if (!imgRes.ok) throw new Error(`Fetch failed: ${imgRes.statusText}`);
             return Buffer.from(await imgRes.arrayBuffer());
         } catch (err: any) {
-            console.warn(`[AI] OpenAI ${model} failed:`, err?.message);
+            console.warn(`[AI] OpenAI ${model} failed:`, err?.message || err);
         }
     }
     throw new Error("OpenAI image models unavailable.");
@@ -156,10 +172,10 @@ export async function POST(request: NextRequest) {
         let imageBuffer: Buffer | null = null;
         let engineUsed = "";
 
-        // 1. Try Pollinations (gpt-image-1, gpt-image-2, flux)
+        // 1. Try Pollinations AI (Fastest & keyless)
         try {
             imageBuffer = await generateWithPollinations(prompt);
-            engineUsed = "gpt-image";
+            engineUsed = "pollinations";
         } catch (e1: any) {
             console.warn("[AI] Pollinations failed, trying Hugging Face:", e1.message);
         }
@@ -174,7 +190,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 3. Try OpenAI as last resort
+        // 3. Try OpenAI as fallback
         if (!imageBuffer && process.env.OPENAI_API_KEY) {
             try {
                 imageBuffer = await generateWithOpenAI(prompt);
@@ -185,7 +201,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (!imageBuffer) {
-            throw new Error("Unable to generate image. Please try again in a few moments.");
+            throw new Error("Unable to generate image at this time. Please try again in a moment.");
         }
 
         // Upload to Cloudinary for a permanent URL

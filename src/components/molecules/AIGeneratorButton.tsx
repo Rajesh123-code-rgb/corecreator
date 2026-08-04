@@ -105,7 +105,15 @@ export default function AIGeneratorButton({
                 body: JSON.stringify({ title, description, type }),
             });
 
-            const data = await res.json();
+            const contentType = res.headers.get("content-type") || "";
+            let data: any = {};
+            if (contentType.includes("application/json")) {
+                data = await res.json();
+            } else {
+                const textResponse = await res.text();
+                console.error("Non-JSON API response:", textResponse);
+                throw new Error(`Server returned status ${res.status}. Please try again.`);
+            }
 
             if (!res.ok) throw new Error(data.error || "Failed to generate AI image");
             if (!data.url)  throw new Error("No image URL returned from AI engine");
