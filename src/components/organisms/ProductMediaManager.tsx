@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Upload, X, Star, Image as ImageIcon, Trash2, Plus, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms";
-import { Card, AIGeneratorButton } from "@/components/molecules";
+import { Card, AIGeneratorButton, useToast } from "@/components/molecules";
 
 interface ProductImage {
     url: string;
@@ -23,6 +23,7 @@ export default function ProductMediaManager({ images, productTitle = "", product
     const galleryInputRef = React.useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = React.useState(false);
     const [uploadError, setUploadError] = React.useState<string | null>(null);
+    const toast = useToast();
 
     // Get featured (primary) image
     const featuredImage = images.find(img => img.isPrimary);
@@ -180,6 +181,7 @@ export default function ProductMediaManager({ images, productTitle = "", product
                                 const updatedImages = images.filter(img => !img.isPrimary);
                                 onChange([newImage, ...updatedImages]);
                             }}
+                            onError={(err) => toast.error(err)}
                         />
                     </div>
                 </div>
