@@ -1,6 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db/mongodb";
 import Product from "@/lib/db/models/Product";
+import Category from "@/lib/db/models/Category";
+
+function escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function getCategoryFilterRegex(categoryParam: string) {
+    if (!categoryParam || categoryParam === "all") return null;
+
+    // Search for predefined category document
+    const catDoc = await Category.findOne({
+        type: "product",
+        $or: [
+            { slug: categoryParam.toLowerCase() },
+            { name: { $regex: new RegExp(`^${escapeRegExp(categoryParam)}$`, "i") } }
+        ]
+    }).lean();
+
+    const possibleValues = new Set<string>();
+    possibleValues.add(categoryParam);
+    possibleValues.add(categoryParam.replace(/-/g, " "));
+    possibleValues.add(categoryParam.replace(/ /g, "-"));
+
+    if (catDoc) {
+        if (catDoc.name) possibleValues.add(catDoc.name);
+        if (catDoc.slug) possibleValues.add(catDoc.slug);
+    }
+
+    // Build flexible patterns
+    const patterns = Array.from(possibleValues).map(val =>
+        `^${escapeRegExp(val).replace(/\\-/g, "[\\s\\-]")}s?$`
+    );
+
+    return new RegExp(patterns.join("|"), "i");
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -14,7 +49,7 @@ export async function GET(request: NextRequest) {
         const skip = (page - 1) * limit;
 
         // Filters
-        const category = searchParams.get("category");
+        const categoryParam = searchParams.get("category");
         const minPrice = searchParams.get("minPrice");
         const maxPrice = searchParams.get("maxPrice");
         const sort = searchParams.get("sort") || "newest";
@@ -31,7 +66,13 @@ export async function GET(request: NextRequest) {
             ]
         };
 
-        if (category) query.category = category;
+        if (categoryParam && categoryParam !== "all") {
+            const catRegex = await getCategoryFilterRegex(categoryParam);
+            if (catRegex) {
+                query.category = { $regex: catRegex };
+            }
+        }
+
         if (featured === "true") query.isFeatured = true;
         const minRating = searchParams.get("minRating");
         if (minRating) query.rating = { $gte: parseFloat(minRating) };

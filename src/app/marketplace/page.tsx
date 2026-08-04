@@ -137,7 +137,8 @@ function MarketplaceContent() {
         } else {
             setSelectedRating(0);
         }
-    }, [minRatingParam]);
+        setSelectedCategory(categoryParam);
+    }, [minRatingParam, categoryParam]);
 
     const updateParams = (updates: Record<string, string | null>) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -269,16 +270,19 @@ function MarketplaceContent() {
                                                 <span>All</span>
                                             </button>
                                         </li>
-                                        {categories.map((cat) => (
-                                            <li key={cat._id}>
-                                                <button
-                                                    onClick={() => handleCategoryChange(cat.slug)}
-                                                    className={`w-full text-left flex items-center justify-between py-2 px-3 rounded-lg transition-colors text-sm ${selectedCategory === cat.slug ? "bg-[var(--secondary-100)] text-[var(--secondary-700)] font-medium" : "hover:bg-[var(--muted)]"}`}
-                                                >
-                                                    <span>{cat.name}</span>
-                                                </button>
-                                            </li>
-                                        ))}
+                                        {categories.map((cat) => {
+                                            const isActive = selectedCategory.toLowerCase() === cat.slug.toLowerCase() || selectedCategory.toLowerCase() === cat.name.toLowerCase();
+                                            return (
+                                                <li key={cat._id}>
+                                                    <button
+                                                        onClick={() => handleCategoryChange(cat.slug)}
+                                                        className={`w-full text-left flex items-center justify-between py-2 px-3 rounded-lg transition-colors text-sm ${isActive ? "bg-[var(--secondary-100)] text-[var(--secondary-700)] font-medium" : "hover:bg-[var(--muted)]"}`}
+                                                    >
+                                                        <span>{cat.name}</span>
+                                                    </button>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 </div>
 

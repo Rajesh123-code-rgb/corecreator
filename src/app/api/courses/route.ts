@@ -1,6 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db/mongodb";
 import Course from "@/lib/db/models/Course";
+import Category from "@/lib/db/models/Category";
+
+function escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function getCategoryFilterRegex(categoryParam: string) {
+    if (!categoryParam || categoryParam === "all") return null;
+
+    // Search for predefined category document
+    const catDoc = await Category.findOne({
+        type: "course",
+        $or: [
+            { slug: categoryParam.toLowerCase() },
+            { name: { $regex: new RegExp(`^${escapeRegExp(categoryParam)}$`, "i") } }
+        ]
+    }).lean();
+
+    const possibleValues = new Set<string>();
+    possibleValues.add(categoryParam);
+    possibleValues.add(categoryParam.replace(/-/g, " "));
+    possibleValues.add(categoryParam.replace(/ /g, "-"));
+
+    if (catDoc) {
+        if (catDoc.name) possibleValues.add(catDoc.name);
+        if (catDoc.slug) possibleValues.add(catDoc.slug);
+    }
+
+    // Build flexible patterns
+    const patterns = Array.from(possibleValues).map(val =>
+        `^${escapeRegExp(val).replace(/\\-/g, "[\\s\\-]")}s?$`
+    );
+
+    return new RegExp(patterns.join("|"), "i");
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -12,7 +47,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get("limit") || "12");
         const skip = (page - 1) * limit;
 
-        const category = searchParams.get("category");
+        const categoryParam = searchParams.get("category");
         const level = searchParams.get("level");
         const sort = searchParams.get("sort") || "popular";
         const search = searchParams.get("search");
@@ -22,8 +57,17 @@ export async function GET(request: NextRequest) {
 
         const query: Record<string, unknown> = { status: "published" };
 
-        if (category) query.category = category;
-        if (level) query.level = level;
+        if (categoryParam && categoryParam !== "all") {
+            const catRegex = await getCategoryFilterRegex(categoryParam);
+            if (catRegex) {
+                query.category = { $regex: catRegex };
+            }
+        }
+
+        if (level && level !== "all") {
+            query.level = { $regex: new RegExp(`^${escapeRegExp(level)}$`, "i") };
+        }
+
         if (featured === "true") query.isFeatured = true;
         if (instructor) query.instructor = instructor;
         if (minRating) query.rating = { $gte: parseFloat(minRating) };

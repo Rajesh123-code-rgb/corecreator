@@ -131,7 +131,8 @@ function LearnContent() {
 
     React.useEffect(() => {
         fetchCourses();
-    }, [fetchCourses]);
+        setSelectedCategory(categoryParam);
+    }, [fetchCourses, categoryParam]);
 
     // Handle Filter Changes
     const updateParams = (updates: Record<string, string | null>) => {
@@ -243,16 +244,19 @@ function LearnContent() {
                                                     <span>All Courses</span>
                                                 </button>
                                             </li>
-                                            {courseCategories.map((cat) => (
-                                                <li key={cat._id}>
-                                                    <button
-                                                        onClick={() => handleCategoryChange(cat.slug)}
-                                                        className={`w-full text-left flex items-center justify-between py-2 px-3 rounded-lg transition-colors text-sm ${selectedCategory === cat.slug ? "bg-[var(--secondary-100)] text-[var(--secondary-700)] font-medium" : "hover:bg-[var(--muted)]"}`}
-                                                    >
-                                                        <span>{cat.name}</span>
-                                                    </button>
-                                                </li>
-                                            ))}
+                                            {courseCategories.map((cat) => {
+                                                const isActive = selectedCategory.toLowerCase() === cat.slug.toLowerCase() || selectedCategory.toLowerCase() === cat.name.toLowerCase();
+                                                return (
+                                                    <li key={cat._id}>
+                                                        <button
+                                                            onClick={() => handleCategoryChange(cat.slug)}
+                                                            className={`w-full text-left flex items-center justify-between py-2 px-3 rounded-lg transition-colors text-sm ${isActive ? "bg-[var(--secondary-100)] text-[var(--secondary-700)] font-medium" : "hover:bg-[var(--muted)]"}`}
+                                                        >
+                                                            <span>{cat.name}</span>
+                                                        </button>
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     </ul>
                                 </div>
