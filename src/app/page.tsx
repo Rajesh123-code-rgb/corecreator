@@ -1,6 +1,7 @@
 "use client";
 
 import { useCurrency } from "@/context/CurrencyContext";
+import { commissionHeadline } from "@/lib/commission";
 import Link from "next/link";
 import Image from "next/image";
 import { Button, ImageWithFallback } from "@/components/atoms";
@@ -735,7 +736,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-[var(--secondary-100)] text-[var(--secondary-600)] flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
-                  <span>Earn 85% revenue, withdraw anytime</span>
+                  <span>{commissionHeadline()}, withdraw anytime</span>
                 </li>
               </ul>
               <Button variant="secondary" className="mt-6 w-full" asChild>
@@ -797,7 +798,7 @@ export default function HomePage() {
                   { icon: Award, title: "Quality Verified", desc: "Every course and artwork is vetted for quality" },
                   { icon: Users, title: "50K+ Community", desc: "Join a thriving creative community" },
                   { icon: Globe, title: "Global Reach", desc: "Sell and learn from anywhere in the world" },
-                  { icon: Sparkles, title: "Fair Pricing", desc: "Creators keep 85% of their earnings" },
+                  { icon: Sparkles, title: "Fair Pricing", desc: commissionHeadline() },
                 ].map((item) => (
                   <div key={item.title} className="flex gap-4">
                     <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
