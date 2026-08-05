@@ -105,8 +105,8 @@ export function Header() {
                         <Image
                             src="/logo.png"
                             alt="Core Creator"
-                            width={160}
-                            height={40}
+                            width={150}
+                            height={80}
                             className="h-10 w-auto group-hover:scale-105 transition-transform"
                             priority
                         />
@@ -274,7 +274,15 @@ export function Header() {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="lg:hidden bg-[var(--background)] border-t border-[var(--border)] animate-fade-in-down">
+                <>
+                    <div
+                        className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-40"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                    <div
+                        className="lg:hidden relative z-50 bg-[var(--background)] border-t border-[var(--border)] animate-fade-in-down"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                     <div className="container-app py-4 space-y-2">
                         {/* Mobile Theme Toggle & Search */}
                         {mounted && (
@@ -343,7 +351,8 @@ export function Header() {
                             </div>
                         )}
                     </div>
-                </div>
+                    </div>
+                </>
             )}
 
             {/* Search Modal */}
