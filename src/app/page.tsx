@@ -2,6 +2,7 @@
 
 import { useCurrency } from "@/context/CurrencyContext";
 import { commissionHeadline } from "@/lib/commission";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 import Link from "next/link";
 import Image from "next/image";
 import { Button, ImageWithFallback } from "@/components/atoms";
@@ -75,13 +76,6 @@ interface Artist {
   rating: number;
 }
 
-const stats = [
-  { label: "Artists & Creators", value: "50K+", icon: Palette },
-  { label: "Courses & Workshops", value: "2,500+", icon: GraduationCap },
-  { label: "Artworks Listed", value: "100K+", icon: Store },
-  { label: "Creator Earnings", value: "Creator Earnings", icon: Users },
-];
-
 const features = [
   {
     title: "Buy Authentic Artworks",
@@ -118,6 +112,18 @@ import { courseCategories } from "@/lib/courseCategories";
 
 export default function HomePage() {
   const { formatPrice } = useCurrency();
+  const { stats: liveStats } = usePlatformStats();
+
+  const stats = [
+    { label: "Artists & Creators", value: `${liveStats.creators}+`, icon: Palette },
+    { label: "Courses & Workshops", value: `${liveStats.courses}+`, icon: GraduationCap },
+    { label: "Artworks Listed", value: `${liveStats.products}+`, icon: Store },
+    {
+      label: "Creator Earnings",
+      value: formatPrice(liveStats.creatorEarnings, "INR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + "+",
+      icon: Users,
+    },
+  ];
   const toast = useToast();
   const [featuredArtworks, setFeaturedArtworks] = useState<FeaturedProduct[]>([]);
   const [loadingArtworks, setLoadingArtworks] = useState(true);
@@ -252,7 +258,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-              Join 50,000+ artists and creators on the ultimate platform for learning, teaching, and selling art & craft globally.
+              Join our growing community of artists and creators on the ultimate platform for learning, teaching, and selling art & craft globally.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
@@ -295,7 +301,7 @@ export default function HomePage() {
                   <stat.icon className="w-6 h-6" />
                 </div>
                 <div className="text-3xl lg:text-4xl font-bold text-[var(--secondary-600)]">
-                  {stat.label === "Creator Earnings" ? formatPrice(54695, "INR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + "+" : stat.value}
+                  {stat.value}
                 </div>
                 <div className="text-sm text-[var(--muted-foreground)]">{stat.label}</div>
               </div>
@@ -675,7 +681,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-[var(--muted-foreground)]">
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-                  <span>Browse 2,500+ courses across all art forms</span>
+                  <span>Browse courses across all art forms</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
@@ -701,7 +707,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-[var(--muted-foreground)]">
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-                  <span>Discover 100K+ authentic artworks</span>
+                  <span>Discover authentic artworks</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
@@ -817,21 +823,21 @@ export default function HomePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <Card className="p-6 bg-white/10 border-white/10">
-                    <p className="text-4xl font-bold text-[var(--primary-400)]">2,500+</p>
+                    <p className="text-4xl font-bold text-[var(--primary-400)]">{liveStats.courses}+</p>
                     <p className="text-white/60">Courses & Workshops</p>
                   </Card>
                   <Card className="p-6 bg-white/10 border-white/10">
-                    <p className="text-4xl font-bold text-[var(--primary-400)]">{formatPrice(54695, "INR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}+</p>
+                    <p className="text-4xl font-bold text-[var(--primary-400)]">{formatPrice(liveStats.creatorEarnings, "INR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}+</p>
                     <p className="text-white/60">Creator Earnings</p>
                   </Card>
                 </div>
                 <div className="space-y-4 pt-8">
                   <Card className="p-6 bg-white/10 border-white/10">
-                    <p className="text-4xl font-bold text-[var(--primary-400)]">100K+</p>
+                    <p className="text-4xl font-bold text-[var(--primary-400)]">{liveStats.products}+</p>
                     <p className="text-white/60">Artworks Listed</p>
                   </Card>
                   <Card className="p-6 bg-white/10 border-white/10">
-                    <p className="text-4xl font-bold text-[var(--primary-400)]">500K+</p>
+                    <p className="text-4xl font-bold text-[var(--primary-400)]">{liveStats.learners}+</p>
                     <p className="text-white/60">Happy Learners</p>
                   </Card>
                 </div>

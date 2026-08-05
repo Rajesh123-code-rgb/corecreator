@@ -18,6 +18,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 import { fetchWithTimeout } from "@/lib/utils/fetchWithTimeout";
 
 interface Instructor {
@@ -57,6 +58,7 @@ function LearnContent() {
     const router = useRouter();
     const { formatPrice } = useCurrency();
     const searchParams = useSearchParams();
+    const { stats: liveStats } = usePlatformStats();
 
     // Query Params
     const categoryParam = searchParams.get("category") || "all";
@@ -210,15 +212,15 @@ function LearnContent() {
                     {/* Stats */}
                     <div className="flex justify-center gap-8 lg:gap-16 mt-12 text-white">
                         <div className="text-center">
-                            <p className="text-3xl font-bold">2,500+</p>
+                            <p className="text-3xl font-bold">{liveStats.courses}+</p>
                             <p className="text-sm text-white/70">Courses</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-3xl font-bold">500K+</p>
+                            <p className="text-3xl font-bold">{liveStats.learners}+</p>
                             <p className="text-sm text-white/70">Students</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-3xl font-bold">850+</p>
+                            <p className="text-3xl font-bold">{liveStats.creators}+</p>
                             <p className="text-sm text-white/70">Instructors</p>
                         </div>
                     </div>

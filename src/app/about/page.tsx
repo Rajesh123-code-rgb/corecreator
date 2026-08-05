@@ -2,8 +2,11 @@ import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
 import { Users, Target, Heart, Globe, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { getPlatformStats } from "@/lib/platformStats";
+import { formatCurrency } from "@/lib/formatting";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+    const stats = await getPlatformStats();
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
@@ -65,7 +68,7 @@ export default function AboutPage() {
                 <div className="container-app">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         <div>
-                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">50K+</div>
+                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">{stats.creators}+</div>
                             <div className="text-sm text-[var(--muted-foreground)]">Active Creators</div>
                         </div>
                         <div>
@@ -77,7 +80,7 @@ export default function AboutPage() {
                             <div className="text-sm text-[var(--muted-foreground)]">Lessons Watched</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">$10M+</div>
+                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">{formatCurrency(stats.creatorEarnings, "INR")}+</div>
                             <div className="text-sm text-[var(--muted-foreground)]">Paid to Artists</div>
                         </div>
                     </div>
