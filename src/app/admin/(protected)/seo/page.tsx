@@ -6,7 +6,6 @@ import { useConfirmModal, useToast } from "@/components/molecules";
 import {
     Globe,
     FileText,
-    RefreshCw,
     Save,
     Loader2,
     ArrowRightLeft,
@@ -102,22 +101,6 @@ export default function SeoDashboardPage() {
         }
     };
 
-    const handleGenerateSitemap = async () => {
-        setSaving(true);
-        try {
-            const res = await fetch("/api/admin/seo/sitemap", { method: "POST" });
-            if (res.ok) {
-                toast.success("Sitemap generation triggered successfully!");
-            } else {
-                toast.error("Failed to trigger sitemap generation");
-            }
-        } catch (error) {
-            toast.error("Network error");
-        } finally {
-            setSaving(false);
-        }
-    };
-
     const [redirects, setRedirects] = React.useState<any[]>([]);
     const [newRedirect, setNewRedirect] = React.useState({ source: "", destination: "", permanent: true });
 
@@ -174,41 +157,6 @@ export default function SeoDashboardPage() {
             }
         } catch (error) {
             toast.error("Error deleting redirect");
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const handleSitemapUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (file.type !== "text/xml" && !file.name.endsWith(".xml")) {
-            toast.error("Please upload a valid .xml file");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        setSaving(true);
-        try {
-            const res = await fetch("/api/admin/seo/sitemap/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (res.ok) {
-                toast.success("Sitemap uploaded successfully!");
-                // Clear input
-                e.target.value = "";
-            } else {
-                const data = await res.json();
-                toast.error(data.error || "Failed to upload sitemap");
-            }
-        } catch (error) {
-            toast.error("Upload failed");
-            console.error(error);
         } finally {
             setSaving(false);
         }
@@ -367,51 +315,19 @@ export default function SeoDashboardPage() {
 
                     {activeTab === "sitemap" && (
                         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-6">
-                            <h2 className="text-lg font-semibold">Sitemap Settings</h2>
-
-                            <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                            <h2 className="text-lg font-semibold">Sitemap</h2>
+                            <div className="p-4 bg-green-50 border border-green-100 rounded-lg">
                                 <div className="flex items-start gap-3">
-                                    <Globe className="w-5 h-5 text-blue-600 mt-0.5" />
+                                    <Globe className="w-5 h-5 text-green-600 mt-0.5" />
                                     <div>
-                                        <h3 className="font-medium text-blue-900">Sitemap Status</h3>
-                                        <p className="text-sm text-blue-700 mt-1">
-                                            Your sitemap is available at <a href="/sitemap.xml" target="_blank" className="underline">/sitemap.xml</a>
+                                        <h3 className="font-medium text-green-900">Automatically generated</h3>
+                                        <p className="text-sm text-green-700 mt-1">
+                                            <a href="/sitemap.xml" target="_blank" className="underline">/sitemap.xml</a> is
+                                            generated on request directly from live products, courses, workshops, and blog
+                                            posts (src/app/sitemap.ts) - there&apos;s nothing to regenerate or upload
+                                            manually anymore.
                                         </p>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="border-t border-gray-100 pt-6">
-                                <h3 className="font-medium mb-4">Manual Regeneration</h3>
-                                <p className="text-sm text-gray-500 mb-4">
-                                    Trigger a manual regeneration of the sitemap. This is usually automated daily, but you can force an update if you've made significant content changes.
-                                </p>
-                                <Button variant="outline" onClick={handleGenerateSitemap} disabled={saving}>
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                                    Regenerate Sitemap Now
-                                </Button>
-                            </div>
-
-                            <div className="border-t border-gray-100 pt-6">
-                                <h3 className="font-medium mb-4">Manual Upload</h3>
-                                <p className="text-sm text-gray-500 mb-4">
-                                    Upload a custom <code>sitemap.xml</code> file directly. This will overwrite the automatically generated sitemap.
-                                </p>
-                                <div className="flex items-center gap-4">
-                                    <input
-                                        type="file"
-                                        accept=".xml"
-                                        onChange={handleSitemapUpload}
-                                        disabled={saving}
-                                        className="block w-full text-sm text-gray-500
-                                            file:mr-4 file:py-2 file:px-4
-                                            file:rounded-full file:border-0
-                                            file:text-sm file:font-semibold
-                                            file:bg-purple-50 file:text-purple-700
-                                            hover:file:bg-purple-100
-                                        "
-                                    />
-                                    {saving && <Loader2 className="w-5 h-5 animate-spin text-purple-600" />}
                                 </div>
                             </div>
                         </div>

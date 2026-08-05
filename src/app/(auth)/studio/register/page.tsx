@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Input } from "@/components/atoms";
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle, CheckCircle, Palette } from "lucide-react";
+import { commissionHeadline } from "@/lib/commission";
 
 const registerSchema = z
     .object({
@@ -90,7 +91,7 @@ export default function StudioRegisterPage() {
                         </li>
                         <li className="flex items-center gap-3">
                             <CheckCircle className="w-5 h-5 text-[var(--secondary-500)]" />
-                            <span>Earn 85% revenue share</span>
+                            <span>{commissionHeadline()}</span>
                         </li>
                     </ul>
                 </div>

@@ -1,5 +1,6 @@
 import { Header, Footer } from "@/components/organisms";
 import { Plus, Minus, Search } from "lucide-react";
+import { commissionFaqAnswer } from "@/lib/commission";
 
 const faqs = [
     {
@@ -14,7 +15,7 @@ const faqs = [
         category: "For Selling",
         items: [
             { q: "How do I start selling?", a: "Simply sign up for a Studio account, complete your profile, and start listing your artworks or courses. It takes less than 5 minutes to get started." },
-            { q: "What are the fees?", a: "We take a flat 10% commission on sales to cover payment processing and platform maintenance. There are no monthly subscription fees." },
+            { q: "What are the fees?", a: commissionFaqAnswer() },
             { q: "How do I get paid?", a: "We support payouts via bank transfer and PayPal. Payouts are processed weekly for all completed orders." },
         ]
     },

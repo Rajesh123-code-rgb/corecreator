@@ -56,7 +56,7 @@ declare global {
 export default function CheckoutPage() {
     const router = useRouter();
     const { data: session } = useSession();
-    const { items, subtotal, clearCart, discount, promoCode, shippingTotal } = useCart();
+    const { items, isHydrated, subtotal, clearCart, discount, promoCode, shippingTotal } = useCart();
     const { formatPrice } = useCurrency();
     const toast = useToast();
     const [currentStep, setCurrentStep] = React.useState(0);
@@ -93,10 +93,10 @@ export default function CheckoutPage() {
     }, []);
 
     React.useEffect(() => {
-        if (items.length === 0) {
+        if (isHydrated && items.length === 0) {
             router.push("/cart");
         }
-    }, [items, router]);
+    }, [isHydrated, items, router]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAddress({ ...address, [e.target.name]: e.target.value });
@@ -190,6 +190,13 @@ export default function CheckoutPage() {
         }
     };
 
+    if (!isHydrated) {
+        return (
+            <div className="min-h-screen bg-[var(--muted)] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--muted-foreground)]" />
+            </div>
+        );
+    }
     if (items.length === 0) return null;
 
     return (

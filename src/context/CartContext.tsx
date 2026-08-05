@@ -18,6 +18,7 @@ interface CartItem {
 
 interface CartContextType {
     items: CartItem[];
+    isHydrated: boolean;
     addItem: (item: CartItem) => void;
     removeItem: (id: string) => void;
     updateQuantity: (id: string, quantity: number) => void;
@@ -36,6 +37,7 @@ const CartContext = React.createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = React.useState<CartItem[]>([]);
+    const [isHydrated, setIsHydrated] = React.useState(false);
     const [promoCode, setPromoCode] = React.useState<string | null>(null);
     const [discount, setDiscount] = React.useState(0);
 
@@ -49,6 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 localStorage.removeItem("cart");
             }
         }
+        setIsHydrated(true);
     }, []);
 
     // Save cart to localStorage when it changes
@@ -125,6 +128,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         <CartContext.Provider
             value={{
                 items,
+                isHydrated,
                 addItem,
                 removeItem,
                 updateQuantity,

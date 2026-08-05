@@ -6,7 +6,7 @@ import { Metadata } from "next";
 export const siteConfig = {
     name: "Core Creator",
     description: "Global Art & Craft eLearning & Marketplace",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://corecreator.com",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://corecreator.online",
     ogImage: "/og-image.jpg",
     twitterHandle: "@corecreator",
     keywords: [

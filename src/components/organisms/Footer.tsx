@@ -52,7 +52,6 @@ const footerSections = [
             { label: "Studio Login", href: "/studio/login" },
             { label: "Studio Dashboard", href: "/studio/dashboard" },
             { label: "Pricing & Fees", href: "/pricing" },
-            { label: "Success Stories", href: "/success-stories" },
         ],
     },
     {

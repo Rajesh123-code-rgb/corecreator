@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function CartPage() {
-    const { items, removeItem, updateQuantity, subtotal, clearCart, applyPromo, removePromo, discount, promoCode } = useCart();
+    const { items, isHydrated, removeItem, updateQuantity, subtotal, clearCart, applyPromo, removePromo, discount, promoCode } = useCart();
     const { formatPrice } = useCurrency();
     const [inputCode, setInputCode] = React.useState("");
     const [error, setError] = React.useState("");
@@ -50,7 +50,7 @@ export default function CartPage() {
         }
     };
 
-    if (items.length === 0) {
+    if (isHydrated && items.length === 0) {
         return (
             <div className="min-h-screen bg-[var(--background)]">
                 <Header />

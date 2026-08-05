@@ -6,6 +6,7 @@ import { Search, Book, User, CreditCard, Shield, Truck, Settings, MessageCircle,
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { commissionFaqAnswer } from "@/lib/commission";
 
 // Types
 type CategoryId = "getting-started" | "account" | "billing" | "safety" | "shipping" | "tech-support";
@@ -57,7 +58,7 @@ const helpCategories: Category[] = [
             { id: "bil-1", question: "What payment methods do you accept?", answer: "We securely accept all major credit cards (Visa, Mastercard, Amex), PayPal, and Apple Pay." },
             { id: "bil-2", question: "When will I be charged?", answer: "You are charged immediately upon checking out for products or courses. You will receive an email receipt for your records." },
             { id: "bil-3", question: "How do payouts work for sellers?", answer: "Sellers receive payouts on a weekly basis for all completed orders. Funds are transferred directly to your connected bank account or PayPal." },
-            { id: "bil-4", question: "Are there transaction fees?", answer: "We charge a standard 10% platform fee on sales to cover hosting, marketing, and payment processing costs. There are no listing fees." },
+            { id: "bil-4", question: "Are there transaction fees?", answer: commissionFaqAnswer() },
         ]
     },
     {
