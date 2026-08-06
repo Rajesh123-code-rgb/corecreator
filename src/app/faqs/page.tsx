@@ -28,7 +28,7 @@ const faqs = [
         category: "For Learning",
         items: [
             { q: "Do courses expire?", a: "No. Once you purchase a course, you have lifetime access to it, including any future updates." },
-            { q: "Can I get a refund?", a: "Yes, we offer a 30-day money-back guarantee on all courses if you are not satisfied with your purchase." },
+            { q: "Can I get a refund?", a: "Digital courses and tutorials carry a 30-day money-back guarantee — if you're not satisfied, request a refund within 30 days of purchase. Physical artworks and products work differently: you're always entitled to a full refund or replacement if an item arrives damaged or isn't as described, but change-of-mind returns follow the individual artist's policy. See our Returns & Refunds page for full details." },
         ]
     }
 ];

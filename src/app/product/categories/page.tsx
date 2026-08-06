@@ -77,9 +77,6 @@ export default function CategoriesPage() {
                                     <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                                         <div className="flex items-center justify-between mb-2">
                                             <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                                            <span className="px-2 py-1 rounded-md bg-white/20 text-white text-xs font-medium backdrop-blur-sm">
-                                                {category.count}
-                                            </span>
                                         </div>
                                         <p className="text-white/80 text-sm line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                                             {category.description}

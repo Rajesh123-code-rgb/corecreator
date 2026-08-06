@@ -428,7 +428,6 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
-                  <p className="text-white/70 text-sm">{category.count} items</p>
                 </div>
               </Link>
             ))}
@@ -515,7 +514,6 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
-                  <p className="text-white/70 text-sm">{category.count} Courses</p>
                 </div>
               </Link>
             ))}
