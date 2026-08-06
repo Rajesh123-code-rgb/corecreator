@@ -9,3 +9,4 @@ export { default as GoogleAnalytics } from "./GoogleAnalytics";
 export { default as JsonLd } from "./JsonLd";
 export { default as GoogleTranslate } from "./GoogleTranslate";
 export { default as PriceDisplay } from "./PriceDisplay";
+export { SkipLink } from "./Accessibility";

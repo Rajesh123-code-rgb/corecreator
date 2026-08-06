@@ -12,6 +12,7 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero */}
             <section className="bg-[var(--muted)] pt-32 pb-20">
@@ -128,6 +129,7 @@ export default function ContactPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

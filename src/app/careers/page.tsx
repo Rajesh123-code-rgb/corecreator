@@ -23,6 +23,7 @@ export default function CareersPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero */}
             <section className="pt-32 pb-20 text-center">
@@ -65,6 +66,7 @@ export default function CareersPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

@@ -37,6 +37,7 @@ export default function FAQPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             <section className="bg-[var(--muted)] pt-32 pb-20">
                 <div className="container-app text-center">
@@ -83,6 +84,7 @@ export default function FAQPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

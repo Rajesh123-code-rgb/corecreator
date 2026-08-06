@@ -116,6 +116,7 @@ export default function HelpCenterPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero */}
             <section className="bg-[var(--muted)] pt-32 pb-20">
@@ -234,6 +235,7 @@ export default function HelpCenterPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

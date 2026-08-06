@@ -15,6 +15,7 @@ export default async function AboutPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
@@ -110,6 +111,7 @@ export default async function AboutPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

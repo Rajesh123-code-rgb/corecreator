@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/atoms";
+import { Button, SkipLink } from "@/components/atoms";
 import { SearchBar } from "@/components/molecules";
 import { useCart } from "@/context";
 import { GoogleTranslate } from "@/components/atoms";
@@ -93,6 +93,8 @@ export function Header() {
     const headerIconColor = isScrolled ? "text-[var(--muted-foreground)]" : "text-[var(--foreground)]";
 
     return (
+        <>
+        <SkipLink />
         <header
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)]"
@@ -376,5 +378,6 @@ export function Header() {
                 </div>
             )}
         </header>
+        </>
     );
 }

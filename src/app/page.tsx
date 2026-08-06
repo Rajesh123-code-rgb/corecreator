@@ -237,6 +237,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <Header />
+      <main id="main-content">
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
@@ -869,6 +870,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      </main>
       <Footer />
     </div>
   );
