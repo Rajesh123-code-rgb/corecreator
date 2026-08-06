@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
+import { useConsent } from "@/context/ConsentContext";
 
 /**
  * Utility to track custom events
@@ -51,8 +52,15 @@ function GoogleAnalyticsInner({ measurementId }: { measurementId: string }) {
 
 export default function GoogleAnalytics() {
     const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+    const { consent } = useConsent();
 
     if (!measurementId) {
+        return null;
+    }
+
+    // Analytics cookies are non-essential: don't load gtag.js (which sets
+    // _ga/_gid) until the visitor has actively opted in.
+    if (!consent?.analytics) {
         return null;
     }
 
