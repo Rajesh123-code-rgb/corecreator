@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/atoms";
-import { CertificateDownloadButton, VideoPlayer } from "@/components/molecules";
+import { CertificateDownloadButton } from "@/components/molecules/CertificateDownloadButton";
+import { VideoPlayer } from "@/components/molecules/VideoPlayer";
 import {
     ChevronLeft,
     ChevronRight,

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button, SkipLink } from "@/components/atoms";
-import { SearchBar } from "@/components/molecules";
+import { SearchBar } from "@/components/molecules/SearchBar";
 import { useCart } from "@/context";
 import { GoogleTranslate } from "@/components/atoms";
 import {
