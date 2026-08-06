@@ -2,12 +2,11 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/organisms";
 import { categories } from "@/lib/categories";
 import CategoryProductList from "./CategoryProductList";
+import { getProducts } from "@/lib/productSearch";
 
-export function generateStaticParams() {
-    return categories.map((category) => ({
-        slug: category.slug,
-    }));
-}
+// Rendered per request: the listing comes from the database, and the Docker
+// build has no DB connection, so this must not be statically generated.
+export const dynamic = "force-dynamic";
 
 // Define params type correctly for Next.js 15+ / 16
 type Props = {
@@ -24,9 +23,18 @@ export default async function CategoryPage({ params }: Props) {
         notFound();
     }
 
+    // Matches CategoryProductList's own default query (name, limit 20, newest).
+    const { products } = await getProducts({
+        category: category.name,
+        limit: 20,
+        sort: "newest",
+    });
+    const initialProducts = JSON.parse(JSON.stringify(products));
+
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
@@ -55,10 +63,11 @@ export default async function CategoryPage({ params }: Props) {
             {/* Products Section */}
             <section className="py-12">
                 <div className="container-app">
-                    <CategoryProductList categorySlug={category.name} />
+                    <CategoryProductList categorySlug={category.name} initialProducts={initialProducts} />
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

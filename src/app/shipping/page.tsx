@@ -1,10 +1,16 @@
 import { Header, Footer } from "@/components/organisms";
 import { Truck, Globe, Clock, AlertCircle } from "lucide-react";
 
+export const metadata = {
+    title: "Shipping Information | Core Creator",
+    description: "Shipping timelines, costs, and policies for physical artworks and products purchased on Core Creator.",
+};
+
 export default function ShippingPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             <section className="bg-[var(--muted)] pt-32 pb-20">
                 <div className="container-app text-center">
@@ -69,6 +75,7 @@ export default function ShippingPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

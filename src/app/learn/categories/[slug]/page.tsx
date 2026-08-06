@@ -2,12 +2,11 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/organisms";
 import { courseCategories } from "@/lib/courseCategories";
 import CategoryCourseList from "./CategoryCourseList";
+import { getCourses } from "@/lib/courseSearch";
 
-export function generateStaticParams() {
-    return courseCategories.map((category) => ({
-        slug: category.slug,
-    }));
-}
+// Rendered per request: the listing comes from the database, and the Docker
+// build has no DB connection, so this must not be statically generated.
+export const dynamic = "force-dynamic";
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -22,9 +21,18 @@ export default async function CourseCategoryPage({ params }: Props) {
         notFound();
     }
 
+    // Matches CategoryCourseList's own default query (name, limit 20, popular).
+    const { courses } = await getCourses({
+        category: category.name,
+        limit: 20,
+        sort: "popular",
+    });
+    const initialCourses = JSON.parse(JSON.stringify(courses));
+
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
@@ -53,10 +61,11 @@ export default async function CourseCategoryPage({ params }: Props) {
             {/* Courses Section */}
             <section className="py-12">
                 <div className="container-app">
-                    <CategoryCourseList categorySlug={category.name} />
+                    <CategoryCourseList categorySlug={category.name} initialCourses={initialCourses} />
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

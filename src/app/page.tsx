@@ -237,6 +237,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <Header />
+      <main id="main-content">
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
@@ -271,7 +272,7 @@ export default function HomePage() {
               <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
                 <Link href="/studio/register">
                   <Palette className="w-5 h-5" />
-                  <span>Become an Instructor</span>
+                  <span>Become a Creator</span>
                 </Link>
               </Button>
             </div>
@@ -427,7 +428,6 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
-                  <p className="text-white/70 text-sm">{category.count} items</p>
                 </div>
               </Link>
             ))}
@@ -514,7 +514,6 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
-                  <p className="text-white/70 text-sm">{category.count} Courses</p>
                 </div>
               </Link>
             ))}
@@ -811,7 +810,7 @@ export default function HomePage() {
                       <item.icon className="w-6 h-6 text-[var(--primary-400)]" />
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-1">{item.title}</h4>
+                      <h3 className="font-semibold mb-1">{item.title}</h3>
                       <p className="text-sm text-white/60">{item.desc}</p>
                     </div>
                   </div>
@@ -858,7 +857,7 @@ export default function HomePage() {
               <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">Join thousands of artists, learners, and art lovers on the world's most vibrant creative platform.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="xl" className="bg-white text-[var(--foreground)] hover:bg-white/90 w-full sm:w-auto font-semibold" asChild>
-                  <Link href="/register">Create Free Account<ArrowRight className="w-5 h-5 ml-2" /></Link>
+                  <Link href="/register">Get Started<ArrowRight className="w-5 h-5 ml-2" /></Link>
                 </Button>
                 <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10 w-full sm:w-auto" asChild>
                   <Link href="/marketplace">Explore Marketplace</Link>
@@ -869,6 +868,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      </main>
       <Footer />
     </div>
   );

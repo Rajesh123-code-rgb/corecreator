@@ -78,7 +78,7 @@ export default function StudioRegisterPage() {
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?q=80&w=2600&auto=format&fit=crop')] bg-cover bg-center opacity-20" />
                 <div className="relative w-full h-full max-w-2xl text-center flex flex-col items-center justify-center z-10">
                     <Palette className="w-16 h-16 text-white mb-6" />
-                    <h2 className="text-4xl font-bold mb-4 text-white">Share Your Art with the World</h2>
+                    <p className="text-4xl font-bold mb-4 text-white">Share Your Art with the World</p>
                     <p className="text-lg text-white/90">Join thousands of instructors and artists earning by teaching and selling on Core Creator.</p>
                     <ul className="mt-8 text-left space-y-4 text-white/80">
                         <li className="flex items-center gap-3">

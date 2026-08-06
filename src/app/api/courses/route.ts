@@ -1,102 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/db/mongodb";
-import Course from "@/lib/db/models/Course";
-import Category from "@/lib/db/models/Category";
-
-function escapeRegExp(string: string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-async function getCategoryFilterRegex(categoryParam: string) {
-    if (!categoryParam || categoryParam === "all") return null;
-
-    // Search for predefined category document
-    const catDoc = await Category.findOne({
-        type: "course",
-        $or: [
-            { slug: categoryParam.toLowerCase() },
-            { name: { $regex: new RegExp(`^${escapeRegExp(categoryParam)}$`, "i") } }
-        ]
-    }).lean();
-
-    const possibleValues = new Set<string>();
-    possibleValues.add(categoryParam);
-    possibleValues.add(categoryParam.replace(/-/g, " "));
-    possibleValues.add(categoryParam.replace(/ /g, "-"));
-
-    if (catDoc) {
-        if (catDoc.name) possibleValues.add(catDoc.name);
-        if (catDoc.slug) possibleValues.add(catDoc.slug);
-    }
-
-    // Build flexible patterns
-    const patterns = Array.from(possibleValues).map(val =>
-        `^${escapeRegExp(val).replace(/\\-/g, "[\\s\\-]")}s?$`
-    );
-
-    return new RegExp(patterns.join("|"), "i");
-}
+import { getCourses } from "@/lib/courseSearch";
 
 export async function GET(request: NextRequest) {
     try {
-        await connectDB();
-
         const { searchParams } = new URL(request.url);
 
-        const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || "12");
-        const skip = (page - 1) * limit;
-
-        const categoryParam = searchParams.get("category");
-        const level = searchParams.get("level");
-        const sort = searchParams.get("sort") || "popular";
-        const search = searchParams.get("search");
-        const featured = searchParams.get("featured");
-        const instructor = searchParams.get("instructor");
-        const minRating = searchParams.get("minRating");
-
-        const query: Record<string, unknown> = { status: "published" };
-
-        if (categoryParam && categoryParam !== "all") {
-            const catRegex = await getCategoryFilterRegex(categoryParam);
-            if (catRegex) {
-                query.category = { $regex: catRegex };
-            }
-        }
-
-        if (level && level !== "all") {
-            query.level = { $regex: new RegExp(`^${escapeRegExp(level)}$`, "i") };
-        }
-
-        if (featured === "true") query.isFeatured = true;
-        if (instructor) query.instructor = instructor;
-        if (minRating) query.rating = { $gte: parseFloat(minRating) };
-        if (search) query.$text = { $search: search };
-
-        let sortOption: Record<string, 1 | -1> = { enrollmentCount: -1 };
-        switch (sort) {
-            case "newest": sortOption = { createdAt: -1 }; break;
-            case "price-low": sortOption = { price: 1 }; break;
-            case "price-high": sortOption = { price: -1 }; break;
-            case "rating": sortOption = { averageRating: -1 }; break;
-            default: sortOption = { enrollmentCount: -1 };
-        }
-
-        const [courses, total] = await Promise.all([
-            Course.find(query)
-                .sort(sortOption)
-                .skip(skip)
-                .limit(limit)
-                .select("title subtitle description price averageRating totalStudents thumbnail images slug category level createdAt")
-                .populate("instructor", "name avatar bio")
-                .lean(),
-            Course.countDocuments(query),
-        ]);
-
-        return NextResponse.json({
-            courses,
-            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+        const result = await getCourses({
+            page: parseInt(searchParams.get("page") || "1"),
+            limit: parseInt(searchParams.get("limit") || "12"),
+            category: searchParams.get("category"),
+            level: searchParams.get("level"),
+            sort: searchParams.get("sort"),
+            search: searchParams.get("search"),
+            featured: searchParams.get("featured"),
+            instructor: searchParams.get("instructor"),
+            minRating: searchParams.get("minRating"),
         });
+
+        return NextResponse.json(result);
     } catch (error) {
         console.error("Courses API Error:", error);
         return NextResponse.json({ error: "Failed to fetch courses" }, { status: 500 });

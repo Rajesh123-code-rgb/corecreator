@@ -5,11 +5,17 @@ import Link from "next/link";
 import { getPlatformStats } from "@/lib/platformStats";
 import { formatCurrency } from "@/lib/formatting";
 
+export const metadata = {
+    title: "About Us | Core Creator",
+    description: "Learn about Core Creator's mission to connect artists, instructors, and collectors in a global art & craft marketplace.",
+};
+
 export default async function AboutPage() {
     const stats = await getPlatformStats();
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
@@ -36,7 +42,7 @@ export default async function AboutPage() {
                             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
                                 <Target className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Our Mission</h3>
+                            <h2 className="text-xl font-bold mb-3">Our Mission</h2>
                             <p className="text-[var(--muted-foreground)]">
                                 To democratize art education and provide a global marketplace where creators can thrive financially and artistically.
                             </p>
@@ -45,7 +51,7 @@ export default async function AboutPage() {
                             <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
                                 <Heart className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Our Values</h3>
+                            <h2 className="text-xl font-bold mb-3">Our Values</h2>
                             <p className="text-[var(--muted-foreground)]">
                                 We believe in authenticity, community support, and the transformative power of continuous learning.
                             </p>
@@ -54,7 +60,7 @@ export default async function AboutPage() {
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
                                 <Globe className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Global Reach</h3>
+                            <h2 className="text-xl font-bold mb-3">Global Reach</h2>
                             <p className="text-[var(--muted-foreground)]">
                                 Connecting artists from over 100 countries, fostering cultural exchange through the universal language of art.
                             </p>
@@ -105,6 +111,7 @@ export default async function AboutPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

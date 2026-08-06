@@ -3,6 +3,11 @@ import { Button } from "@/components/atoms";
 import Link from "next/link";
 import { Book, Palette, Users, ArrowRight } from "lucide-react";
 
+export const metadata = {
+    title: "Documentation & Guides | Core Creator",
+    description: "Guides and resources for creators and learners using the Core Creator platform.",
+};
+
 export default function DocumentationHubPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">

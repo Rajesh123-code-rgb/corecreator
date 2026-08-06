@@ -2,6 +2,11 @@ import { Header, Footer } from "@/components/organisms";
 import { Plus, Minus, Search } from "lucide-react";
 import { commissionFaqAnswer } from "@/lib/commission";
 
+export const metadata = {
+    title: "FAQs | Core Creator",
+    description: "Answers to common questions about buying, selling, and teaching on Core Creator — fees, payouts, refunds, and more.",
+};
+
 const faqs = [
     {
         category: "General",
@@ -23,7 +28,7 @@ const faqs = [
         category: "For Learning",
         items: [
             { q: "Do courses expire?", a: "No. Once you purchase a course, you have lifetime access to it, including any future updates." },
-            { q: "Can I get a refund?", a: "Yes, we offer a 30-day money-back guarantee on all courses if you are not satisfied with your purchase." },
+            { q: "Can I get a refund?", a: "Digital courses and tutorials carry a 30-day money-back guarantee — if you're not satisfied, request a refund within 30 days of purchase. Physical artworks and products work differently: you're always entitled to a full refund or replacement if an item arrives damaged or isn't as described, but change-of-mind returns follow the individual artist's policy. See our Returns & Refunds page for full details." },
         ]
     }
 ];
@@ -32,6 +37,7 @@ export default function FAQPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             <section className="bg-[var(--muted)] pt-32 pb-20">
                 <div className="container-app text-center">
@@ -78,6 +84,7 @@ export default function FAQPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

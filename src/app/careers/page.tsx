@@ -3,6 +3,11 @@ import { Button } from "@/components/atoms";
 import { Briefcase, MapPin, Clock, ArrowRight, Zap, Coffee, Smile, Globe } from "lucide-react";
 import Link from "next/link";
 
+export const metadata = {
+    title: "Careers | Core Creator",
+    description: "Join the Core Creator team and help build the future of the global art & craft community.",
+};
+
 
 
 const perks = [
@@ -18,6 +23,7 @@ export default function CareersPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero */}
             <section className="pt-32 pb-20 text-center">
@@ -60,6 +66,7 @@ export default function CareersPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

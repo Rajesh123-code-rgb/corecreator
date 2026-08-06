@@ -3,10 +3,16 @@ import { Button } from "@/components/atoms";
 import { Mail, MapPin, Phone, MessageSquare, Clock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+export const metadata = {
+    title: "Contact Us | Core Creator",
+    description: "Get in touch with the Core Creator team for support, partnership inquiries, or general questions.",
+};
+
 export default function ContactPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             {/* Hero */}
             <section className="bg-[var(--muted)] pt-32 pb-20">
@@ -123,6 +129,7 @@ export default function ContactPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

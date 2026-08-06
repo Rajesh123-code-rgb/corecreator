@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Button } from "@/components/atoms";
 import { Download, Award } from "lucide-react";
-import jsPDF from "jspdf";
 
 interface CertificateDownloadButtonProps {
     studentName: string;
@@ -22,10 +21,15 @@ export const CertificateDownloadButton: React.FC<CertificateDownloadButtonProps>
 }) => {
     const [isGenerating, setIsGenerating] = React.useState(false);
 
-    const generateCertificate = () => {
+    const generateCertificate = async () => {
         setIsGenerating(true);
 
         try {
+            // Loaded on demand - jsPDF is only needed once the user actually
+            // clicks, and keeping it out of the static import graph stops it
+            // being pulled into the shared bundle.
+            const { default: jsPDF } = await import("jspdf");
+
             // Create landscape PDF (A4)
             const doc = new jsPDF({
                 orientation: "landscape",

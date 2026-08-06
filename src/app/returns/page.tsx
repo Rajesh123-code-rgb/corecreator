@@ -3,10 +3,16 @@ import { RefreshCcw, ShieldCheck, Mail, FileText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/atoms";
 
+export const metadata = {
+    title: "Returns & Refunds | Core Creator",
+    description: "Our refund guarantee for digital courses and return policy for physical artworks and products.",
+};
+
 export default function ReturnsPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <Header />
+            <main id="main-content">
 
             <section className="bg-[var(--muted)] pt-32 pb-20">
                 <div className="container-app text-center">
@@ -70,6 +76,7 @@ export default function ReturnsPage() {
                 </div>
             </section>
 
+            </main>
             <Footer />
         </div>
     );

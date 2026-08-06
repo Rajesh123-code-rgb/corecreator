@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/atoms";
 import { Card, CardContent } from "@/components/molecules";
-import { Header } from "@/components/organisms";
 import { useCart } from "@/context/CartContext";
 import {
     Heart,
@@ -42,10 +41,16 @@ interface Product {
     };
 }
 
-export default function CategoryProductList({ categorySlug }: { categorySlug: string }) {
+export default function CategoryProductList({
+    categorySlug,
+    initialProducts,
+}: {
+    categorySlug: string;
+    initialProducts: Product[];
+}) {
     // State
-    const [products, setProducts] = React.useState<Product[]>([]);
-    const [loading, setLoading] = React.useState(true);
+    const [products, setProducts] = React.useState<Product[]>(initialProducts);
+    const [loading, setLoading] = React.useState(false);
     const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
     const [sortBy, setSortBy] = React.useState("newest");
     const { addItem } = useCart();
@@ -54,6 +59,10 @@ export default function CategoryProductList({ categorySlug }: { categorySlug: st
 
     // NOTE: categorySlug passed here is the Name (e.g. "Paintings"), which matches what the API likely expects if it filters by name.
     // The previous page passed category.name.
+
+    // The server already ran this query for the default sort and passed the
+    // result in as props - only refetch once the user changes sort.
+    const isInitialRender = React.useRef(true);
 
     React.useEffect(() => {
         const fetchProducts = async () => {
@@ -79,6 +88,10 @@ export default function CategoryProductList({ categorySlug }: { categorySlug: st
             }
         };
 
+        if (isInitialRender.current) {
+            isInitialRender.current = false;
+            return;
+        }
         fetchProducts();
     }, [categorySlug, sortBy]);
 

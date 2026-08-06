@@ -48,7 +48,7 @@ const footerSections = [
     {
         title: "For Creators",
         links: [
-            { label: "Open a Studio", href: "/studio/register" },
+            { label: "Become a Creator", href: "/studio/register" },
             { label: "Studio Login", href: "/studio/login" },
             { label: "Studio Dashboard", href: "/studio/dashboard" },
             { label: "Pricing & Fees", href: "/pricing" },
@@ -121,7 +121,7 @@ export function Footer() {
                             <div className="flex flex-wrap gap-4">
                                 <Button size="xl" className="bg-white text-[var(--secondary-700)] hover:bg-white/90 shadow-lg px-8" asChild>
                                     <Link href="/studio/register">
-                                        Start Creating
+                                        Become a Creator
                                         <ArrowRight className="w-5 h-5 ml-2" />
                                     </Link>
                                 </Button>

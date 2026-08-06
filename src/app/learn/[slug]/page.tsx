@@ -12,15 +12,19 @@ export default async function CourseDetailPage(props: PageProps) {
     const params = await props.params;
     await connectDB();
 
-    // Only select required metadata for the server page, the client fetches the rest
-    const courseDoc = await Course.findOne({ slug: params.slug })
-        .populate("instructor", "name")
-        .select("title description thumbnail price compareAtPrice rating instructorName reviewCount")
+    // Fetch the full course server-side and pass it down, so the page's content
+    // is in the initial HTML rather than arriving via a client fetch.
+    // status: "published" mirrors the filter in /api/courses/[slug] - without it
+    // this would render unpublished/draft courses publicly.
+    const courseDoc = await Course.findOne({ slug: params.slug, status: "published" })
+        .populate("instructor", "name avatar bio rating students courses")
         .lean();
 
     if (!courseDoc) {
         notFound();
     }
+
+    const course = JSON.parse(JSON.stringify(courseDoc));
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -55,7 +59,7 @@ export default async function CourseDetailPage(props: PageProps) {
     return (
         <>
             <JsonLd data={jsonLd} />
-            <CourseClientPage />
+            <CourseClientPage initialCourse={course} />
         </>
     );
 }

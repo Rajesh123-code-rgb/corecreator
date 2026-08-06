@@ -7,6 +7,8 @@ import { CartProvider } from "@/context";
 import { ToastProvider } from "@/components/molecules/Toast";
 import "./globals.css";
 import GoogleAnalytics from "@/components/atoms/GoogleAnalytics";
+import { ConsentProvider } from "@/context/ConsentContext";
+import { ConsentBanner } from "@/components/organisms/ConsentBanner";
 import connectDB from "@/lib/db/mongodb";
 import SystemConfig from "@/lib/db/models/SystemConfig";
 
@@ -124,23 +126,26 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <GoogleAnalytics />
-        <AuthProvider>
-          <LanguageProvider>
-            <CurrencyProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <CartProvider>
-                  <ToastProvider>{children}</ToastProvider>
-                </CartProvider>
-              </ThemeProvider>
-            </CurrencyProvider>
-          </LanguageProvider>
-        </AuthProvider>
+        <ConsentProvider>
+          <GoogleAnalytics />
+          <AuthProvider>
+            <LanguageProvider>
+              <CurrencyProvider>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  <CartProvider>
+                    <ToastProvider>{children}</ToastProvider>
+                  </CartProvider>
+                </ThemeProvider>
+              </CurrencyProvider>
+            </LanguageProvider>
+          </AuthProvider>
+          <ConsentBanner />
+        </ConsentProvider>
       </body>
     </html>
   );
