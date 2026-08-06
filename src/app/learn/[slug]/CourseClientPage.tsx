@@ -22,7 +22,6 @@ import {
     Download,
     Heart,
     Share2,
-    Loader2,
     Users,
     MessageSquare,
     X
@@ -86,17 +85,16 @@ interface Course {
 
 
 
-export default function CourseClientPage() {
+export default function CourseClientPage({ initialCourse }: { initialCourse: Course }) {
     const params = useParams();
     const router = useRouter();
     const { addItem } = useCart();
     const { formatPrice } = useCurrency();
     const toast = useToast();
 
-    // Course State
-    const [course, setCourse] = React.useState<Course | null>(null);
-    const [loading, setLoading] = React.useState(true);
-    const [error, setError] = React.useState<string | null>(null);
+    // Course State - seeded from the server render; the page no longer refetches
+    // its own content on mount.
+    const [course] = React.useState<Course | null>(initialCourse);
     const [expandedSection, setExpandedSection] = React.useState<number | null>(0);
 
     // Actions State
@@ -105,29 +103,6 @@ export default function CourseClientPage() {
     const [copied, setCopied] = React.useState(false);
     const [previewOpen, setPreviewOpen] = React.useState(false);
 
-    const slug = params.slug as string;
-
-    React.useEffect(() => {
-        const fetchCourse = async () => {
-            try {
-                const res = await fetch(`/api/courses/${slug}`);
-                if (!res.ok) {
-                    if (res.status === 404) throw new Error("Course not found");
-                    throw new Error("Failed to fetch course");
-                }
-                const data = await res.json();
-                setCourse(data.course);
-
-            } catch (err) {
-                console.error(err);
-                setError(err instanceof Error ? err.message : "Something went wrong");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (slug) fetchCourse();
-    }, [slug]);
 
     const handleAddToCart = () => {
         if (!course) return;
@@ -166,25 +141,15 @@ export default function CourseClientPage() {
         toast.error(`${feature} feature coming soon!`);
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[var(--background)] flex flex-col">
-                <Header />
-                <div className="flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-                </div>
-                <Footer />
-            </div>
-        );
-    }
-
-    if (error || !course) {
+    // Defensive only - the server calls notFound() when the course doesn't
+    // exist, so this branch shouldn't be reachable in practice.
+    if (!course) {
         return (
             <div className="min-h-screen bg-[var(--background)] flex flex-col">
                 <Header />
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
                     <h1 className="text-2xl font-bold mb-4">Course not found</h1>
-                    <p className="text-[var(--muted-foreground)] mb-6">{error || "The course you are looking for does not exist."}</p>
+                    <p className="text-[var(--muted-foreground)] mb-6">The course you are looking for does not exist.</p>
                     <Link href="/learn">
                         <Button>Browse Courses</Button>
                     </Link>
