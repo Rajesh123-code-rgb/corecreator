@@ -3,6 +3,11 @@ import { Button } from "@/components/atoms";
 import { Briefcase, MapPin, Clock, ArrowRight, Zap, Coffee, Smile, Globe } from "lucide-react";
 import Link from "next/link";
 
+export const metadata = {
+    title: "Careers | Core Creator",
+    description: "Join the Core Creator team and help build the future of the global art & craft community.",
+};
+
 
 
 const perks = [

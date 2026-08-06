@@ -2,6 +2,11 @@ import { Header, Footer } from "@/components/organisms";
 import { Plus, Minus, Search } from "lucide-react";
 import { commissionFaqAnswer } from "@/lib/commission";
 
+export const metadata = {
+    title: "FAQs | Core Creator",
+    description: "Answers to common questions about buying, selling, and teaching on Core Creator — fees, payouts, refunds, and more.",
+};
+
 const faqs = [
     {
         category: "General",

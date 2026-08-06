@@ -1,5 +1,10 @@
 import { Header, Footer } from "@/components/organisms";
 
+export const metadata = {
+    title: "Terms of Service | Core Creator",
+    description: "The terms and conditions governing use of the Core Creator marketplace and learning platform.",
+};
+
 export default function TermsPage() {
     return (
         <div className="min-h-screen bg-[var(--background)]">
