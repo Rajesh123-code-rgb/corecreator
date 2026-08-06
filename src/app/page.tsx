@@ -272,7 +272,7 @@ export default function HomePage() {
               <Button variant="outline" size="xl" className="w-full sm:w-auto" asChild>
                 <Link href="/studio/register">
                   <Palette className="w-5 h-5" />
-                  <span>Become an Instructor</span>
+                  <span>Become a Creator</span>
                 </Link>
               </Button>
             </div>
@@ -857,7 +857,7 @@ export default function HomePage() {
               <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">Join thousands of artists, learners, and art lovers on the world's most vibrant creative platform.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="xl" className="bg-white text-[var(--foreground)] hover:bg-white/90 w-full sm:w-auto font-semibold" asChild>
-                  <Link href="/register">Create Free Account<ArrowRight className="w-5 h-5 ml-2" /></Link>
+                  <Link href="/register">Get Started<ArrowRight className="w-5 h-5 ml-2" /></Link>
                 </Button>
                 <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10 w-full sm:w-auto" asChild>
                   <Link href="/marketplace">Explore Marketplace</Link>
