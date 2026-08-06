@@ -40,10 +40,20 @@ interface Course {
     isBestseller?: boolean;
 }
 
-export default function CategoryCourseList({ categorySlug }: { categorySlug: string }) {
-    const [courses, setCourses] = React.useState<Course[]>([]);
-    const [loading, setLoading] = React.useState(true);
+export default function CategoryCourseList({
+    categorySlug,
+    initialCourses,
+}: {
+    categorySlug: string;
+    initialCourses: Course[];
+}) {
+    const [courses, setCourses] = React.useState<Course[]>(initialCourses);
+    const [loading, setLoading] = React.useState(false);
     const [sortBy, setSortBy] = React.useState("popular");
+
+    // The server already ran this query for the default sort and passed the
+    // result in as props - only refetch once the user changes sort.
+    const isInitialRender = React.useRef(true);
 
     React.useEffect(() => {
         const fetchCourses = async () => {
@@ -67,6 +77,10 @@ export default function CategoryCourseList({ categorySlug }: { categorySlug: str
             }
         };
 
+        if (isInitialRender.current) {
+            isInitialRender.current = false;
+            return;
+        }
         fetchCourses();
     }, [categorySlug, sortBy]);
 
