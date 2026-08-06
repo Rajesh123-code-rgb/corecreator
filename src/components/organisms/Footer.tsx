@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { formatCurrency } from "@/lib/formatting";
 
 const footerSections = [
     {
@@ -93,6 +95,7 @@ const trustBadges = [
 
 export function Footer() {
     const { currency, setCurrency } = useCurrency();
+    const { stats } = usePlatformStats();
     return (
         <footer className="relative overflow-hidden">
             {/* Partner CTA Section - Enhanced */}
@@ -134,15 +137,15 @@ export function Footer() {
                         {/* Stats */}
                         <div className="grid grid-cols-3 gap-4 lg:gap-6">
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">50K+</p>
+                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">{stats.creators}+</p>
                                 <p className="text-white/70 text-sm lg:text-base">Artists & Creators</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">2.5K+</p>
+                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">{stats.courses}+</p>
                                 <p className="text-white/70 text-sm lg:text-base">Courses & Workshops</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">50L+</p>
+                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">{formatCurrency(stats.creatorEarnings, "INR")}+</p>
                                 <p className="text-white/70 text-sm lg:text-base">Creator Earnings</p>
                             </div>
                         </div>
@@ -182,10 +185,11 @@ export function Footer() {
                                     <input
                                         type="email"
                                         placeholder="Enter your email"
+                                        aria-label="Email address for newsletter"
                                         className="flex-1 px-5 py-4 text-base rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--secondary-500)] focus:border-transparent transition-all"
                                     />
-                                    <button type="submit" className="px-6 py-4 rounded-xl bg-[var(--secondary-500)] hover:bg-[var(--secondary-600)] transition-colors shadow-lg hover:shadow-xl">
-                                        <Mail className="w-5 h-5" />
+                                    <button type="submit" aria-label="Subscribe to newsletter" className="px-6 py-4 rounded-xl bg-[var(--secondary-500)] hover:bg-[var(--secondary-600)] transition-colors shadow-lg hover:shadow-xl">
+                                        <Mail className="w-5 h-5" aria-hidden="true" />
                                     </button>
                                 </form>
                             </div>
@@ -211,7 +215,7 @@ export function Footer() {
                         {/* Link Columns */}
                         {footerSections.map((section) => (
                             <div key={section.title} className="py-4">
-                                <h4 className="font-semibold text-sm uppercase tracking-wider text-white/40 mb-6">{section.title}</h4>
+                                <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-6">{section.title}</h4>
                                 <ul className="space-y-4">
                                     {section.links.map((link) => (
                                         <li key={link.href}>
@@ -276,6 +280,7 @@ export function Footer() {
                                     <select
                                         value={currency}
                                         onChange={(e) => setCurrency(e.target.value as any)}
+                                        aria-label="Select currency"
                                         className="appearance-none bg-white/5 border border-white/10 rounded-lg pl-3 pr-8 py-1.5 text-sm text-white/80 focus:outline-none focus:ring-1 focus:ring-[var(--secondary-500)] cursor-pointer hover:bg-white/10 transition-colors"
                                     >
                                         <option value="INR" className="bg-[var(--neutral-800)]">INR (₹)</option>

@@ -379,6 +379,8 @@ export default function HomePage() {
                     <button
                       type="button"
                       onClick={(e) => handleWishlistToggle(e, art._id, 'product')}
+                      aria-label={wishlist.has(art._id) ? `Remove ${art.name} from wishlist` : `Add ${art.name} to wishlist`}
+                      aria-pressed={wishlist.has(art._id)}
                       className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors z-10"
                     >
                       <Heart className={`w-4 h-4 ${wishlist.has(art._id) ? 'text-red-500 fill-red-500' : 'text-gray-600'}`} />
@@ -461,8 +463,12 @@ export default function HomePage() {
                     <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur text-xs font-bold rounded text-[var(--foreground)] capitalize">
                       {course.level}
                     </div>
-                    <Link href={`/learn/${course.slug}`} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Play className="w-12 h-12 text-white fill-current" />
+                    <Link
+                      href={`/learn/${course.slug}`}
+                      aria-label={`Preview course: ${course.title}`}
+                      className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    >
+                      <Play className="w-12 h-12 text-white fill-current" aria-hidden="true" />
                     </Link>
                   </div>
                   <CardContent className="p-5 flex flex-col h-[180px]">
