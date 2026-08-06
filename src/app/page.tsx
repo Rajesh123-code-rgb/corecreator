@@ -811,7 +811,7 @@ export default function HomePage() {
                       <item.icon className="w-6 h-6 text-[var(--primary-400)]" />
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-1">{item.title}</h4>
+                      <h3 className="font-semibold mb-1">{item.title}</h3>
                       <p className="text-sm text-white/60">{item.desc}</p>
                     </div>
                   </div>

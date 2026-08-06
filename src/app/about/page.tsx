@@ -41,7 +41,7 @@ export default async function AboutPage() {
                             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
                                 <Target className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Our Mission</h3>
+                            <h2 className="text-xl font-bold mb-3">Our Mission</h2>
                             <p className="text-[var(--muted-foreground)]">
                                 To democratize art education and provide a global marketplace where creators can thrive financially and artistically.
                             </p>
@@ -50,7 +50,7 @@ export default async function AboutPage() {
                             <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
                                 <Heart className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Our Values</h3>
+                            <h2 className="text-xl font-bold mb-3">Our Values</h2>
                             <p className="text-[var(--muted-foreground)]">
                                 We believe in authenticity, community support, and the transformative power of continuous learning.
                             </p>
@@ -59,7 +59,7 @@ export default async function AboutPage() {
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
                                 <Globe className="w-6 h-6" />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Global Reach</h3>
+                            <h2 className="text-xl font-bold mb-3">Global Reach</h2>
                             <p className="text-[var(--muted-foreground)]">
                                 Connecting artists from over 100 countries, fostering cultural exchange through the universal language of art.
                             </p>
