@@ -95,6 +95,13 @@ export function Header() {
     return (
         <>
         <SkipLink />
+        {isMobileMenuOpen && (
+            <div
+                className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-30 bg-black/50 backdrop-blur-sm"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-hidden="true"
+            />
+        )}
         <header
             className={cn(
                 "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)]"
@@ -274,17 +281,14 @@ export function Header() {
                 </div>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu panel. The dimming backdrop is rendered as a sibling
+                of <header> rather than here: this header sets backdrop-blur-md,
+                and a non-none backdrop-filter makes an element the containing
+                block for its fixed-position descendants - so a backdrop nested
+                inside would size against the header's own box instead of the
+                viewport, and never cover the page. */}
             {isMobileMenuOpen && (
-                <>
-                    <div
-                        className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-40"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    />
-                    <div
-                        className="lg:hidden relative z-50 bg-[var(--background)] border-t border-[var(--border)] animate-fade-in-down"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                <div className="lg:hidden relative z-50 bg-[var(--background)] border-t border-[var(--border)] animate-fade-in-down">
                     <div className="container-app py-4 space-y-2">
                         {/* Mobile Theme Toggle & Search */}
                         {mounted && (
@@ -353,8 +357,7 @@ export function Header() {
                             </div>
                         )}
                     </div>
-                    </div>
-                </>
+                </div>
             )}
 
             {/* Search Modal */}
