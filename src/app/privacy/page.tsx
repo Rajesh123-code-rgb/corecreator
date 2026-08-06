@@ -45,7 +45,29 @@ export default function PrivacyPage() {
                             We implement industry-standard security measures to protect your personal information from unauthorized access, disclosure, or misuse.
                         </p>
 
-                        <h2 className="text-2xl font-bold mb-4">5. Your Rights</h2>
+                        <h2 className="text-2xl font-bold mb-4">5. Data Retention</h2>
+                        <p className="mb-4 text-[var(--muted-foreground)]">
+                            We keep your personal data only for as long as we need it for the purposes described in this policy:
+                        </p>
+                        <ul className="mb-6 space-y-2 text-[var(--muted-foreground)] list-disc pl-6">
+                            <li>
+                                <strong>Account information</strong> — kept while your account is active. If you request deletion, we remove your personal data within 30 days, apart from anything we are required to retain (see below).
+                            </li>
+                            <li>
+                                <strong>Order and transaction records</strong> — retained for as long as applicable tax, accounting, and company law requires us to keep them, even after an account is closed.
+                            </li>
+                            <li>
+                                <strong>Payment details</strong> — full card details are never stored on our servers; they are handled by our payment processor under their own retention terms.
+                            </li>
+                            <li>
+                                <strong>Support and communication history</strong> — kept while your account is active so we can provide continuity of support, and deleted along with your account.
+                            </li>
+                            <li>
+                                <strong>Marketing preferences</strong> — retained until you opt out, after which we keep only the minimum record needed to honour that opt-out.
+                            </li>
+                        </ul>
+
+                        <h2 className="text-2xl font-bold mb-4">6. Your Rights</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
                             You have the right to access, correct, or delete your personal data. You can manage your account settings or contact us to exercise these rights.
                         </p>
