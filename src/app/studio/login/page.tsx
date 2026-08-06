@@ -105,7 +105,7 @@ export default function StudioLoginPage() {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full gradient-gold text-white"
+                            className="w-full gradient-gold text-[var(--neutral-900)]"
                         >
                             {isLoading ? "Signing in..." : "Sign in to Studio"}
                         </Button>

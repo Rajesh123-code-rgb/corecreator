@@ -134,7 +134,7 @@ export default function StudioRegisterPage() {
                             </label>
                         </div>
 
-                        <Button type="submit" variant="secondary" size="lg" className="w-full gradient-gold text-white" isLoading={isLoading}>Create Studio</Button>
+                        <Button type="submit" variant="secondary" size="lg" className="w-full gradient-gold text-[var(--neutral-900)]" isLoading={isLoading}>Create Studio</Button>
                     </form>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">

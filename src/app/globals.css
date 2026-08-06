@@ -185,7 +185,7 @@ body {
 
 /* Golden Gradient - FOR HIGHLIGHTS ONLY */
 .gradient-gold {
-  background: linear-gradient(135deg, #fbbf24 0%, #d4a017 35%, #b8860b 65%, #92650a 100%);
+  background: linear-gradient(135deg, #fbbf24 0%, #d4a017 45%, #b8860b 100%);
 }
 
 .gradient-accent {

@@ -131,7 +131,7 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
                         <div className="hidden md:block">
                             <CurrencySwitcher variant="minimal" className="bg-white border-gray-200 text-gray-700 hover:bg-gray-50" />
                         </div>
-                        <Link href="/studio/courses/new" className="px-4 py-2 rounded-lg gradient-gold text-white text-sm font-medium hover:opacity-90">
+                        <Link href="/studio/courses/new" className="px-4 py-2 rounded-lg gradient-gold text-[var(--neutral-900)] text-sm font-medium hover:opacity-90">
                             + New Course
                         </Link>
                         <Link href="/studio/products/new" className="px-4 py-2 rounded-lg bg-[var(--secondary-500)] hover:bg-[var(--secondary-600)] text-white text-sm font-medium">

@@ -416,7 +416,7 @@ export function MarketplaceListClient({
                                                     </span>
                                                 )}
                                                 {product.isFeatured && (
-                                                    <span className="absolute top-2 left-2 px-2 py-1 text-xs font-medium gradient-gold text-white rounded-full z-10 pointer-events-none">
+                                                    <span className="absolute top-2 left-2 px-2 py-1 text-xs font-medium gradient-gold text-[var(--neutral-900)] rounded-full z-10 pointer-events-none">
                                                         Featured
                                                     </span>
                                                 )}

@@ -82,7 +82,7 @@ function LoginContent() {
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
                         </div>
-                        <Button type="submit" size="lg" className="w-full gradient-gold text-white" isLoading={isLoading}>Sign In</Button>
+                        <Button type="submit" size="lg" className="w-full gradient-gold text-[var(--neutral-900)]" isLoading={isLoading}>Sign In</Button>
                     </form>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
