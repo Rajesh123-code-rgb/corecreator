@@ -361,7 +361,7 @@ export default function HomePage() {
                 <Card key={art._id} hover className="overflow-hidden group animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="relative aspect-square">
                     <Link href={`/marketplace/${art.slug}`}>
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={art.images?.find(i => i.isPrimary)?.url || art.images?.[0]?.url || "https://placehold.co/400x500?text=Artwork"}
                         alt={art.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 cursor-pointer"
@@ -426,7 +426,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.slice(0, 6).map((category, index) => (
               <Link key={category.name} href={`/product/categories/${category.slug}`} className="group relative rounded-2xl overflow-hidden aspect-[4/5] animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <img src={category.image} alt={category.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <img loading="lazy" decoding="async" src={category.image} alt={category.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
@@ -459,7 +459,7 @@ export default function HomePage() {
               {topCourses.map((course, index) => (
                 <Card key={course._id} hover className="group overflow-hidden animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="relative aspect-video overflow-hidden">
-                    <img src={course.thumbnail || "https://placehold.co/600x400?text=Course"} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img loading="lazy" decoding="async" src={course.thumbnail || "https://placehold.co/600x400?text=Course"} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur text-xs font-bold rounded text-[var(--foreground)] capitalize">
                       {course.level}
                     </div>
@@ -516,7 +516,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {courseCategories.slice(0, 6).map((category, index) => (
               <Link key={category.name} href={`/learn/categories/${category.slug}`} className="group relative rounded-2xl overflow-hidden aspect-[4/5] animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <img src={category.image} alt={category.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <img loading="lazy" decoding="async" src={category.image} alt={category.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
@@ -567,7 +567,7 @@ export default function HomePage() {
                       <Link href={`/workshops/${workshop.slug}`}>{workshop.title}</Link>
                     </h3>
                     <div className="flex items-center gap-2 mb-4">
-                      <img src={workshop.instructor.avatar} alt={workshop.instructor.name} className="w-6 h-6 rounded-full object-cover" />
+                      <img loading="lazy" decoding="async" src={workshop.instructor.avatar} alt={workshop.instructor.name} className="w-6 h-6 rounded-full object-cover" />
                       <span className="text-sm text-[var(--muted-foreground)]">{workshop.instructor.name}</span>
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
@@ -608,7 +608,7 @@ export default function HomePage() {
                 <Link key={artist.id} href={`/artists/${artist.id}`}>
                   <Card hover className="p-6 text-center animate-fade-in-up cursor-pointer" style={{ animationDelay: `${index * 0.1}s` }}>
                     <div className="relative inline-block mb-4">
-                      <img src={artist.avatar} alt={artist.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
+                      <img loading="lazy" decoding="async" src={artist.avatar} alt={artist.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
                       <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--secondary-500)] rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
                         ✓
                       </div>
@@ -638,7 +638,7 @@ export default function HomePage() {
               ].map((artist, index) => (
                 <Card key={artist.name} hover className="p-6 text-center animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="relative inline-block mb-4">
-                    <img src={artist.image} alt={artist.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
+                    <img loading="lazy" decoding="async" src={artist.image} alt={artist.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
                     <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--secondary-500)] rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
                       ✓
                     </div>
@@ -782,7 +782,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-[var(--muted-foreground)] mb-6 italic">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div className="flex items-center gap-3">
-                  <img src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover" />
+                  <img loading="lazy" decoding="async" src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover" />
                   <div>
                     <p className="font-semibold">{testimonial.name}</p>
                     <p className="text-sm text-[var(--muted-foreground)]">{testimonial.role}</p>
