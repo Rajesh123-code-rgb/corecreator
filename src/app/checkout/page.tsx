@@ -53,6 +53,8 @@ declare global {
     }
 }
 
+const CHECKOUT_DRAFT_KEY = "checkout-draft";
+
 export default function CheckoutPage() {
     const router = useRouter();
     const { data: session } = useSession();
@@ -74,6 +76,35 @@ export default function CheckoutPage() {
         state: "",
         country: ""
     });
+
+    // Checkout progress is kept in sessionStorage so a reload or an accidental
+    // back-navigation doesn't wipe a half-filled shipping form. sessionStorage
+    // (not localStorage) deliberately: this is PII, so it should not outlive the
+    // tab, and it's cleared outright once payment succeeds.
+    React.useEffect(() => {
+        try {
+            const saved = sessionStorage.getItem(CHECKOUT_DRAFT_KEY);
+            if (saved) {
+                const draft = JSON.parse(saved);
+                if (draft.address) setAddress((prev) => ({ ...prev, ...draft.address }));
+                if (typeof draft.currentStep === "number") setCurrentStep(draft.currentStep);
+            }
+        } catch {
+            sessionStorage.removeItem(CHECKOUT_DRAFT_KEY);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        try {
+            sessionStorage.setItem(
+                CHECKOUT_DRAFT_KEY,
+                JSON.stringify({ address, currentStep })
+            );
+        } catch {
+            // storage unavailable (private mode / quota) - persistence is a
+            // convenience here, so failing to save must not break checkout.
+        }
+    }, [address, currentStep]);
 
     // Use shippingTotal from cart (calculated from product shipping prices)
     // Courses and workshops have 0 shipping
@@ -164,6 +195,7 @@ export default function CheckoutPage() {
 
                     if (verifyRes.ok) {
                         clearCart();
+                        sessionStorage.removeItem(CHECKOUT_DRAFT_KEY);
                         router.push("/checkout/success");
                     } else {
                         toast.error("Payment verification failed");
