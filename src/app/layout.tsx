@@ -9,6 +9,8 @@ import "./globals.css";
 import GoogleAnalytics from "@/components/atoms/GoogleAnalytics";
 import { ConsentProvider } from "@/context/ConsentContext";
 import { ConsentBanner } from "@/components/organisms/ConsentBanner";
+import JsonLd from "@/components/atoms/JsonLd";
+import { generateOrganizationJsonLd } from "@/lib/seo";
 import connectDB from "@/lib/db/mongodb";
 import SystemConfig from "@/lib/db/models/SystemConfig";
 
@@ -126,6 +128,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased`}
       >
+        <JsonLd data={generateOrganizationJsonLd()} />
         <ConsentProvider>
           <GoogleAnalytics />
           <AuthProvider>

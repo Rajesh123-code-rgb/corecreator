@@ -3,6 +3,8 @@ import { Header, Footer } from "@/components/organisms";
 import { categories } from "@/lib/categories";
 import CategoryProductList from "./CategoryProductList";
 import { getProducts } from "@/lib/productSearch";
+import JsonLd from "@/components/atoms/JsonLd";
+import { generateBreadcrumbJsonLd } from "@/lib/seo";
 
 // Rendered per request: the listing comes from the database, and the Docker
 // build has no DB connection, so this must not be statically generated.
@@ -33,6 +35,13 @@ export default async function CategoryPage({ params }: Props) {
 
     return (
         <div className="min-h-screen bg-[var(--background)]">
+            <JsonLd
+                data={generateBreadcrumbJsonLd([
+                    { name: "Home", url: "/" },
+                    { name: "Marketplace", url: "/marketplace" },
+                    { name: category.name, url: `/product/categories/${category.slug}` },
+                ])}
+            />
             <Header />
             <main id="main-content">
 

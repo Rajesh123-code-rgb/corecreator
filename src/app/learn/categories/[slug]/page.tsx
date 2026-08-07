@@ -3,6 +3,8 @@ import { Header, Footer } from "@/components/organisms";
 import { courseCategories } from "@/lib/courseCategories";
 import CategoryCourseList from "./CategoryCourseList";
 import { getCourses } from "@/lib/courseSearch";
+import JsonLd from "@/components/atoms/JsonLd";
+import { generateBreadcrumbJsonLd } from "@/lib/seo";
 
 // Rendered per request: the listing comes from the database, and the Docker
 // build has no DB connection, so this must not be statically generated.
@@ -31,6 +33,13 @@ export default async function CourseCategoryPage({ params }: Props) {
 
     return (
         <div className="min-h-screen bg-[var(--background)]">
+            <JsonLd
+                data={generateBreadcrumbJsonLd([
+                    { name: "Home", url: "/" },
+                    { name: "Learn", url: "/learn" },
+                    { name: category.name, url: `/learn/categories/${category.slug}` },
+                ])}
+            />
             <Header />
             <main id="main-content">
 
