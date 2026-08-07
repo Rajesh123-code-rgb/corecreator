@@ -70,7 +70,7 @@ export default function UserDashboardLayout({ children }: DashboardLayoutProps) 
                 <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-[var(--muted)]">
                     <Menu className="w-6 h-6" />
                 </button>
-                <Image src="/logo.png" alt="Core Creator" width={120} height={30} className="h-8 w-auto" />
+                <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-8 w-auto" />
                 <div className="relative">
                     <NotificationBell context="user" />
                 </div>
@@ -90,7 +90,7 @@ export default function UserDashboardLayout({ children }: DashboardLayoutProps) 
             >
                 <div className="flex items-center justify-between h-16 px-4 border-b border-[var(--border)]">
                     <Link href="/">
-                        <Image src="/logo.png" alt="Core Creator" width={130} height={32} className="h-8 w-auto" />
+                        <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-8 w-auto" />
                     </Link>
                     <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 rounded-lg hover:bg-[var(--muted)]">
                         <X className="w-5 h-5" />

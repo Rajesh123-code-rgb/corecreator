@@ -60,7 +60,7 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
                 <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-[var(--muted)]">
                     <Menu className="w-6 h-6" />
                 </button>
-                <Image src="/logo.png" alt="Core Creator" width={120} height={30} className="h-8 w-auto" />
+                <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-8 w-auto" />
                 <div className="relative">
                     <NotificationBell context="studio" />
                 </div>
@@ -75,7 +75,7 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
             )}>
                 <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
                     <Link href="/">
-                        <Image src="/logo.png" alt="Core Creator" width={130} height={32} className="h-8 w-auto brightness-0 invert" />
+                        <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-8 w-auto brightness-0 invert" />
                     </Link>
                     <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 rounded-lg hover:bg-white/10">
                         <X className="w-5 h-5" />

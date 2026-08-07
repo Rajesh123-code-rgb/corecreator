@@ -101,7 +101,7 @@ export default function StudioRegisterPage() {
             <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto">
                 <div className="w-full max-w-md">
                     <Link href="/" className="inline-block mb-6">
-                        <Image src="/logo.png" alt="Core Creator" width={160} height={40} className="h-10 w-auto" />
+                        <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-10 w-auto" />
                     </Link>
 
                     <div className="mb-6">
