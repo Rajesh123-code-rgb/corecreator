@@ -44,8 +44,8 @@ interface TopRatedCourse {
   title: string;
   slug: string;
   instructorName: string;
-  rating: number;
-  enrollmentCount: number;
+  averageRating: number;
+  totalStudents: number;
   price: number;
   thumbnail: string;
   level: string;
@@ -473,9 +473,9 @@ export default function HomePage() {
                   </div>
                   <CardContent className="p-5 flex flex-col h-[180px]">
                     <div className="flex items-center gap-2 mb-2 text-xs text-[var(--muted-foreground)]">
-                      <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-amber-500" /> {course.rating?.toFixed(1) || "New"}</span>
+                      <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-amber-500" /> {course.averageRating?.toFixed(1) || "New"}</span>
                       <span>•</span>
-                      <span>{course.enrollmentCount?.toLocaleString()} students</span>
+                      <span>{course.totalStudents?.toLocaleString()} students</span>
                     </div>
                     <Link href={`/learn/${course.slug}`} className="hover:text-[var(--secondary-600)] transition-colors">
                       <h3 className="font-bold text-lg mb-2 line-clamp-2">{course.title}</h3>

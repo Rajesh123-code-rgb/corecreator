@@ -26,7 +26,7 @@ export async function GET(
             instructor: id,
             status: "published"
         })
-            .select("title slug thumbnail price averageRating enrollmentCount level")
+            .select("title slug thumbnail price averageRating totalStudents level")
             .lean();
 
         // Fetch their products
@@ -38,7 +38,7 @@ export async function GET(
             .lean();
 
         // Calculate total students
-        const totalStudents = courses.reduce((sum, c: any) => sum + (c.enrollmentCount || 0), 0);
+        const totalStudents = courses.reduce((sum, c: any) => sum + (c.totalStudents || 0), 0);
 
         // Calculate average rating
         const validRatings = courses.filter((c: any) => c.averageRating > 0);
@@ -59,7 +59,10 @@ export async function GET(
             courses: courses.map((c: any) => ({
                 ...c,
                 _id: c._id.toString(),
+                // This endpoint exposes a mapped shape; keep the aliases in one
+                // place rather than renaming across every consumer.
                 rating: c.averageRating || 0,
+                enrollmentCount: c.totalStudents || 0,
             })),
             products: products.map((p: any) => ({
                 ...p,

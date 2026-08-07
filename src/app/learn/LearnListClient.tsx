@@ -36,11 +36,11 @@ interface Course {
     instructorName: string;
     price: number;
     compareAtPrice?: number;
-    rating: number;
-    reviewCount: number;
-    enrollmentCount: number;
-    duration: number; // in minutes
-    totalLessons?: number; // populated by middleware/virtuals theoretically
+    averageRating: number;
+    totalReviews: number;
+    totalStudents: number;
+    totalDuration: number; // in minutes
+    totalLectures: number;
     level: string;
     isBestseller?: boolean;
     isFeatured?: boolean;
@@ -391,14 +391,14 @@ export function LearnListClient({
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <div className="flex items-center gap-1">
                                                         <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                                                        <span className="text-sm font-medium">{(course.rating || 0).toFixed(1)}</span>
+                                                        <span className="text-sm font-medium">{(course.averageRating || 0).toFixed(1)}</span>
                                                     </div>
-                                                    <span className="text-xs text-[var(--muted-foreground)]">({(course.reviewCount || 0).toLocaleString()})</span>
+                                                    <span className="text-xs text-[var(--muted-foreground)]">({(course.totalReviews || 0).toLocaleString()})</span>
                                                 </div>
                                                 <div className="flex items-center gap-3 text-xs text-[var(--muted-foreground)] mb-3">
-                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{Math.round(course.duration / 60)}h</span>
-                                                    <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{course.totalLessons || 12} lessons</span>
-                                                    <span className="flex items-center gap-1"><Users className="w-3 h-3" />{course.enrollmentCount > 1000 ? (course.enrollmentCount / 1000).toFixed(1) + 'k' : course.enrollmentCount}</span>
+                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{Math.round(course.totalDuration / 60)}h</span>
+                                                    <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{course.totalLectures || 12} lessons</span>
+                                                    <span className="flex items-center gap-1"><Users className="w-3 h-3" />{course.totalStudents > 1000 ? (course.totalStudents / 1000).toFixed(1) + 'k' : course.totalStudents}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold text-lg">{formatPrice(course.price)}</span>
