@@ -11,6 +11,15 @@ services:
       - "3002:3000"
     env_file:
       - .env.production
+    # Surfaces real health in `docker ps` rather than just "is the process
+    # alive" - /api/health returns 503 if the app can't reach MongoDB.
+    # wget is busybox-provided in the node:20-alpine base image.
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
     networks:
       - corecreator_network
 
