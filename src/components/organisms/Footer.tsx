@@ -23,8 +23,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
-import { usePlatformStats } from "@/hooks/usePlatformStats";
-import { formatCurrency } from "@/lib/formatting";
 
 const footerSections = [
     {
@@ -95,7 +93,6 @@ const trustBadges = [
 
 export function Footer() {
     const { currency, setCurrency } = useCurrency();
-    const { stats } = usePlatformStats();
     return (
         <footer className="relative overflow-hidden">
             {/* Partner CTA Section - Enhanced */}
@@ -107,9 +104,9 @@ export function Footer() {
                 </div>
 
                 <div className="container-app py-20 relative">
-                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <div className="max-w-3xl mx-auto text-center">
                         <div className="text-white">
-                            <div className="flex items-center gap-4 mb-6">
+                            <div className="flex items-center justify-center gap-4 mb-6">
                                 <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
                                     <Palette className="w-7 h-7" />
                                 </div>
@@ -118,10 +115,10 @@ export function Footer() {
                                 </div>
                             </div>
                             <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-4 leading-tight">Join the Art & Craft Ecosystem</h3>
-                            <p className="text-white/80 text-lg lg:text-xl mb-8 max-w-lg leading-relaxed">
+                            <p className="text-white/80 text-lg lg:text-xl mb-8 mx-auto max-w-2xl leading-relaxed">
                                 Whether you want to teach courses, sell your creations, or both — Core Creator gives you the tools to turn your passion into profit.
                             </p>
-                            <div className="flex flex-wrap gap-4">
+                            <div className="flex flex-wrap justify-center gap-4">
                                 <Button size="xl" className="bg-white text-[var(--secondary-700)] hover:bg-white/90 shadow-lg px-8" asChild>
                                     <Link href="/studio/register">
                                         Become a Creator
@@ -131,22 +128,6 @@ export function Footer() {
                                 <Button size="xl" variant="outline" className="border-2 border-white text-white hover:bg-white/10 px-8" asChild>
                                     <Link href="/studio/login">Studio Login</Link>
                                 </Button>
-                            </div>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="grid grid-cols-3 gap-4 lg:gap-6">
-                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">{stats.creators}+</p>
-                                <p className="text-white/70 text-sm lg:text-base">Artists & Creators</p>
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">{stats.courses}+</p>
-                                <p className="text-white/70 text-sm lg:text-base">Courses & Workshops</p>
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 text-center text-white border border-white/20 hover:bg-white/15 transition-colors">
-                                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-2">{formatCurrency(stats.creatorEarnings, "INR")}+</p>
-                                <p className="text-white/70 text-sm lg:text-base">Creator Earnings</p>
                             </div>
                         </div>
                     </div>
