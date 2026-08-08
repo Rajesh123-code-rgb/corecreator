@@ -30,26 +30,47 @@ export default function ReturnsPage() {
 
                         <section>
                             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                                <ShieldCheck className="w-6 h-6 text-green-600" />
-                                30-Day Money-Back Guarantee
+                                <RefreshCcw className="w-6 h-6 text-blue-600" />
+                                Physical Artworks &amp; Products
                             </h2>
-                            <p className="text-[var(--muted-foreground)] leading-relaxed">
-                                For clear peace of mind, we offer a 30-day money-back guarantee on all <strong>Digital Courses</strong> and <strong>Tutorials</strong>. If you're not learning what you expected, simply request a refund within 30 days of purchase for a full refund.
+                            <p className="text-[var(--muted-foreground)] leading-relaxed mb-4">
+                                Physical items can be returned or replaced within <strong>7 days of delivery</strong>,
+                                and only in these cases:
+                            </p>
+                            <ul className="list-disc pl-6 space-y-2 text-[var(--muted-foreground)]">
+                                <li><strong>Damaged item</strong> — the piece arrived broken or damaged in transit.</li>
+                                <li><strong>Wrong item</strong> — what arrived doesn&apos;t match what you ordered.</li>
+                            </ul>
+                            <p className="text-[var(--muted-foreground)] leading-relaxed mt-4">
+                                We don&apos;t accept change-of-mind returns. Please check the listing details,
+                                dimensions and photographs carefully before ordering.
                             </p>
                         </section>
 
                         <section>
                             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                                <RefreshCcw className="w-6 h-6 text-blue-600" />
-                                Physical Artworks & Products
+                                <ShieldCheck className="w-6 h-6 text-amber-600" />
+                                Customized &amp; Personalized Items
                             </h2>
-                            <p className="text-[var(--muted-foreground)] leading-relaxed mb-4">
-                                Because many artworks are unique or made-to-order, return policies for physical goods are set by the individual artist. However, Core Creator enforces a minimum standard:
+                            <p className="text-[var(--muted-foreground)] leading-relaxed">
+                                Customized and personalized products <strong>cannot be returned or replaced</strong>,
+                                including for damage or mismatch. These pieces are made specifically to your
+                                order and can&apos;t be resold, so please confirm every detail of your
+                                customization before completing your purchase.
                             </p>
-                            <ul className="list-disc pl-6 space-y-2 text-[var(--muted-foreground)]">
-                                <li><strong>Damaged or Incorrect Items</strong>: You are always entitled to a full refund or replacement if your item arrives damaged or is not as described.</li>
-                                <li><strong>Change of Mind</strong>: Individual artist policies apply. Please check the &quot;Returns&quot; tab on the product page before purchasing.</li>
-                            </ul>
+                        </section>
+
+                        <section>
+                            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                                <FileText className="w-6 h-6 text-slate-600" />
+                                Digital Courses, Tutorials &amp; Downloads
+                            </h2>
+                            <p className="text-[var(--muted-foreground)] leading-relaxed">
+                                All digital purchases are <strong>final</strong>. Because course content and
+                                downloads are accessible immediately after payment, we don&apos;t offer refunds
+                                or returns on them. Most courses include a free preview lesson — we&apos;d
+                                encourage you to watch it before buying.
+                            </p>
                         </section>
 
                         <section>
@@ -58,9 +79,9 @@ export default function ReturnsPage() {
                                 How to Request a Return
                             </h2>
                             <ol className="list-decimal pl-6 space-y-4 text-[var(--muted-foreground)]">
-                                <li>Go to your <strong>Order History</strong> in your account dashboard.</li>
+                                <li>Within 7 days of delivery, go to your <strong>Order History</strong> in your account dashboard.</li>
                                 <li>Select the order containing the item you wish to return.</li>
-                                <li>Click <strong>&quot;Request Refund/Return&quot;</strong> and select the reason.</li>
+                                <li>Click <strong>&quot;Request Refund/Return&quot;</strong> and select the reason (damaged or wrong item).</li>
                                 <li>The artist or our support team will review your request within 48 hours.</li>
                             </ol>
                         </section>

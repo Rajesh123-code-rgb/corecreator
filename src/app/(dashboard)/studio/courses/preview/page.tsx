@@ -156,9 +156,6 @@ export default function CoursePreviewPage() {
                                 <Button className="w-full" size="lg">
                                     Enroll Now
                                 </Button>
-                                <div className="text-xs text-center text-gray-500">
-                                    30-Day Money-Back Guarantee
-                                </div>
                             </div>
                         </div>
                     </div>

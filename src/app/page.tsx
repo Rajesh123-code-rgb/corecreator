@@ -24,7 +24,6 @@ import {
   Video,
   Globe,
   Loader2,
-  RefreshCcw,
   ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -281,13 +280,13 @@ export default function HomePage() {
 
             <div className="flex items-center justify-center gap-6 mt-10 text-sm text-[var(--muted-foreground)] animate-fade-in" style={{ animationDelay: "0.4s" }}>
               <div className="flex items-center gap-1">
-                <RefreshCcw className="w-4 h-4 text-[var(--secondary-500)]" />
-                <span>30-day money-back guarantee</span>
+                <ShieldCheck className="w-4 h-4 text-[var(--secondary-500)]" />
+                <span>Secure checkout</span>
               </div>
               <div className="h-4 w-px bg-[var(--border)]" />
               <div className="flex items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-[var(--secondary-500)]" />
-                <span>Secure checkout</span>
+                <Globe className="w-4 h-4 text-[var(--secondary-500)]" />
+                <span>Worldwide shipping</span>
               </div>
             </div>
           </div>

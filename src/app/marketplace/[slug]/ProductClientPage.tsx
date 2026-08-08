@@ -494,7 +494,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <RotateCcw className="w-5 h-5 text-[var(--secondary-600)]" />
-                                    <div><p className="font-medium">30-day returns</p><p className="text-sm text-[var(--muted-foreground)]">Free returns on this item</p></div>
+                                    <div><p className="font-medium">7-day returns</p><p className="text-sm text-[var(--muted-foreground)]">Damaged or wrong item only</p></div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Shield className="w-5 h-5 text-[var(--secondary-600)]" />
@@ -703,7 +703,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                                 <ul className="space-y-2">
                                                     <li className="flex items-center gap-2">
                                                         <span className="w-2 h-2 bg-[var(--secondary-500)] rounded-full" />
-                                                        30-day return window
+                                                        7-day return window (damaged or wrong item only)
                                                     </li>
                                                     <li className="flex items-center gap-2">
                                                         <span className="w-2 h-2 bg-[var(--secondary-500)] rounded-full" />

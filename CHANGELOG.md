@@ -9,6 +9,25 @@ left alone.
 
 ## Phase 4 — Indexation & trust claims
 
+**Corrected the refund policy sitewide.** The site advertised a 30-day
+money-back guarantee in nine places - homepage hero, course and workshop detail
+pages, product pages, the studio course preview, and the /returns, /faqs and
+/pricing policy pages - and it isn't a policy the business offers. Advertising a
+refund right that isn't honoured is a consumer-law exposure, not just inaccurate
+copy, so all nine were corrected to the real terms:
+
+- Digital courses, tutorials and downloads are **final sale**, no refunds or
+  returns, since access is granted immediately on payment.
+- Physical items can be returned or replaced within **7 days of delivery**, and
+  only for a damaged item or a wrong/mismatched product. No change-of-mind
+  returns.
+- **Customized and personalized items** can't be returned or replaced at all.
+
+Product pages previously showed "30-day returns / Free returns on this item" on
+every listing; they now state the 7-day damaged-or-wrong-item terms. /returns was
+restructured around the three real categories rather than the guarantee it opened
+with.
+
 **Canonical URLs and `metadataBase`.** Neither existed anywhere on the site.
 Without `metadataBase`, Next emits *relative* canonical and Open Graph URLs,
 which crawlers and social scrapers can't resolve — so even the OG tags that did
