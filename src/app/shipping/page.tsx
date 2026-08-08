@@ -4,6 +4,7 @@ import { Truck, Globe, Clock, AlertCircle } from "lucide-react";
 export const metadata = {
     title: "Shipping Information | Core Creator",
     description: "Shipping timelines, costs, and policies for physical artworks and products purchased on Core Creator.",
+    alternates: { canonical: "/shipping" },
 };
 
 export default function ShippingPage() {

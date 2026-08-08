@@ -6,6 +6,7 @@ import Link from "next/link";
 export const metadata = {
     title: "Contact Us | Core Creator",
     description: "Get in touch with the Core Creator team for support, partnership inquiries, or general questions.",
+    alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

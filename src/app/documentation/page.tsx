@@ -6,6 +6,7 @@ import { Book, Palette, Users, ArrowRight } from "lucide-react";
 export const metadata = {
     title: "Documentation & Guides | Core Creator",
     description: "Guides and resources for creators and learners using the Core Creator platform.",
+    alternates: { canonical: "/documentation" },
 };
 
 export default function DocumentationHubPage() {

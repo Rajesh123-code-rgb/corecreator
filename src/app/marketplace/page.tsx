@@ -5,6 +5,7 @@ import { MarketplaceListClient } from "./MarketplaceListClient";
 export const metadata = {
     title: "Art & Craft Marketplace | Core Creator",
     description: "Discover unique handcrafted artworks from talented artists worldwide — paintings, ceramics, jewelry, textiles, digital art and more.",
+    alternates: { canonical: "/marketplace" },
 };
 
 // Reading searchParams makes this dynamically rendered per request, which is

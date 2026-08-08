@@ -3,6 +3,7 @@ import { Header, Footer } from "@/components/organisms";
 export const metadata = {
     title: "Terms of Service | Core Creator",
     description: "The terms and conditions governing use of the Core Creator marketplace and learning platform.",
+    alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {
