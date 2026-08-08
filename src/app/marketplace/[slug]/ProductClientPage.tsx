@@ -489,8 +489,17 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                             {/* Shipping Info */}
                             <div className="space-y-3 p-4 border border-[var(--border)] rounded-xl mb-6">
                                 <div className="flex items-center gap-3">
-                                    <Truck className="w-5 h-5 text-green-600" />
-                                    <div><p className="font-medium text-green-600">Free Shipping</p><p className="text-sm text-[var(--muted-foreground)]">Estimated 5-7 business days</p></div>
+                                    <Truck className={`w-5 h-5 ${product.shipping?.isFreeShipping ? "text-green-600" : "text-[var(--secondary-600)]"}`} />
+                                    <div>
+                                        <p className={`font-medium ${product.shipping?.isFreeShipping ? "text-green-600" : ""}`}>
+                                            {product.shipping?.isFreeShipping
+                                                ? "Free shipping"
+                                                : product.shipping?.shippingPrice
+                                                    ? `${formatPrice(product.shipping.shippingPrice)} shipping`
+                                                    : "Shipping calculated at checkout"}
+                                        </p>
+                                        <p className="text-sm text-[var(--muted-foreground)]">Dispatched from the artist&apos;s studio</p>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <RotateCcw className="w-5 h-5 text-[var(--secondary-600)]" />
@@ -675,7 +684,9 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                                 Shipping Information
                                             </h3>
                                             <div className="space-y-4 text-[var(--muted-foreground)]">
-                                                <p>We offer free standard shipping on all orders. Your item will be carefully packaged to ensure it arrives in perfect condition.</p>
+                                                <p>{product.shipping?.isFreeShipping
+                                                    ? "Shipping is free on this item."
+                                                    : "Shipping for this item is set by the artist and shown at checkout."} Your item will be carefully packaged to ensure it arrives in perfect condition.</p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-center gap-2">
                                                         <span className="w-2 h-2 bg-green-500 rounded-full" />
@@ -707,7 +718,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                                     </li>
                                                     <li className="flex items-center gap-2">
                                                         <span className="w-2 h-2 bg-[var(--secondary-500)] rounded-full" />
-                                                        Free return shipping
+                                                        Returns accepted for damaged or wrong items
                                                     </li>
                                                     <li className="flex items-center gap-2">
                                                         <span className="w-2 h-2 bg-[var(--secondary-500)] rounded-full" />
