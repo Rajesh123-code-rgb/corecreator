@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/molecules";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Header, Footer } from "@/components/organisms";
 import { Button, Input, ImageWithFallback } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -28,7 +29,9 @@ export default function WorkshopCheckoutPage() {
     const [loading, setLoading] = useState(true);
     const [seats, setSeats] = useState(1);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const toast = useToast();
+    const { data: session } = useSession();
 
     // Form State
     const [formData, setFormData] = useState({
@@ -59,6 +62,19 @@ export default function WorkshopCheckoutPage() {
         }
     };
 
+    useEffect(() => {
+        if (window.Razorpay) {
+            setRazorpayLoaded(true);
+            return;
+        }
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        script.onload = () => setRazorpayLoaded(true);
+        script.onerror = () => toast.error("Could not load the payment gateway. Please refresh and try again.");
+        document.body.appendChild(script);
+    }, [toast]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -69,14 +85,104 @@ export default function WorkshopCheckoutPage() {
 
     const handlePayment = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!workshop) return;
+
+        if (!razorpayLoaded) {
+            toast.error("Payment gateway is still loading. Please try again in a moment.");
+            return;
+        }
+
         setIsProcessing(true);
 
-        // Simulate Payment Processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const checkoutPath = `/workshops/${slug}/checkout`;
+        const orderItems = [{
+            id: workshop.id,
+            kind: "workshop" as const,
+            name: workshop.title,
+            quantity: seats,
+            price: workshop.price,
+        }];
 
-        toast.error(`Payment Successful! Registered ${seats} seat(s) for ${workshop?.title}.`);
-        setIsProcessing(false);
-        router.push("/checkout/success"); // Or a dedicated success page
+        try {
+            // 1. Create the order. The amount is derived server-side from the
+            // stored workshop price - what we send here is not trusted.
+            const res = await fetch("/api/payment/razorpay/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    shippingAddress: {
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        email: formData.email,
+                        phone: `${formData.countryCode}${formData.phone}`,
+                    },
+                    items: orderItems,
+                }),
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    toast.error("Please sign in to complete your booking.");
+                    router.push(`/login?callbackUrl=${encodeURIComponent(checkoutPath)}`);
+                    setIsProcessing(false);
+                    return;
+                }
+                const data = await res.json().catch(() => ({}));
+                // Sold-out and seat-limit errors surface here - show the real
+                // reason rather than a generic payment failure.
+                throw new Error(data.error || "Failed to start the booking");
+            }
+
+            const orderData = await res.json();
+            const dbOrderId = orderData.dbOrderId;
+
+            // 2. Hand off to Razorpay
+            const rzp = new window.Razorpay({
+                key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                amount: orderData.order.amount,
+                currency: orderData.order.currency,
+                name: "Core Creator",
+                description: `${seats} seat(s) - ${workshop.title}`,
+                order_id: orderData.order.id,
+                handler: async function (response: RazorpayPaymentResponse) {
+                    // 3. Verify the signature server-side. This is what marks
+                    // the order paid and registers the attendee.
+                    const verifyRes = await fetch("/api/payment/razorpay/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            orderId: dbOrderId,
+                            items: orderItems.map(i => ({ id: i.id, kind: "Workshop", quantity: i.quantity })),
+                        }),
+                    });
+
+                    if (verifyRes.ok) {
+                        router.push("/checkout/success");
+                    } else {
+                        // Money may have been taken - never tell them to just retry.
+                        toast.error("Payment received but we could not confirm your booking. Please contact support with your payment ID.");
+                        setIsProcessing(false);
+                    }
+                },
+                prefill: {
+                    name: `${formData.firstName} ${formData.lastName}`.trim(),
+                    email: formData.email,
+                    contact: formData.phone,
+                },
+                modal: {
+                    ondismiss: () => setIsProcessing(false),
+                },
+                theme: { color: "#9333EA" },
+            });
+            rzp.open();
+        } catch (error) {
+            console.error("Workshop payment failed:", error);
+            toast.error(error instanceof Error ? error.message : "Payment failed. Please try again.");
+            setIsProcessing(false);
+        }
     };
 
     if (loading) {

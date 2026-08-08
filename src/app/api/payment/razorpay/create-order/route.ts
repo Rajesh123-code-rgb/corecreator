@@ -20,7 +20,15 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { currency = "INR", items, shippingAddress, promoCode } = body;
+        const { items, shippingAddress, promoCode } = body;
+
+        // Currency is NOT taken from the request. All catalogue prices are
+        // stored in INR (CurrencyContext treats INR as the source currency and
+        // converts only for display), and nothing here converts between
+        // currencies - so the charge must be denominated in INR. Accepting the
+        // client's label meant an INR amount could be stamped as another
+        // currency and sent to Razorpay unconverted.
+        const currency = "INR";
 
         if (!items || items.length === 0) {
             return NextResponse.json({ error: "No items in order" }, { status: 400 });
@@ -108,7 +116,7 @@ export async function POST(request: NextRequest) {
                     }
                 } else if (item.kind === "workshop") {
                     const workshop = await Workshop.findById(item.id)
-                        .select("instructor instructorName price")
+                        .select("instructor instructorName price title capacity enrolledCount")
                         .lean() as any;
                     if (!workshop) {
                         priceErrors.push(`Workshop ${item.id} no longer exists`);
@@ -116,6 +124,22 @@ export async function POST(request: NextRequest) {
                         sellerId = workshop.instructor;
                         sellerName = workshop.instructorName;
                         unitPrice = Number(workshop.price) || 0;
+
+                        // Workshops have a finite number of seats, so unlike a
+                        // course they can be oversold. Check here, where the
+                        // seat count is authoritative, not in the browser.
+                        const capacity = Number(workshop.capacity);
+                        if (Number.isFinite(capacity) && capacity > 0) {
+                            const taken = Number(workshop.enrolledCount) || 0;
+                            const remaining = capacity - taken;
+                            if (item.quantity > remaining) {
+                                priceErrors.push(
+                                    remaining > 0
+                                        ? `Only ${remaining} seat(s) left for "${workshop.title}"`
+                                        : `"${workshop.title}" is sold out`
+                                );
+                            }
+                        }
                     }
                 }
             } catch (e) {

@@ -23,36 +23,6 @@ import { useCurrency } from "@/context/CurrencyContext";
 
 const steps = ["Shipping", "Review & Pay"];
 
-interface RazorpayOptions {
-    key: string;
-    amount: number;
-    currency: string;
-    name: string;
-    description: string;
-    order_id: string;
-    handler: (response: any) => void;
-    prefill: {
-        name: string;
-        email: string;
-        contact: string;
-    };
-    theme: {
-        color: string;
-    };
-}
-
-interface Razorpay {
-    new(options: RazorpayOptions): {
-        open: () => void;
-    };
-}
-
-declare global {
-    interface Window {
-        Razorpay: Razorpay;
-    }
-}
-
 const CHECKOUT_DRAFT_KEY = "checkout-draft";
 
 export default function CheckoutPage() {
@@ -147,9 +117,8 @@ export default function CheckoutPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    // Amount is calculated server-side now, but passing for reference if needed (will be ignored by backend logic)
-                    amount: total,
-                    currency: "USD",
+                    // Amount and currency are both derived server-side from the
+                    // stored catalogue prices - anything sent here is ignored.
                     shippingAddress: address,
                     promoCode,
                     items: items.map(item => ({
