@@ -8,11 +8,11 @@ const buttonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-[var(--primary-500)] text-white shadow-md hover:bg-[var(--primary-600)] focus-visible:ring-[var(--primary-500)] active:scale-[0.98]",
+                    "bg-[var(--primary-500)] text-[var(--neutral-900)] shadow-md hover:bg-[var(--primary-600)] focus-visible:ring-[var(--primary-500)] active:scale-[0.98]",
                 secondary:
                     "bg-[var(--secondary-500)] text-white shadow-md hover:bg-[var(--secondary-600)] focus-visible:ring-[var(--secondary-500)] active:scale-[0.98]",
                 accent:
-                    "gradient-gold text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
+                    "gradient-gold text-[var(--neutral-900)] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
                 destructive:
                     "bg-[var(--error)] text-white shadow-md hover:brightness-110 focus-visible:ring-red-500 active:scale-[0.98]",
                 outline:
@@ -22,7 +22,7 @@ const buttonVariants = cva(
                 link:
                     "text-[var(--secondary-500)] underline-offset-4 hover:underline focus-visible:ring-[var(--secondary-500)]",
                 gradient:
-                    "gradient-gold text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
+                    "gradient-gold text-[var(--neutral-900)] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
             },
             size: {
                 sm: "h-9 px-3 text-xs",

@@ -24,7 +24,7 @@ export async function GET(request: Request) {
                     Course.countDocuments({ instructor: user._id, status: "published" }),
                     Product.countDocuments({ seller: user._id, status: "active" }),
                     Course.find({ instructor: user._id, status: "published" })
-                        .select("averageRating enrollmentCount")
+                        .select("averageRating totalStudents")
                         .lean(),
                 ]);
 

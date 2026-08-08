@@ -55,7 +55,7 @@ export default function StudioLoginPage() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-block mb-6">
-                        <Image src="/logo.png" alt="Core Creator" width={180} height={45} className="h-12 w-auto" />
+                        <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-12 w-auto" />
                     </Link>
                     <div className="flex items-center justify-center gap-2 mb-2">
                         <div className="w-12 h-12 rounded-full gradient-gold flex items-center justify-center">
@@ -105,7 +105,7 @@ export default function StudioLoginPage() {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full gradient-gold text-white"
+                            className="w-full gradient-gold text-[var(--neutral-900)]"
                         >
                             {isLoading ? "Signing in..." : "Sign in to Studio"}
                         </Button>

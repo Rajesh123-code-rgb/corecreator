@@ -232,7 +232,7 @@ export default function ShippingProfileManager() {
                 </div>
 
                 <div className="flex justify-end pt-4">
-                    <Button onClick={handleSave} className="gradient-gold text-white">Save Profile</Button>
+                    <Button onClick={handleSave} className="gradient-gold text-[var(--neutral-900)]">Save Profile</Button>
                 </div>
             </div>
         );
@@ -245,7 +245,7 @@ export default function ShippingProfileManager() {
                     <h2 className="text-lg font-semibold text-gray-900">Shipping Profiles</h2>
                     <p className="text-sm text-gray-500">Manage your shipping zones and rates</p>
                 </div>
-                <Button onClick={() => setIsCreating(true)} className="gradient-gold text-white">
+                <Button onClick={() => setIsCreating(true)} className="gradient-gold text-[var(--neutral-900)]">
                     <Plus className="w-4 h-4 mr-2" /> Create Profile
                 </Button>
             </div>

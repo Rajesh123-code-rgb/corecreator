@@ -414,16 +414,16 @@ export default async function StudioPage(props: PageProps) {
                                         <div className="flex items-center gap-3 mt-3 text-xs text-[var(--muted-foreground)]">
                                             <span className="flex items-center gap-1">
                                                 <Users className="w-3.5 h-3.5" />
-                                                {course.enrollmentCount || 0}
+                                                {course.totalStudents || 0}
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 <Clock className="w-3.5 h-3.5" />
-                                                {Math.round((course.duration || 0) / 60)}h
+                                                {Math.round((course.totalDuration || 0) / 60)}h
                                             </span>
-                                            {course.rating > 0 && (
+                                            {course.averageRating > 0 && (
                                                 <span className="flex items-center gap-1">
                                                     <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                                                    {course.rating.toFixed(1)}
+                                                    {course.averageRating.toFixed(1)}
                                                 </span>
                                             )}
                                         </div>

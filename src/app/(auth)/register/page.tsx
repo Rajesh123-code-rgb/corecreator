@@ -85,7 +85,7 @@ export default function RegisterPage() {
             <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto">
                 <div className="w-full max-w-md">
                     <Link href="/" className="inline-block mb-6">
-                        <Image src="/logo.png" alt="Core Creator" width={160} height={40} className="h-10 w-auto" />
+                        <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-10 w-auto" />
                     </Link>
 
                     <div className="mb-6">
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                             </label>
                         </div>
 
-                        <Button type="submit" variant="secondary" size="lg" className="w-full gradient-gold text-white" isLoading={isLoading}>Create Account</Button>
+                        <Button type="submit" variant="secondary" size="lg" className="w-full gradient-gold text-[var(--neutral-900)]" isLoading={isLoading}>Create Account</Button>
                     </form>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">

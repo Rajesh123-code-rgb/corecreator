@@ -67,11 +67,11 @@ interface Course {
     instructorName: string;
     price: number;
     compareAtPrice?: number;
-    rating: number;
-    reviewCount: number;
-    enrollmentCount: number;
+    averageRating: number;
+    totalReviews: number;
+    totalStudents: number;
     totalDuration: number; // in minutes
-    totalLessons: number; // populated by middleware/virtuals theoretically
+    totalLectures: number;
     level: string;
     category?: string;
     language: string;
@@ -192,15 +192,15 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                         <div className="flex flex-wrap items-center gap-6 mb-8 text-sm sm:text-base">
                             <div className="flex items-center gap-2 bg-yellow-400/10 px-3 py-1.5 rounded-full border border-yellow-400/20">
                                 <span className="text-yellow-400 font-bold flex items-center gap-1">
-                                    {(course.rating || 0).toFixed(1)} <Star className="w-4 h-4 fill-current" />
+                                    {(course.averageRating || 0).toFixed(1)} <Star className="w-4 h-4 fill-current" />
                                 </span>
                                 <span className="text-purple-200 underline decoration-purple-200/50 underline-offset-4">
-                                    ({(course.reviewCount || 0).toLocaleString()} reviews)
+                                    ({(course.totalReviews || 0).toLocaleString()} reviews)
                                 </span>
                             </div>
                             <div className="flex items-center gap-2 text-purple-200">
                                 <Users className="w-4 h-4" />
-                                <span>{(course.enrollmentCount || 0).toLocaleString()} students</span>
+                                <span>{(course.totalStudents || 0).toLocaleString()} students</span>
                             </div>
                         </div>
 
@@ -293,7 +293,7 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <div className="w-8 flex justify-center"><BookOpen className="w-4 h-4 text-purple-600" /></div>
-                                        <span>{course.totalLessons} lessons</span>
+                                        <span>{course.totalLectures} lessons</span>
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <div className="w-8 flex justify-center"><Download className="w-4 h-4 text-purple-600" /></div>
@@ -348,7 +348,7 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-gray-900">Course Content</h2>
                                 <div className="text-sm text-gray-500 font-medium">
-                                    {course.sections.length} sections • {course.totalLessons} lessons • {Math.round(course.totalDuration / 60)}h total length
+                                    {course.sections.length} sections • {course.totalLectures} lessons • {Math.round(course.totalDuration / 60)}h total length
                                 </div>
                             </div>
 

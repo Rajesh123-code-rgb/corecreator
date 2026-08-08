@@ -194,8 +194,8 @@ export function generateCourseJsonLd(course: {
  */
 export function generateBreadcrumbJsonLd(
     items: { name: string; url: string }[]
-): string {
-    return JSON.stringify({
+) {
+    return ({
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         itemListElement: items.map((item, index) => ({
@@ -208,24 +208,62 @@ export function generateBreadcrumbJsonLd(
 }
 
 /**
- * Generate organization structured data (JSON-LD)
+ * Sitewide Organization + WebSite structured data.
+ *
+ * Returned as an object (not a pre-stringified string) so it can be handed
+ * straight to the <JsonLd> component, which does its own serialisation.
+ *
+ * Deliberately omits `sameAs`: that property asserts official social profiles,
+ * and the footer's social links are currently placeholders (href="#"). Add the
+ * real profile URLs here once they exist rather than claiming them now.
  */
-export function generateOrganizationJsonLd(): string {
-    return JSON.stringify({
+export function generateOrganizationJsonLd() {
+    return {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        name: siteConfig.name,
-        url: siteConfig.url,
-        logo: `${siteConfig.url}/logo.png`,
-        sameAs: [
-            `https://twitter.com/${siteConfig.twitterHandle.replace("@", "")}`,
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": `${siteConfig.url}/#organization`,
+                name: siteConfig.name,
+                url: siteConfig.url,
+                logo: {
+                    "@type": "ImageObject",
+                    url: `${siteConfig.url}/logo.png`,
+                    width: 150,
+                    height: 80,
+                },
+                contactPoint: {
+                    "@type": "ContactPoint",
+                    contactType: "customer support",
+                    email: "support@corecreator.com",
+                    telephone: "+91 7424888915",
+                    areaServed: "IN",
+                },
+                address: {
+                    "@type": "PostalAddress",
+                    addressLocality: "Jaipur",
+                    addressRegion: "Rajasthan",
+                    addressCountry: "IN",
+                },
+            },
+            {
+                "@type": "WebSite",
+                "@id": `${siteConfig.url}/#website`,
+                url: siteConfig.url,
+                name: siteConfig.name,
+                description: siteConfig.description,
+                publisher: { "@id": `${siteConfig.url}/#organization` },
+                potentialAction: {
+                    "@type": "SearchAction",
+                    target: {
+                        "@type": "EntryPoint",
+                        urlTemplate: `${siteConfig.url}/search?q={search_term_string}`,
+                    },
+                    "query-input": "required name=search_term_string",
+                },
+            },
         ],
-        contactPoint: {
-            "@type": "ContactPoint",
-            contactType: "customer support",
-            email: "support@corecreator.com",
-        },
-    });
+    };
 }
 
 /**

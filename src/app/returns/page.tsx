@@ -33,7 +33,7 @@ export default function ReturnsPage() {
                                 30-Day Money-Back Guarantee
                             </h2>
                             <p className="text-[var(--muted-foreground)] leading-relaxed">
-                                For clear peace of mind, we offer a 30-day money-back guarantee on all **Digital Courses** and **Tutorials**. If you're not learning what you expected, simply request a refund within 30 days of purchase for a full refund.
+                                For clear peace of mind, we offer a 30-day money-back guarantee on all <strong>Digital Courses</strong> and <strong>Tutorials</strong>. If you're not learning what you expected, simply request a refund within 30 days of purchase for a full refund.
                             </p>
                         </section>
 
@@ -46,8 +46,8 @@ export default function ReturnsPage() {
                                 Because many artworks are unique or made-to-order, return policies for physical goods are set by the individual artist. However, Core Creator enforces a minimum standard:
                             </p>
                             <ul className="list-disc pl-6 space-y-2 text-[var(--muted-foreground)]">
-                                <li>**Damaged or Incorrect Items**: You are always entitled to a full refund or replacement if your item arrives damaged or is not as described.</li>
-                                <li>**Change of Mind**: Individual artist policies apply. Please check the "Returns" tab on the product page before purchasing.</li>
+                                <li><strong>Damaged or Incorrect Items</strong>: You are always entitled to a full refund or replacement if your item arrives damaged or is not as described.</li>
+                                <li><strong>Change of Mind</strong>: Individual artist policies apply. Please check the &quot;Returns&quot; tab on the product page before purchasing.</li>
                             </ul>
                         </section>
 
@@ -57,9 +57,9 @@ export default function ReturnsPage() {
                                 How to Request a Return
                             </h2>
                             <ol className="list-decimal pl-6 space-y-4 text-[var(--muted-foreground)]">
-                                <li>Go to your **Order History** in your account dashboard.</li>
+                                <li>Go to your <strong>Order History</strong> in your account dashboard.</li>
                                 <li>Select the order containing the item you wish to return.</li>
-                                <li>Click **"Request Refund/Return"** and select the reason.</li>
+                                <li>Click <strong>&quot;Request Refund/Return&quot;</strong> and select the reason.</li>
                                 <li>The artist or our support team will review your request within 48 hours.</li>
                             </ol>
                         </section>

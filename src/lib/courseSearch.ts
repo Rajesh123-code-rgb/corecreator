@@ -5,12 +5,11 @@
 // serve both the API route (for client-side re-fetching on filter change) and
 // Server Components rendering the initial listing.
 //
-// NOTE: the .select() list below is preserved exactly as-is. The Course model
-// stores averageRating/totalStudents, but the frontend reads rating/
-// reviewCount/enrollmentCount/duration/totalLessons - a pre-existing field-name
-// mismatch that makes those values render as undefined/NaN. Fixing it is a
-// separate, deliberate change; do not "tidy" it here or behavior shifts
-// silently as a side effect of this refactor.
+// The .select() list includes totalReviews/totalDuration/totalLectures, which
+// the listing UI needs. They were previously omitted while the frontend also
+// read them under the wrong names (reviewCount/duration/totalLessons), so the
+// values silently rendered as undefined/NaN. Both halves are fixed together -
+// keep the field names here in sync with the Course model, not with the UI.
 import connectDB from "@/lib/db/mongodb";
 import Course from "@/lib/db/models/Course";
 import Category from "@/lib/db/models/Category";
@@ -101,16 +100,16 @@ export async function getCourses(filters: CourseSearchFilters = {}): Promise<Cou
 
     if (featured === "true") query.isFeatured = true;
     if (instructor) query.instructor = instructor;
-    if (minRating) query.rating = { $gte: parseFloat(minRating) };
+    if (minRating) query.averageRating = { $gte: parseFloat(minRating) };
     if (search) query.$text = { $search: search };
 
-    let sortOption: Record<string, 1 | -1> = { enrollmentCount: -1 };
+    let sortOption: Record<string, 1 | -1> = { totalStudents: -1 };
     switch (sort) {
         case "newest": sortOption = { createdAt: -1 }; break;
         case "price-low": sortOption = { price: 1 }; break;
         case "price-high": sortOption = { price: -1 }; break;
         case "rating": sortOption = { averageRating: -1 }; break;
-        default: sortOption = { enrollmentCount: -1 };
+        default: sortOption = { totalStudents: -1 };
     }
 
     const [courses, total] = await Promise.all([
@@ -118,7 +117,7 @@ export async function getCourses(filters: CourseSearchFilters = {}): Promise<Cou
             .sort(sortOption)
             .skip(skip)
             .limit(limit)
-            .select("title subtitle description price averageRating totalStudents thumbnail images slug category level createdAt")
+            .select("title subtitle description price averageRating totalReviews totalStudents totalDuration totalLectures thumbnail images slug category level createdAt")
             .populate("instructor", "name avatar bio")
             .lean(),
         Course.countDocuments(query),

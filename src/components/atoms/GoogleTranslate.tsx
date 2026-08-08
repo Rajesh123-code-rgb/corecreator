@@ -21,6 +21,10 @@ const LANGUAGES = [
 export default function GoogleTranslate({ id = "google_translate_element", className }: { id?: string, className?: string }) {
     const [mounted, setMounted] = useState(false);
     const [currentLang, setCurrentLang] = useState("en");
+    // Google's element.js is ~50KiB and was loading on every page view. Defer it
+    // until it's actually needed: either a translation is already active (the
+    // engine has to re-apply it), or the visitor engages with the picker.
+    const [shouldLoadScript, setShouldLoadScript] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -44,7 +48,12 @@ export default function GoogleTranslate({ id = "google_translate_element", class
         const match = document.cookie.match(/(?:^|;)\s*googtrans=([^;]*)/);
         if (match && match[1]) {
             const parsed = match[1].split('/')[2];
-            if (parsed) setCurrentLang(parsed);
+            if (parsed) {
+                setCurrentLang(parsed);
+                // A non-English translation is active, so the engine is needed
+                // on this page load to re-apply it.
+                if (parsed !== "en") setShouldLoadScript(true);
+            }
         }
     }, [id]);
 
@@ -79,6 +88,8 @@ export default function GoogleTranslate({ id = "google_translate_element", class
                     <select
                         value={currentLang}
                         onChange={handleLanguageChange}
+                        onFocus={() => setShouldLoadScript(true)}
+                        onPointerEnter={() => setShouldLoadScript(true)}
                         className={cn(
                             "appearance-none cursor-pointer pl-9 pr-8 py-2 rounded-lg text-sm font-medium focus:outline-none transition-all",
                             "bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--muted)] text-[var(--foreground)]"
@@ -101,10 +112,12 @@ export default function GoogleTranslate({ id = "google_translate_element", class
             {/* Hidden Google Engine - Does all the heavy lifting silently in the DOM */}
             <div id={id} className="hidden"></div>
             
-            <Script
-                src={`//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit_${id}`}
-                strategy="afterInteractive"
-            />
+            {shouldLoadScript && (
+                <Script
+                    src={`//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit_${id}`}
+                    strategy="afterInteractive"
+                />
+            )}
             
             {/* Kill all external Google CSS that leaks to the body */}
             <style jsx global>{`

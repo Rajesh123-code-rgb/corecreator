@@ -126,7 +126,7 @@ export default function StudioProductsPage() {
                     <h1 className="text-2xl font-bold text-gray-900">Products & Artworks</h1>
                     <p className="text-gray-500">Manage your product inventory and listings</p>
                 </div>
-                <Button onClick={handleCreateProduct} className="gradient-gold text-white shadow-lg shadow-amber-500/20">
+                <Button onClick={handleCreateProduct} className="gradient-gold text-[var(--neutral-900)] shadow-lg shadow-amber-500/20">
                     <Plus className="w-4 h-4 mr-2" />
                     New Product
                 </Button>
@@ -250,7 +250,7 @@ export default function StudioProductsPage() {
                     <p className="text-gray-500 mb-6 max-w-sm mx-auto">
                         Start selling your art by creating your first product listing.
                     </p>
-                    <Button onClick={handleCreateProduct} className="gradient-gold text-white">
+                    <Button onClick={handleCreateProduct} className="gradient-gold text-[var(--neutral-900)]">
                         <Plus className="w-4 h-4 mr-2" />
                         Create Product
                     </Button>
