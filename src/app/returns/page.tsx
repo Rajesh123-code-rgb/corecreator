@@ -6,6 +6,7 @@ import { Button } from "@/components/atoms";
 export const metadata = {
     title: "Returns & Refunds | Core Creator",
     description: "Our refund guarantee for digital courses and return policy for physical artworks and products.",
+    alternates: { canonical: "/returns" },
 };
 
 export default function ReturnsPage() {

@@ -8,6 +8,7 @@ import { formatCurrency } from "@/lib/formatting";
 export const metadata = {
     title: "About Us | Core Creator",
     description: "Learn about Core Creator's mission to connect artists, instructors, and collectors in a global art & craft marketplace.",
+    alternates: { canonical: "/about" },
 };
 
 export default async function AboutPage() {

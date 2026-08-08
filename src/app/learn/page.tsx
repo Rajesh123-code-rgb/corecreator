@@ -5,6 +5,7 @@ import { LearnListClient } from "./LearnListClient";
 export const metadata = {
     title: "Learn Art & Craft | Core Creator",
     description: "Access courses taught by professional artists — painting, drawing, sculpture, digital art, photography, ceramics and more. Start learning today.",
+    alternates: { canonical: "/learn" },
 };
 
 // Reading searchParams makes this dynamically rendered per request, which is

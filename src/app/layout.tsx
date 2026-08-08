@@ -10,7 +10,7 @@ import GoogleAnalytics from "@/components/atoms/GoogleAnalytics";
 import { ConsentProvider } from "@/context/ConsentContext";
 import { ConsentBanner } from "@/components/organisms/ConsentBanner";
 import JsonLd from "@/components/atoms/JsonLd";
-import { generateOrganizationJsonLd } from "@/lib/seo";
+import { generateOrganizationJsonLd, siteConfig } from "@/lib/seo";
 import connectDB from "@/lib/db/mongodb";
 import SystemConfig from "@/lib/db/models/SystemConfig";
 
@@ -46,6 +46,9 @@ export async function generateMetadata(): Promise<Metadata> {
     const description = settings.siteDescription || "The ultimate platform for artists, learners, and art lovers. Buy authentic artworks, learn new skills, and sell your creations globally.";
 
     return {
+      // Resolves relative canonical/OG URLs to absolute ones. Without it Next
+      // emits relative URLs, which crawlers and social scrapers can't use.
+      metadataBase: new URL(siteConfig.url),
       title,
       description,
       keywords: settings.keywords ? settings.keywords.split(",").map((k: string) => k.trim()) : [
@@ -78,6 +81,7 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch (e) {
     console.error("Failed to fetch SEO config:", e);
     return {
+      metadataBase: new URL(siteConfig.url),
       title: "Core Creator - Global Art & Craft eLearning & Marketplace",
       description: "The ultimate platform for artists, learners, and art lovers.",
     };

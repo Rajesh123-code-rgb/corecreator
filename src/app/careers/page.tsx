@@ -6,6 +6,7 @@ import Link from "next/link";
 export const metadata = {
     title: "Careers | Core Creator",
     description: "Join the Core Creator team and help build the future of the global art & craft community.",
+    alternates: { canonical: "/careers" },
 };
 
 

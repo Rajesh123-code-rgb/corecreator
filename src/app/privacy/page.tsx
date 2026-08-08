@@ -3,6 +3,7 @@ import { Header, Footer } from "@/components/organisms";
 export const metadata = {
     title: "Privacy Policy | Core Creator",
     description: "How Core Creator collects, uses, and protects your personal information.",
+    alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

@@ -12,6 +12,7 @@ import {
 export const metadata = {
     title: "Pricing & Fees | Core Creator",
     description: "See exactly what Core Creator charges creators and buyers — commission rate, payout schedule, and refund policy, all in one place.",
+    alternates: { canonical: "/pricing" },
 };
 
 export default function PricingPage() {
