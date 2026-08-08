@@ -46,9 +46,9 @@ So each got a thin server wrapper carrying metadata, with the previous body
 re-exported as `XClient.tsx`.
 
 **Removed unsourced hero claims.** "4.9/5 Rating" and "Trusted by 500K+" had
-nothing behind them — no linked review platform, no rating data to compute from.
-Replaced with a 30-day money-back guarantee and secure checkout, both true and
-already documented on `/returns`.
+nothing behind them — no linked review platform, no rating data to compute from,
+and a real learner count nowhere near 500K. Replaced with "Secure checkout" and
+"Worldwide shipping", both of which the platform actually does.
 
 Still open: the five footer social icons still point at `href="#"` (awaiting real
 profile URLs, which should also populate the Organization schema's `sameAs`), and
