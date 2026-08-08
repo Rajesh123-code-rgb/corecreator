@@ -79,7 +79,7 @@ export default function StudioRegisterPage() {
                 <div className="relative w-full h-full max-w-2xl text-center flex flex-col items-center justify-center z-10">
                     <Palette className="w-16 h-16 text-white mb-6" />
                     <p className="text-4xl font-bold mb-4 text-white">Share Your Art with the World</p>
-                    <p className="text-lg text-white/90">Join thousands of instructors and artists earning by teaching and selling on Core Creator.</p>
+                    <p className="text-lg text-white/90">Teach what you know and sell what you make, to buyers worldwide.</p>
                     <ul className="mt-8 text-left space-y-4 text-white/80">
                         <li className="flex items-center gap-3">
                             <CheckCircle className="w-5 h-5 text-[var(--secondary-500)]" />
@@ -136,6 +136,32 @@ export default function StudioRegisterPage() {
 
                         <Button type="submit" variant="secondary" size="lg" className="w-full gradient-gold text-[var(--neutral-900)]" isLoading={isLoading}>Create Studio</Button>
                     </form>
+
+                    <div className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--muted)] p-5">
+                        <h2 className="text-sm font-semibold mb-3">What happens next</h2>
+                        <ol className="space-y-3 text-sm text-[var(--muted-foreground)]">
+                            <li className="flex gap-3">
+                                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--secondary-100)] text-[var(--secondary-700)] text-xs font-bold flex items-center justify-center">1</span>
+                                <span>Your studio account is created straight away and you can explore the dashboard.</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--secondary-100)] text-[var(--secondary-700)] text-xs font-bold flex items-center justify-center">2</span>
+                                <span>
+                                    Complete <strong className="text-[var(--foreground)]">Studio Verification</strong> from your
+                                    dashboard: your contact and address details, plus a government ID proof and a
+                                    business or address proof (image or PDF).
+                                </span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--secondary-100)] text-[var(--secondary-700)] text-xs font-bold flex items-center justify-center">3</span>
+                                <span>
+                                    Our team reviews your submission. Once approved you can publish products,
+                                    courses and workshops — <strong className="text-[var(--foreground)]">listing is only enabled after verification</strong>.
+                                    If anything is missing we&apos;ll tell you why so you can resubmit.
+                                </span>
+                            </li>
+                        </ol>
+                    </div>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
                         Want to learn instead? <Link href="/register" className="font-medium text-[var(--primary-600)] hover:underline">Create Learner Account</Link>
