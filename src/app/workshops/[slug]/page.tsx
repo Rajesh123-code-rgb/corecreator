@@ -327,10 +327,6 @@ export default function WorkshopDetailPage() {
                                                 </li>
                                             </>
                                         )}
-                                        <li className="flex gap-2">
-                                            <Shield className="w-4 h-4 text-[var(--muted-foreground)]" />
-                                            <span>30-day money-back guarantee</span>
-                                        </li>
                                     </ul>
                                 </div>
 

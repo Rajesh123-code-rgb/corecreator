@@ -281,7 +281,6 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                                 </Button>
                             </div>
 
-                            <p className="text-center text-xs text-gray-500">30-Day Money-Back Guarantee</p>
 
                             {/* Features List */}
                             <div className="space-y-4 pt-6 border-t border-gray-100">

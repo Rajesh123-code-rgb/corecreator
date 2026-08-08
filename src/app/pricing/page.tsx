@@ -84,13 +84,16 @@ export default function PricingPage() {
                             </h2>
                             <ul className="list-disc pl-6 space-y-2 text-[var(--muted-foreground)]">
                                 <li>
-                                    <strong>Digital courses &amp; tutorials:</strong> 30-day money-back guarantee.
+                                    <strong>Digital courses &amp; tutorials:</strong> final sale — no refunds or
+                                    returns, since access is granted immediately on payment.
                                 </li>
                                 <li>
-                                    <strong>Physical artworks &amp; products:</strong> full refund or replacement if an item
-                                    arrives damaged or isn&apos;t as described. Change-of-mind returns follow the individual
-                                    artist&apos;s policy — check the &quot;Returns&quot; tab on the product page before
-                                    purchasing.
+                                    <strong>Physical artworks &amp; products:</strong> return or replacement within
+                                    7 days of delivery, for damaged or wrong items only. No change-of-mind returns.
+                                </li>
+                                <li>
+                                    <strong>Customized &amp; personalized items:</strong> not returnable or
+                                    replaceable.
                                 </li>
                             </ul>
                         </section>
@@ -118,11 +121,11 @@ export default function PricingPage() {
                                     </tr>
                                     <tr>
                                         <td className="p-4 font-semibold">Refunds — digital</td>
-                                        <td className="p-4 text-[var(--muted-foreground)]">30-day money-back guarantee</td>
+                                        <td className="p-4 text-[var(--muted-foreground)]">Final sale, no refunds</td>
                                     </tr>
                                     <tr>
                                         <td className="p-4 font-semibold">Refunds — physical</td>
-                                        <td className="p-4 text-[var(--muted-foreground)]">Full refund/replacement if damaged or not as described</td>
+                                        <td className="p-4 text-[var(--muted-foreground)]">7-day return/replacement, damaged or wrong item only</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -1,5 +1,10 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Project history
+
+Audit-driven changes are recorded in [CHANGELOG.md](./CHANGELOG.md), grouped by
+phase with the reasoning behind each change and a list of known deferred items.
+
 ## Getting Started
 
 First, run the development server:
