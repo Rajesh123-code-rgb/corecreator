@@ -162,7 +162,19 @@ export default function CheckoutPage() {
                 })
             });
 
-            if (!res.ok) throw new Error("Failed to create order");
+            if (!res.ok) {
+                // The order API requires a session. Middleware should have
+                // redirected already, but a session can expire while the form
+                // is open - say so plainly rather than blaming the payment.
+                if (res.status === 401) {
+                    toast.error("Please sign in to complete your purchase.");
+                    router.push(`/login?callbackUrl=${encodeURIComponent("/checkout")}`);
+                    setIsProcessing(false);
+                    return;
+                }
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || "Failed to create order");
+            }
             const orderData = await res.json();
             const dbOrderId = orderData.dbOrderId;
 
@@ -217,7 +229,7 @@ export default function CheckoutPage() {
 
         } catch (error) {
             console.error("Payment failed:", error);
-            toast.error("Payment failed. Please try again.");
+            toast.error(error instanceof Error ? error.message : "Payment failed. Please try again.");
             setIsProcessing(false);
         }
     };

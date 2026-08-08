@@ -7,6 +7,64 @@ left alone.
 
 ---
 
+## Phase 5 — "Looks real, isn't": simulated flows and payment integrity
+
+*In progress.*
+
+### Payment
+
+**Logged-out buyers could not purchase anything — confirmed end to end.** Reported
+manually as "try again at checkout" and reproduced in a real browser against the
+live site for both an artwork and a course. `/checkout` was not in the middleware
+matcher, so guests could reach it; the page used `useSession` only to prefill name
+and email and never gated on it; `create-order` requires a session and returns
+401. The page's catch block then showed "Payment failed. Please try again." So a
+visitor filled the entire shipping form, clicked Pay, and was told payment failed
+when the real problem was that they weren't signed in. No order, no charge, no
+explanation — a total purchase blocker for every first-time buyer.
+
+Fixed by gating `/checkout` in middleware, the same way `/user` and `/studio`
+already are, so guests are redirected to login *before* filling anything, with a
+callback back to checkout. As defence in depth the page now handles 401
+explicitly rather than reporting it as a payment failure, and surfaces the real
+API error instead of a fixed string. Guest checkout isn't possible today in any
+case: `Order.user` is `required: true`, so supporting it would be a data-model
+change and a product decision.
+
+**Payment amounts were client-controlled.** `create-order` never read prices from
+the database despite a comment claiming it did — it trusted `item.price` from the
+request body, which flowed into `razorpay.orders.create({ amount })`. `verify()`
+confirms on Razorpay signature alone and never re-checks the amount, and the
+signature is valid because the order really was created for the tampered figure.
+So a crafted request could buy any item for any amount, and the order would be
+marked paid, access granted, the seller notified and a confirmation emailed.
+
+Prices are now re-derived server-side. Courses and workshops have a single fixed
+price so the stored value is used outright and the client's number is discarded.
+Products are configurable and those selections aren't forwarded to the route, so
+the client price is floor-checked against the cheapest configuration the product
+could legitimately sell at. Any mismatch rejects the whole order.
+
+*Follow-up:* forward variant, customization and add-on selections from the cart
+through checkout so product prices can be recomputed exactly rather than
+floor-checked.
+
+**Workshop checkout takes no payment at all.** `handlePayment` is a two-second
+`setTimeout` followed by a "Payment Successful!" toast and a redirect to the
+success page. No API call, no charge, no seat reserved, no record — while a
+Razorpay logo sits on the page. Live and reachable. The server half is now built
+(the route had only a bare `// Add workshop if needed` comment); the page still
+needs wiring to it.
+
+### Fabricated data
+
+**`/studio/[id]` invents verified instructors.** When a user isn't found it serves
+made-up people — named, with stock photos, bios, `isVerified: true` and
+`example.com` contact details — and *any* unknown ID returns a plausible fake
+profile instead of 404, generating unlimited indexable fake pages.
+
+---
+
 ## Phase 4 — Indexation & trust claims
 
 **Corrected the refund policy sitewide.** The site advertised a 30-day
