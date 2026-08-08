@@ -73,6 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<import("n
 
     return {
         title: `${course.title} | Core Creator`,
+        alternates: { canonical: `/learn/${slug}` },
         description: course.description.substring(0, 160),
         openGraph: {
             title: course.title,

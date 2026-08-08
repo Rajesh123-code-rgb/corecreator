@@ -80,6 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<import("n
 
     return {
         title: `${product.name} | Core Creator Marketplace`,
+        alternates: { canonical: `/marketplace/${slug}` },
         description: product.description.substring(0, 160),
         openGraph: {
             title: product.name,
