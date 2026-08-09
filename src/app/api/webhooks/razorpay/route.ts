@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import connectDB from "@/lib/db/mongodb";
 import Order from "@/lib/db/models/Order";
-import { grantWorkshopAttendance } from "@/lib/orders/fulfillment";
+import { grantWorkshopAttendance, sendGuestAccountInvite } from "@/lib/orders/fulfillment";
 
 export async function POST(request: NextRequest) {
     try {
@@ -84,6 +84,7 @@ async function handlePaymentCaptured(payment: {
         // before verify() runs is confirmed as paid but never given a seat.
         try {
             await grantWorkshopAttendance(order, alreadyPaid);
+            await sendGuestAccountInvite(order, alreadyPaid);
         } catch (err) {
             console.error("Webhook: failed to register workshop attendance:", err);
         }

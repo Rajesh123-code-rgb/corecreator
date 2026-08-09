@@ -38,7 +38,10 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 if (!user.password) {
-                    throw new Error("Please sign in with the provider you used to register");
+                    // Guest checkout creates accounts with no password, and SSO
+                    // accounts have none either. Point at the reset flow rather
+                    // than a provider they may never have used.
+                    throw new Error("This account has no password yet. Use \"Forgot password?\" to set one.");
                 }
 
                 const isPasswordValid = await bcrypt.compare(credentials.password, user.password);

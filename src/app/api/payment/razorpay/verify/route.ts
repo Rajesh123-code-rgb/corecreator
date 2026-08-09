@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { verifyRazorpayPayment, fetchPaymentDetails } from "@/lib/payment/razorpay";
 import connectDB from "@/lib/db/mongodb";
 import Order from "@/lib/db/models/Order";
-import { grantWorkshopAttendance } from "@/lib/orders/fulfillment";
+import { grantWorkshopAttendance, sendGuestAccountInvite } from "@/lib/orders/fulfillment";
 
 export async function POST(request: NextRequest) {
     try {
@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
                 // webhook path stays in step with this one.
                 try {
                     await grantWorkshopAttendance(order, alreadyPaid);
+                    await sendGuestAccountInvite(order, alreadyPaid);
                 } catch (err) {
                     // Payment already succeeded - log loudly rather than failing
                     // the request and leaving the buyer thinking it didn't.

@@ -1,3 +1,7 @@
+import User from "@/lib/db/models/User";
+import { createResetToken, appUrl } from "@/lib/auth/passwordReset";
+import { sendEmail } from "@/lib/email/brevo";
+import { getPasswordResetTemplate } from "@/lib/email/templates";
 import Workshop from "@/lib/db/models/Workshop";
 
 // An order can be confirmed by two independent paths: the browser calling
@@ -33,4 +37,30 @@ export async function grantWorkshopAttendance(
             }
         );
     }
+}
+
+/**
+ * Invites a guest buyer to claim the account that was created for them at
+ * checkout. Sent only after payment is confirmed, so an abandoned checkout
+ * never emails anyone.
+ *
+ * No-ops for buyers who already have a password - either they were signed in,
+ * or they had an existing account the order was attached to.
+ */
+export async function sendGuestAccountInvite(order: { user?: any }, alreadyPaid: boolean): Promise<void> {
+    if (alreadyPaid || !order.user) return;
+
+    const user = await User.findById(order.user).select("+password name email createdViaGuestCheckout");
+    if (!user || !user.createdViaGuestCheckout || user.password) return;
+
+    const { rawToken, tokenHash, expiresAt } = createResetToken();
+    user.resetPasswordToken = tokenHash;
+    user.resetPasswordExpires = expiresAt;
+    await user.save();
+
+    await sendEmail({
+        to: [{ email: user.email, name: user.name }],
+        subject: "Set a password for your Core Creator account",
+        htmlContent: getPasswordResetTemplate(user.name, `${appUrl()}/reset-password?token=${rawToken}`, true),
+    });
 }

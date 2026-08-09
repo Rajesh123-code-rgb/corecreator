@@ -85,3 +85,38 @@ export const getOrderConfirmationTemplate = (order: any, userName: string) => `
 </body>
 </html>
 `;
+
+export const getPasswordResetTemplate = (name: string, resetUrl: string, isNewGuestAccount = false) => `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f6f6f8;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+    <div style="background:#ffffff;border-radius:12px;padding:32px;">
+      <h1 style="margin:0 0 16px;font-size:22px;color:#111827;">
+        ${isNewGuestAccount ? "Set a password for your account" : "Reset your password"}
+      </h1>
+      <p style="margin:0 0 16px;color:#4b5563;line-height:1.6;">Hi ${name},</p>
+      <p style="margin:0 0 24px;color:#4b5563;line-height:1.6;">
+        ${isNewGuestAccount
+            ? "We created an account for you so you can track your order and access anything you purchased. Set a password below to sign in."
+            : "We received a request to reset your password. Click the button below to choose a new one."}
+      </p>
+      <p style="margin:0 0 24px;">
+        <a href="${resetUrl}" style="display:inline-block;background:#9333EA;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:bold;">
+          ${isNewGuestAccount ? "Set my password" : "Reset my password"}
+        </a>
+      </p>
+      <p style="margin:0 0 8px;color:#6b7280;font-size:13px;line-height:1.6;">
+        This link expires in 1 hour. If the button doesn't work, paste this into your browser:
+      </p>
+      <p style="margin:0 0 24px;color:#6b7280;font-size:13px;word-break:break-all;">${resetUrl}</p>
+      <p style="margin:0;color:#6b7280;font-size:13px;line-height:1.6;">
+        ${isNewGuestAccount
+            ? "If you didn't place an order with us, you can ignore this email."
+            : "If you didn't request this, you can safely ignore this email - your password won't change."}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`;

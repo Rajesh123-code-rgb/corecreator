@@ -7,6 +7,50 @@ left alone.
 
 ---
 
+## Phase 6 — Guest checkout and password reset
+
+**Guest checkout.** Signed-out shoppers now choose at `/checkout` between signing
+in, creating an account, and continuing as a guest. Guest is a real option, not a
+login wall with extra steps: `create-order` builds an account from the email
+typed into the checkout form, attaches the order to it, and the buyer claims it
+through a password-reset link.
+
+The accounts are created without a password, so the emailed link is the only way
+in. Two consequences that are deliberate:
+
+- If the email already belongs to an account, the order attaches to it and
+  **nothing** is returned that would let the buyer into it. Otherwise typing a
+  stranger's address at checkout would be an account takeover.
+- The "set your password" email is sent from the payment-confirmation path, not
+  from order creation, so an abandoned checkout never emails anyone.
+
+`Order.user` stays `required: true` — the account is what makes guest checkout
+work, rather than a schema change rippling through order history, course access,
+workshop seats and the seller dashboards.
+
+**Password reset, which had never existed.** `/help` already told users to click
+"Forgot Password" on the login page; there was no such link, page, route or email
+template. Built: `/forgot-password` and `/reset-password` pages, `POST
+/api/auth/forgot-password` and `POST /api/auth/reset-password`, a reset email
+template, and the missing link on the login page.
+
+Only the SHA-256 hash of the token is stored, so a database dump can't be used to
+take over accounts. Tokens expire in an hour, the expiry is part of the lookup
+query rather than a later check, and they are single-use. `/api/auth/forgot-password`
+answers identically whether or not the account exists, so it can't be used to
+discover which addresses are registered.
+
+`authorize()` told passwordless accounts to "sign in with the provider you used
+to register" — meaningless for a guest-created account. It now points at the
+reset flow.
+
+**The success page invented its order number.** It generated
+`ORD-${Date.now().toString(36)}` at render, so every customer saw a reference
+that existed nowhere in the system and changed on every refresh. It now shows the
+real `orderNumber`, and tells guest buyers that an account was created for them.
+
+---
+
 ## Phase 5 — "Looks real, isn't": simulated flows and payment integrity
 
 A pass over the things that render convincingly but aren't backed by anything —
