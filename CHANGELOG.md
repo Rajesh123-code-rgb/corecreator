@@ -81,6 +81,15 @@ verify flow as the main checkout. Three supporting fixes were needed:
   authoritative rather than in the browser.
 - `/workshops/[slug]/checkout` is now gated in middleware, matching `/checkout`.
 
+**The webhook and `verify()` disagreed about fulfilment.** An order can be
+confirmed by two independent paths — the browser calling `verify()` after the
+Razorpay modal closes, and Razorpay's `payment.captured` webhook — and if the
+customer closes the tab straight after paying, only the webhook arrives. The
+webhook marked the order paid but never granted workshop attendance, so that
+customer would be charged and left without a seat. Both paths now call a shared
+`grantWorkshopAttendance()` helper, guarded so a second confirmation cannot
+increment the seat count twice.
+
 The Razorpay SDK type declarations moved out of `checkout/page.tsx` — where they
 were published globally via `declare global` — into `src/types/razorpay.d.ts`, so
 both checkout pages share one definition.

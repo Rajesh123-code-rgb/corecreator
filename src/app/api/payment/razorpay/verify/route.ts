@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { verifyRazorpayPayment, fetchPaymentDetails } from "@/lib/payment/razorpay";
 import connectDB from "@/lib/db/mongodb";
 import Order from "@/lib/db/models/Order";
+import { grantWorkshopAttendance } from "@/lib/orders/fulfillment";
 
 export async function POST(request: NextRequest) {
     try {
@@ -51,6 +52,8 @@ export async function POST(request: NextRequest) {
         if (orderId) {
             const order = await Order.findById(orderId);
             if (order) {
+                // Razorpay's webhook may have confirmed this already.
+                const alreadyPaid = order.paymentStatus === "paid";
                 order.paymentStatus = "paid";
                 order.paymentMethod = "razorpay";
                 order.paymentDetails = {
@@ -64,24 +67,10 @@ export async function POST(request: NextRequest) {
                 order.status = "confirmed";
                 await order.save();
 
-                // Grant workshop attendance. Course and product ownership is
-                // derived from confirmed orders, so nothing extra is needed for
-                // those - but /api/user/workshops looks the user up in the
-                // Workshop's attendees array, so without this a buyer pays and
-                // then finds no booking on their dashboard.
+                // Grant workshop attendance via the shared helper, so the
+                // webhook path stays in step with this one.
                 try {
-                    const workshopItems = (order.items || []).filter(
-                        (i: any) => i.itemType === "workshop"
-                    );
-                    if (workshopItems.length > 0) {
-                        const Workshop = (await import("@/lib/db/models/Workshop")).default;
-                        for (const item of workshopItems) {
-                            await Workshop.findByIdAndUpdate(item.itemId, {
-                                $addToSet: { attendees: order.user },
-                                $inc: { enrolledCount: item.quantity || 1 },
-                            });
-                        }
-                    }
+                    await grantWorkshopAttendance(order, alreadyPaid);
                 } catch (err) {
                     // Payment already succeeded - log loudly rather than failing
                     // the request and leaving the buyer thinking it didn't.
