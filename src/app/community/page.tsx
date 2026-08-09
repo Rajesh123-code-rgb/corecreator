@@ -4,7 +4,7 @@ import { Button } from "@/components/atoms";
 import { MessageSquare } from "lucide-react";
 
 export const metadata = {
-    title: "Community | Core Creator",
+    title: "Community",
     description: "The Core Creator community forum is in the works.",
     alternates: { canonical: "/community" },
     // Nothing to index yet - keep this out of search results until the forum

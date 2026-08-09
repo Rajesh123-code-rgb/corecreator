@@ -3,7 +3,7 @@ import { getCourses } from "@/lib/courseSearch";
 import { LearnListClient } from "./LearnListClient";
 
 export const metadata = {
-    title: "Learn Art & Craft | Core Creator",
+    title: "Learn Art & Craft",
     description: "Access courses taught by professional artists — painting, drawing, sculpture, digital art, photography, ceramics and more. Start learning today.",
     alternates: { canonical: "/learn" },
 };

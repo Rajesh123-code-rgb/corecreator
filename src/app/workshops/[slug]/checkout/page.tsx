@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatDate } from "@/lib/formatDate";
 import { useToast } from "@/components/molecules";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -336,7 +337,7 @@ export default function WorkshopCheckoutPage() {
                                     <div className="space-y-2 text-sm text-[var(--muted-foreground)]">
                                         <div className="flex items-center gap-2">
                                             <Calendar className="w-4 h-4" />
-                                            <span suppressHydrationWarning>{workshopDate.toLocaleDateString()}</span>
+                                            <span>{formatDate(workshopDate)}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-4 h-4" />

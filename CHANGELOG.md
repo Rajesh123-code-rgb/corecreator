@@ -7,6 +7,67 @@ left alone.
 
 ---
 
+## Phase 7 — Findings from the live audit of Phases 1-5
+
+Everything from Phases 1-5 was re-tested against the live site, by request. The
+work verified clean: sitemap and robots, all five security headers, real
+platform stats, the commission copy, metadata and canonicals, landmarks and
+heading structure, the cookie banner, server-rendering on every list page, the
+removal of all fabricated data, and the mobile menu backdrop. What follows is
+what that audit turned up that had not been found before.
+
+### SEO
+
+**The homepage was the only page with no canonical tag.** `src/app/page.tsx` was
+a client component, and a client component cannot export metadata. The body
+moved to `HomeClient.tsx` and `page.tsx` became a server wrapper that supplies
+the canonical and OpenGraph tags. Markup is unchanged.
+
+**Every page title carried the brand twice.** Nineteen pages appended
+"| Core Creator" themselves and the root layout's template appended the full
+site title on top, producing "About Us | Core Creator | Core Creator - Global
+Art & Craft eLearning & Marketplace" — about 85 characters where search results
+show roughly 60. The template now appends the brand alone, and the self-appended
+suffix was removed from all nineteen.
+
+**`robots.txt` disallowed `/(dashboard)/`** — a Next.js route group, which never
+appears in a URL, so the rule protected nothing. Replaced with the real paths.
+`/cart`, `/checkout`, `/login`, `/forgot-password` and `/reset-password` now
+carry `noindex` as well; all are client components, so each needed a thin layout
+to hold the metadata.
+
+**Product and course pages had no `BreadcrumbList`.** `generateBreadcrumbJsonLd`
+already existed and was wired into the category pages only. Now on both detail
+page types.
+
+### Live errors
+
+**The favicon 404'd on every page load.** The layout declared
+`<link rel="icon" href="/favicon.ico">` but no such file existed — only
+`src/app/icon.png`. Generated `public/favicon.ico` from the existing icon.
+
+**React error #418 on course pages, traced to date formatting.** The server
+rendered "Last updated 2/1/2026" and the browser re-rendered "02/02/2026": bare
+`toLocaleDateString()` takes the locale and time zone of whoever runs it, and
+the server runs in UTC while visitors are in IST, so a timestamp near midnight
+lands on a different day.
+
+Added `src/lib/formatDate.ts`, which pins both locale and time zone, and applied
+it across every public page that renders a date — the homepage, workshops list
+and detail, workshop checkout, product reviews, blog and the course page. Two of
+those had `suppressHydrationWarning` on them, which silenced the warning while
+leaving the date wrong; both now use the shared formatter instead. `/pricing`
+was also pinned: the launch offer ends 23:59:59 IST, which is still the previous
+day in UTC, so an unpinned format would have advertised the offer ending a day
+early.
+
+**A decorative texture pointed at a dead third-party URL.** The course page
+loaded `grainy-gradients.vercel.app/noise.svg`, which returns 404 — a
+cross-origin request on every course page for an image that never rendered.
+Removed.
+
+---
+
 ## Phase 6 — Guest checkout and password reset
 
 **Guest checkout.** Signed-out shoppers now choose at `/checkout` between signing

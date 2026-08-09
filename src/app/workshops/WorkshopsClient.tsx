@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatDate } from "@/lib/formatDate";
 import { Header, Footer } from "@/components/organisms";
 import { Button, ImageWithFallback } from "@/components/atoms";
 import { Card, CardContent } from "@/components/molecules";
@@ -277,7 +278,7 @@ export default function WorkshopsClient() {
                                             <div className="bg-black/60 backdrop-blur-sm text-white p-2 rounded-lg text-xs flex items-center justify-between">
                                                 <span className="flex items-center gap-1">
                                                     <Calendar className="w-3 h-3" />
-                                                    {new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                    {formatDate(workshop.date, { month: 'short', day: 'numeric' })}
                                                 </span>
                                                 {workshop.workshopType === "offline" ? (
                                                     <span className="flex items-center gap-1">

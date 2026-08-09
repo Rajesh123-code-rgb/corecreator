@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/atoms";
 
 export const metadata = {
-    title: "Returns & Refunds | Core Creator",
+    title: "Returns & Refunds",
     description: "Our refund guarantee for digital courses and return policy for physical artworks and products.",
     alternates: { canonical: "/returns" },
 };

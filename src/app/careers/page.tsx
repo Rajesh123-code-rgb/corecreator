@@ -4,7 +4,7 @@ import { Briefcase, MapPin, Clock, ArrowRight, Zap, Coffee, Smile, Globe } from 
 import Link from "next/link";
 
 export const metadata = {
-    title: "Careers | Core Creator",
+    title: "Careers",
     description: "Join the Core Creator team and help build the future of the global art & craft community.",
     alternates: { canonical: "/careers" },
 };

@@ -1,4 +1,5 @@
 import { Header, Footer } from "@/components/organisms";
+import { formatDate } from "@/lib/formatDate";
 import { Button } from "@/components/atoms";
 import { Percent, Wallet, ShieldCheck, Mail } from "lucide-react";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import {
 } from "@/lib/commission";
 
 export const metadata = {
-    title: "Pricing & Fees | Core Creator",
+    title: "Pricing & Fees",
     description: "See exactly what Core Creator charges creators and buyers — commission rate, payout schedule, and refund policy, all in one place.",
     alternates: { canonical: "/pricing" },
 };
@@ -19,7 +20,10 @@ export default function PricingPage() {
     const promoActive = isPromoActive();
     const currentPct = getCurrentCommissionPct();
     const currentSharePct = getCurrentCreatorSharePct();
-    const promoEndLabel = COMMISSION.promoEndsAt.toLocaleDateString("en-IN", {
+    // The promo ends 23:59:59 IST, which is still the previous day in UTC -
+    // so this must be formatted in IST or the site would advertise the offer
+    // ending a day early.
+    const promoEndLabel = formatDate(COMMISSION.promoEndsAt, {
         year: "numeric",
         month: "long",
         day: "numeric",
