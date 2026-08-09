@@ -23,7 +23,7 @@ const registerSchema = z
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-export default function RegisterPage() {
+function RegisterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [showPassword, setShowPassword] = React.useState(false);
@@ -127,5 +127,20 @@ export default function RegisterPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// useSearchParams() forces this subtree out of prerendering, so it needs a
+// Suspense boundary or the production build fails on /register. Same shape as
+// (auth)/login/page.tsx.
+export default function RegisterPage() {
+    return (
+        <React.Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin w-8 h-8 border-4 border-[var(--primary-500)] border-t-transparent rounded-full" />
+            </div>
+        }>
+            <RegisterContent />
+        </React.Suspense>
     );
 }
