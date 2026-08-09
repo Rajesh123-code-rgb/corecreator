@@ -128,6 +128,12 @@ export interface IUser extends Document {
     // Timestamps
     lastLoginAt?: Date;
     emailVerifiedAt?: Date;
+    /** sha256 of the emailed reset token - the raw token is never stored. */
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
+    /** Account was created automatically by a guest checkout, so it starts
+     *  without a password and is claimed via the reset-password flow. */
+    createdViaGuestCheckout?: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -249,6 +255,9 @@ const UserSchema = new Schema<IUser>(
         twoFactorSecret: String,
         lastLoginAt: Date,
         emailVerifiedAt: Date,
+        resetPasswordToken: { type: String, select: false },
+        resetPasswordExpires: { type: Date, select: false },
+        createdViaGuestCheckout: { type: Boolean, default: false },
         wishlist: [
             {
                 itemId: { type: Schema.Types.ObjectId, required: true },

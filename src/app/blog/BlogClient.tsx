@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatDate } from "@/lib/formatDate";
 import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
 import { Search, Calendar, User, ArrowRight, Mail, Loader2 } from "lucide-react";
@@ -90,13 +91,7 @@ export default function BlogClient() {
         fetchPosts(nextPage, true);
     };
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-    };
+    // Shared formatter - pins locale AND time zone so SSR and the browser agree.
 
     return (
         <div className="min-h-screen bg-[var(--background)]">

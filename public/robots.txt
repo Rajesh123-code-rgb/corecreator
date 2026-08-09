@@ -4,6 +4,8 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /checkout
 Disallow: /cart
-Disallow: /(dashboard)/
+Disallow: /user/
+Disallow: /studio/dashboard
+Disallow: /reset-password
 
 Sitemap: https://corecreator.online/sitemap.xml

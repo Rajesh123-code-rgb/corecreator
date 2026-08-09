@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +25,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [showPassword, setShowPassword] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -48,7 +49,7 @@ export default function RegisterPage() {
             const result = await response.json();
             if (!response.ok) throw new Error(result.message);
             setSuccess(true);
-            setTimeout(() => signIn("credentials", { email: data.email, password: data.password, callbackUrl: "/user/dashboard" }), 1500);
+            setTimeout(() => signIn("credentials", { email: data.email, password: data.password, callbackUrl: searchParams.get("callbackUrl") || "/user/dashboard" }), 1500);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Registration failed");
         } finally {

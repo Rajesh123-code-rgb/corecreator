@@ -3,6 +3,7 @@ import connectDB from "@/lib/db/mongodb";
 import Product from "@/lib/db/models/Product";
 import ProductClientPage from "./ProductClientPage";
 import JsonLd from "@/components/atoms/JsonLd";
+import { generateBreadcrumbJsonLd } from "@/lib/seo";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -61,6 +62,13 @@ export default async function ProductDetailPage(props: PageProps) {
     return (
         <>
             <JsonLd data={jsonLd} />
+            <JsonLd
+                data={generateBreadcrumbJsonLd([
+                    { name: "Home", url: "/" },
+                    { name: "Marketplace", url: "/marketplace" },
+                    { name: product.name, url: `/marketplace/${product.slug}` },
+                ])}
+            />
             <ProductClientPage product={product} relatedProducts={relatedProducts} />
         </>
     );
@@ -71,7 +79,7 @@ export async function generateMetadata({ params }: PageProps): Promise<import("n
     await connectDB();
     const product = await Product.findOne({ slug }).select("name description images").lean();
 
-    if (!product) return { title: "Product Not Found | Core Creator" };
+    if (!product) return { title: "Product Not Found" };
 
     let imageUrl = "";
     if (product.images && product.images.length > 0) {

@@ -3,6 +3,7 @@ import connectDB from "@/lib/db/mongodb";
 import Course from "@/lib/db/models/Course";
 import CourseClientPage from "./CourseClientPage";
 import JsonLd from "@/components/atoms/JsonLd";
+import { generateBreadcrumbJsonLd } from "@/lib/seo";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -59,6 +60,13 @@ export default async function CourseDetailPage(props: PageProps) {
     return (
         <>
             <JsonLd data={jsonLd} />
+            <JsonLd
+                data={generateBreadcrumbJsonLd([
+                    { name: "Home", url: "/" },
+                    { name: "Learn", url: "/learn" },
+                    { name: courseDoc.title, url: `/learn/${courseDoc.slug}` },
+                ])}
+            />
             <CourseClientPage initialCourse={course} />
         </>
     );
@@ -69,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<import("n
     await connectDB();
     const course = await Course.findOne({ slug }).select("title description thumbnail").lean();
 
-    if (!course) return { title: "Course Not Found | Core Creator" };
+    if (!course) return { title: "Course Not Found" };
 
     return {
         title: `${course.title} | Core Creator`,

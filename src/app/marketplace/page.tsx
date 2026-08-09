@@ -3,7 +3,7 @@ import { getProducts } from "@/lib/productSearch";
 import { MarketplaceListClient } from "./MarketplaceListClient";
 
 export const metadata = {
-    title: "Art & Craft Marketplace | Core Creator",
+    title: "Art & Craft Marketplace",
     description: "Discover unique handcrafted artworks from talented artists worldwide — paintings, ceramics, jewelry, textiles, digital art and more.",
     alternates: { canonical: "/marketplace" },
 };

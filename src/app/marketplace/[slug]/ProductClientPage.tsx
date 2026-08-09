@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { formatDate } from "@/lib/formatDate";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Header, Footer } from "@/components/organisms";
@@ -917,7 +918,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                                                     ))}
                                                                 </div>
                                                                 <span className="text-sm text-[var(--muted-foreground)]">
-                                                                    {new Date(review.createdAt).toLocaleDateString()}
+                                                                    {formatDate(review.createdAt)}
                                                                 </span>
                                                             </div>
                                                             {review.title && <h5 className="font-medium mb-1">{review.title}</h5>}

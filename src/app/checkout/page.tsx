@@ -27,11 +27,14 @@ const CHECKOUT_DRAFT_KEY = "checkout-draft";
 
 export default function CheckoutPage() {
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const { items, isHydrated, subtotal, clearCart, discount, promoCode, shippingTotal } = useCart();
     const { formatPrice } = useCurrency();
     const toast = useToast();
     const [currentStep, setCurrentStep] = React.useState(0);
+    // Set once a signed-out shopper chooses "continue as guest", so the choice
+    // screen doesn't reappear while they fill the form.
+    const [guestMode, setGuestMode] = React.useState(false);
     const [isProcessing, setIsProcessing] = React.useState(false);
 
     // Form State
@@ -146,6 +149,8 @@ export default function CheckoutPage() {
             }
             const orderData = await res.json();
             const dbOrderId = orderData.dbOrderId;
+            const orderNumber = orderData.orderNumber as string | undefined;
+            const guestAccountCreated = Boolean(orderData.guestAccountCreated);
 
             // 2. Open Razorpay Modal
             const options: RazorpayOptions = {
@@ -177,7 +182,10 @@ export default function CheckoutPage() {
                     if (verifyRes.ok) {
                         clearCart();
                         sessionStorage.removeItem(CHECKOUT_DRAFT_KEY);
-                        router.push("/checkout/success");
+                        const params = new URLSearchParams();
+                        if (orderNumber) params.set("order", orderNumber);
+                        if (guestAccountCreated) params.set("newAccount", "1");
+                        router.push(`/checkout/success${params.toString() ? `?${params}` : ""}`);
                     } else {
                         toast.error("Payment verification failed");
                         setIsProcessing(false);
@@ -211,6 +219,60 @@ export default function CheckoutPage() {
         );
     }
     if (items.length === 0) return null;
+
+    // Signed-out shoppers pick how they want to check out before filling
+    // anything in. Guest is a real option - create-order makes an account from
+    // the email they enter and emails them a link to set a password - so this
+    // is a genuine choice, not a login wall with extra steps.
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen bg-[var(--muted)] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--muted-foreground)]" />
+            </div>
+        );
+    }
+
+    if (status === "unauthenticated" && !guestMode) {
+        const callback = encodeURIComponent("/checkout");
+        return (
+            <div className="min-h-screen bg-[var(--muted)] flex flex-col">
+                <Header />
+                <main id="main-content" className="py-12 flex-1">
+                    <div className="container-app max-w-lg">
+                        <div className="bg-white rounded-xl border border-[var(--border)] p-8">
+                            <h1 className="text-2xl font-bold mb-2">How would you like to check out?</h1>
+                            <p className="text-[var(--muted-foreground)] mb-8">
+                                You can buy without an account — we&apos;ll set one up so you can track your order.
+                            </p>
+
+                            <div className="space-y-3">
+                                <Button variant="secondary" size="lg" className="w-full" asChild>
+                                    <Link href={`/login?callbackUrl=${callback}`}>Sign in to my account</Link>
+                                </Button>
+                                <Button variant="outline" size="lg" className="w-full" asChild>
+                                    <Link href={`/register?callbackUrl=${callback}`}>Create an account</Link>
+                                </Button>
+
+                                <div className="flex items-center gap-3 py-2">
+                                    <div className="h-px flex-1 bg-[var(--border)]" />
+                                    <span className="text-xs uppercase tracking-wide text-[var(--muted-foreground)]">or</span>
+                                    <div className="h-px flex-1 bg-[var(--border)]" />
+                                </div>
+
+                                <Button variant="outline" size="lg" className="w-full" onClick={() => setGuestMode(true)}>
+                                    Continue as guest
+                                </Button>
+                                <p className="text-xs text-[var(--muted-foreground)] text-center">
+                                    We&apos;ll create an account with the email you enter and send you a link to set a password.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[var(--muted)] flex flex-col">

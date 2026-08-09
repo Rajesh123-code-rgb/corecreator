@@ -1,9 +1,19 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Button } from "@/components/atoms";
-import { CheckCircle2, Package, Mail, ArrowRight } from "lucide-react";
+import { CheckCircle2, Package, Mail, ArrowRight, KeyRound } from "lucide-react";
 
-export default function CheckoutSuccessPage() {
-    const orderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
+// The order number is passed through from create-order. This page used to
+// generate `ORD-${Date.now()}` on render, showing the customer a reference that
+// existed nowhere in the system and differed on every refresh.
+export default async function CheckoutSuccessPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ order?: string; newAccount?: string }>;
+}) {
+    const params = await searchParams;
+    const orderId = params.order;
+    const isNewGuestAccount = params.newAccount === "1";
 
     return (
         <div className="min-h-screen bg-[var(--muted)] flex items-center justify-center p-8">
@@ -18,12 +28,28 @@ export default function CheckoutSuccessPage() {
                         Thank you for your purchase. Your order has been successfully placed.
                     </p>
 
-                    <div className="bg-[var(--muted)] rounded-xl p-4 mb-6">
-                        <p className="text-sm text-[var(--muted-foreground)]">Order ID</p>
-                        <p className="font-mono font-bold text-lg">{orderId}</p>
-                    </div>
+                    {orderId && (
+                        <div className="bg-[var(--muted)] rounded-xl p-4 mb-6">
+                            <p className="text-sm text-[var(--muted-foreground)]">Order ID</p>
+                            <p className="font-mono font-bold text-lg">{orderId}</p>
+                        </div>
+                    )}
 
                     <div className="space-y-4 text-left mb-8">
+                        {isNewGuestAccount && (
+                            <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-50">
+                                <KeyRound className="w-5 h-5 text-purple-600 mt-0.5" />
+                                <div>
+                                    <p className="font-medium text-sm">We created an account for you</p>
+                                    <p className="text-xs text-[var(--muted-foreground)]">
+                                        Check your email for a link to set a password, then sign in to track this
+                                        order and reach anything you bought. You can also use{" "}
+                                        <Link href="/forgot-password" className="underline">Forgot password</Link>{" "}
+                                        at any time.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                         <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50">
                             <Mail className="w-5 h-5 text-blue-600 mt-0.5" />
                             <div>

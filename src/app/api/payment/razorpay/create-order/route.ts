@@ -10,17 +10,48 @@ import Course from "@/lib/db/models/Course";
 import Workshop from "@/lib/db/models/Workshop";
 import ShippingProfile from "@/lib/db/models/ShippingProfile";
 import mongoose from "mongoose";
+import { findOrCreateGuestUser } from "@/lib/auth/guestCheckout";
 
 export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
         const body = await request.json();
         const { items, shippingAddress, promoCode } = body;
+
+        // Guests may check out. Their order still needs a real user account
+        // (Order.user is required, and order history, course access and
+        // workshop seats all key off a user id), so one is created from the
+        // email they typed. It has no password - they claim it through the
+        // reset-password link emailed to that address.
+        let buyerId: string;
+        let buyerEmail: string;
+        let buyerName: string;
+        let guestAccountCreated = false;
+
+        if (session?.user) {
+            buyerId = session.user.id as string;
+            buyerEmail = session.user.email || "";
+            buyerName = session.user.name || "";
+        } else {
+            try {
+                const guest = await findOrCreateGuestUser({
+                    email: shippingAddress?.email,
+                    firstName: shippingAddress?.firstName,
+                    lastName: shippingAddress?.lastName,
+                    phone: shippingAddress?.phone,
+                });
+                buyerId = guest.userId;
+                buyerEmail = guest.email;
+                buyerName = guest.name;
+                guestAccountCreated = guest.isNewAccount;
+            } catch (guestError) {
+                return NextResponse.json(
+                    { error: guestError instanceof Error ? guestError.message : "Could not start guest checkout." },
+                    { status: 400 }
+                );
+            }
+        }
 
         // Currency is NOT taken from the request. All catalogue prices are
         // stored in INR (CurrencyContext treats INR as the source currency and
@@ -296,7 +327,7 @@ export async function POST(request: NextRequest) {
         // 3. Create MongoDB Order (Pending)
         const dbOrder = new Order({
             orderNumber: orderNumber,
-            user: new mongoose.Types.ObjectId(session.user.id),
+            user: new mongoose.Types.ObjectId(buyerId),
             items: orderItems,
             total: finalAmount,
             subtotal: subtotal,
@@ -331,8 +362,8 @@ export async function POST(request: NextRequest) {
             currency,
             receipt: dbOrder._id.toString(),
             notes: {
-                userId: session.user.id || "",
-                userEmail: session.user.email || "",
+                userId: buyerId,
+                userEmail: buyerEmail,
                 dbOrderId: dbOrder._id.toString(),
                 promoCode: promoCode || ""
             },
@@ -348,6 +379,10 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
+            // Lets the success page tell a guest that an account was made for
+            // them and how to get into it.
+            guestAccountCreated,
+            orderNumber,
             dbOrderId: dbOrder._id.toString(),
             order: {
                 id: order.id,
@@ -357,8 +392,8 @@ export async function POST(request: NextRequest) {
             },
             keyId: getRazorpayKeyId(),
             prefill: {
-                name: session.user.name || "",
-                email: session.user.email || "",
+                name: buyerName,
+                email: buyerEmail,
             },
         });
     } catch (error) {

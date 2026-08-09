@@ -39,9 +39,14 @@ export async function generateMetadata(): Promise<Metadata> {
     const settings = config?.value || {};
 
     const siteTitle = settings.siteTitle || "Core Creator - Global Art & Craft eLearning & Marketplace";
+    // The template appends the BRAND, not the full site title. Using siteTitle
+    // here produced "About Us | Core Creator | Core Creator - Global Art &
+    // Craft eLearning & Marketplace" once pages added their own suffix - the
+    // brand twice, and ~85 characters where search results show about 60.
+    const brand = settings.siteName || "Core Creator";
     const title = {
       default: siteTitle,
-      template: `%s ${settings.separator || "|"} ${siteTitle}`,
+      template: `%s ${settings.separator || "|"} ${brand}`,
     };
     const description = settings.siteDescription || "The ultimate platform for artists, learners, and art lovers. Buy authentic artworks, learn new skills, and sell your creations globally.";
 

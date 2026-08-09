@@ -82,6 +82,11 @@ function LoginContent() {
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
                         </div>
+                        <div className="flex justify-end">
+                            <Link href="/forgot-password" className="text-sm font-medium text-[var(--primary-600)] hover:underline">
+                                Forgot password?
+                            </Link>
+                        </div>
                         <Button type="submit" size="lg" className="w-full gradient-gold text-[var(--neutral-900)]" isLoading={isLoading}>Sign In</Button>
                     </form>
 

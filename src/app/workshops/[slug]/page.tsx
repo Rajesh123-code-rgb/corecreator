@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatDate } from "@/lib/formatDate";
 import { Header, Footer } from "@/components/organisms";
 import { Button, ImageWithFallback } from "@/components/atoms";
 import { Card, CardContent, EnquiryModal, useToast } from "@/components/molecules";
@@ -183,7 +184,7 @@ export default function WorkshopDetailPage() {
                         <div className="flex flex-wrap gap-8 text-lg lg:text-xl font-medium">
                             <div className="flex items-center gap-3">
                                 <Calendar className="w-6 h-6 text-blue-400" />
-                                <span suppressHydrationWarning>{workshopDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                                <span>{formatDate(workshopDate, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Clock className="w-6 h-6 text-blue-400" />

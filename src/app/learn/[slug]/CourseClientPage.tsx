@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { formatDate } from "@/lib/formatDate";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Header, Footer, ReviewsSection } from "@/components/organisms";
@@ -166,7 +167,6 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
             {/* Hero Section */}
             <div className="relative bg-gray-900 text-white overflow-hidden">
                 {/* Background Gradient & Pattern */}
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900" />
 
                 <div className="container-app relative z-10">
@@ -209,7 +209,7 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                         {/* Meta Info */}
                         <div className="flex flex-wrap items-center gap-6 text-sm text-purple-200/80 font-medium">
                             <span className="flex items-center gap-2">
-                                <Clock className="w-4 h-4" /> Last updated {new Date(course.updatedAt).toLocaleDateString()}
+                                <Clock className="w-4 h-4" /> Last updated {formatDate(course.updatedAt)}
                             </span>
                             <span className="flex items-center gap-2">
                                 <Globe className="w-4 h-4" /> {course.language}

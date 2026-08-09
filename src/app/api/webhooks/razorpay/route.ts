@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import connectDB from "@/lib/db/mongodb";
 import Order from "@/lib/db/models/Order";
+import { grantWorkshopAttendance, sendGuestAccountInvite } from "@/lib/orders/fulfillment";
 
 export async function POST(request: NextRequest) {
     try {
@@ -65,6 +66,8 @@ async function handlePaymentCaptured(payment: {
     });
 
     if (order) {
+        // The browser's verify() call may have confirmed this already.
+        const alreadyPaid = order.paymentStatus === "paid";
         order.paymentStatus = "paid";
         order.status = "confirmed";
         order.paymentDetails = {
@@ -76,6 +79,16 @@ async function handlePaymentCaptured(payment: {
             paidAt: new Date(),
         };
         await order.save();
+
+        // Without this, a customer who pays for a workshop and closes the tab
+        // before verify() runs is confirmed as paid but never given a seat.
+        try {
+            await grantWorkshopAttendance(order, alreadyPaid);
+            await sendGuestAccountInvite(order, alreadyPaid);
+        } catch (err) {
+            console.error("Webhook: failed to register workshop attendance:", err);
+        }
+
         console.log(`Order ${order._id} marked as paid`);
     }
 }
