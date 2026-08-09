@@ -444,7 +444,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold mb-2">Top Rated <span className="text-gradient-purple">Courses</span></h2>
-              <p className="text-[var(--muted-foreground)]">Join thousands of students learning from the best</p>
+              <p className="text-[var(--muted-foreground)]">Learn new skills from experienced artists and makers</p>
             </div>
             <Button variant="outline" className="hidden sm:flex" asChild>
               <Link href="/learn">View All Courses<ArrowRight className="w-4 h-4 ml-2" /></Link>
@@ -630,33 +630,8 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: "Sarah Mitchell", specialty: "Watercolor Artist", courses: 12, products: 45, rating: 4.9, image: "https://randomuser.me/api/portraits/women/1.jpg" },
-                { name: "Michael Chen", specialty: "Oil Painting Master", courses: 8, products: 32, rating: 4.8, image: "https://randomuser.me/api/portraits/men/2.jpg" },
-                { name: "Emma Rodriguez", specialty: "Digital Illustrator", courses: 15, products: 28, rating: 4.9, image: "https://randomuser.me/api/portraits/women/3.jpg" },
-                { name: "David Kim", specialty: "Ceramic Artist", courses: 6, products: 67, rating: 4.7, image: "https://randomuser.me/api/portraits/men/4.jpg" },
-              ].map((artist, index) => (
-                <Card key={artist.name} hover className="p-6 text-center animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <div className="relative inline-block mb-4">
-                    <img loading="lazy" decoding="async" src={artist.image} alt={artist.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
-                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--secondary-500)] rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
-                      ✓
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-lg">{artist.name}</h3>
-                  <p className="text-sm text-[var(--muted-foreground)] mb-3">{artist.specialty}</p>
-                  <div className="flex justify-center gap-4 text-xs text-[var(--muted-foreground)] mb-3">
-                    <span>{artist.courses} Courses</span>
-                    <span>•</span>
-                    <span>{artist.products} Artworks</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-1">
-                    <Star className="w-4 h-4 text-[var(--primary-500)] fill-[var(--primary-500)]" />
-                    <span className="font-semibold">{artist.rating}</span>
-                  </div>
-                </Card>
-              ))}
+            <div className="text-center py-12 text-[var(--muted-foreground)]">
+              No featured artists available at the moment.
             </div>
           )}
 
@@ -761,40 +736,6 @@ export default function HomePage() {
 
 
 
-      {/* Testimonials */}
-      <section className="py-20">
-        <div className="container-app">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">What Our Community Says</h2>
-            <p className="text-[var(--muted-foreground)]">Join thousands of satisfied learners and artists</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { quote: `Core Creator helped me turn my hobby into a full-time career. I've earned over ${formatPrice(1000000)} teaching watercolor!`, name: "Priya Sharma", role: "Watercolor Instructor", image: "https://randomuser.me/api/portraits/women/32.jpg" },
-              { quote: "The courses here are phenomenal. I learned digital illustration from scratch and now work as a freelancer.", name: "Rahul Verma", role: "Student & Freelancer", image: "https://randomuser.me/api/portraits/men/45.jpg" },
-              { quote: "As an art collector, I love the variety and quality. Every piece I've bought has exceeded expectations!", name: "Anjali Mehta", role: "Art Collector", image: "https://randomuser.me/api/portraits/women/68.jpg" },
-            ].map((testimonial, index) => (
-              <Card key={testimonial.name} className="p-6 animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <div className="flex gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-4 h-4 text-[var(--primary-500)] fill-[var(--primary-500)]" />
-                  ))}
-                </div>
-                <p className="text-[var(--muted-foreground)] mb-6 italic">&ldquo;{testimonial.quote}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <img loading="lazy" decoding="async" src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover" />
-                  <div>
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-[var(--muted-foreground)]">{testimonial.role}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Why Choose Us */}
       <section className="py-20 bg-[var(--neutral-900)] text-white">
         <div className="container-app">
@@ -808,7 +749,7 @@ export default function HomePage() {
               <div className="grid sm:grid-cols-2 gap-6">
                 {[
                   { icon: Award, title: "Quality Verified", desc: "Every course and artwork is vetted for quality" },
-                  { icon: Users, title: "50K+ Community", desc: "Join a thriving creative community" },
+                  { icon: Users, title: "Creative Community", desc: "Connect with artists, learners and collectors" },
                   { icon: Globe, title: "Global Reach", desc: "Sell and learn from anywhere in the world" },
                   { icon: Sparkles, title: "Fair Pricing", desc: commissionHeadline() },
                 ].map((item) => (
@@ -861,7 +802,7 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-black/10" />
             <div className="relative px-8 py-16 lg:px-16 lg:py-24 text-center text-white">
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-6">Ready to Start Your Creative Journey?</h2>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">Join thousands of artists, learners, and art lovers on the world's most vibrant creative platform.</p>
+              <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">Join a growing community of artists, learners, and art lovers.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="xl" className="bg-white text-[var(--foreground)] hover:bg-white/90 w-full sm:w-auto font-semibold" asChild>
                   <Link href="/register">Get Started<ArrowRight className="w-5 h-5 ml-2" /></Link>

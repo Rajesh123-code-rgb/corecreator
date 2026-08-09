@@ -7,6 +7,157 @@ left alone.
 
 ---
 
+## Phase 5 — "Looks real, isn't": simulated flows and payment integrity
+
+A pass over the things that render convincingly but aren't backed by anything —
+payments that don't charge, profiles for people who don't exist, statistics the
+database contradicts.
+
+### Payment
+
+**Logged-out buyers could not purchase anything — confirmed end to end.** Reported
+manually as "try again at checkout" and reproduced in a real browser against the
+live site for both an artwork and a course. `/checkout` was not in the middleware
+matcher, so guests could reach it; the page used `useSession` only to prefill name
+and email and never gated on it; `create-order` requires a session and returns
+401. The page's catch block then showed "Payment failed. Please try again." So a
+visitor filled the entire shipping form, clicked Pay, and was told payment failed
+when the real problem was that they weren't signed in. No order, no charge, no
+explanation — a total purchase blocker for every first-time buyer.
+
+Fixed by gating `/checkout` in middleware, the same way `/user` and `/studio`
+already are, so guests are redirected to login *before* filling anything, with a
+callback back to checkout. As defence in depth the page now handles 401
+explicitly rather than reporting it as a payment failure, and surfaces the real
+API error instead of a fixed string. Guest checkout isn't possible today in any
+case: `Order.user` is `required: true`, so supporting it would be a data-model
+change and a product decision.
+
+**Payment amounts were client-controlled.** `create-order` never read prices from
+the database despite a comment claiming it did — it trusted `item.price` from the
+request body, which flowed into `razorpay.orders.create({ amount })`. `verify()`
+confirms on Razorpay signature alone and never re-checks the amount, and the
+signature is valid because the order really was created for the tampered figure.
+So a crafted request could buy any item for any amount, and the order would be
+marked paid, access granted, the seller notified and a confirmation emailed.
+
+Prices are now re-derived server-side. Courses and workshops have a single fixed
+price so the stored value is used outright and the client's number is discarded.
+Products are configurable and those selections aren't forwarded to the route, so
+the client price is floor-checked against the cheapest configuration the product
+could legitimately sell at. Any mismatch rejects the whole order.
+
+*Follow-up:* forward variant, customization and add-on selections from the cart
+through checkout so product prices can be recomputed exactly rather than
+floor-checked.
+
+**The charge currency was taken from the request body.** All catalogue prices are
+stored in INR — `CurrencyContext` treats INR as the source currency and converts
+only for display — and nothing anywhere converts between currencies. Yet the
+checkout page sent `currency: "USD"` and `create-order` passed that straight to
+Razorpay against the unconverted INR amount. A ₹2,000 item was sent as $2,000.00.
+Depending on whether the Razorpay account accepts USD that is either a ~83×
+overcharge or an outright rejection — and rejection surfaces to the customer as
+"Payment failed. Please try again.", the same symptom as the guest-checkout bug
+above but affecting signed-in buyers too.
+
+Currency is now pinned server-side alongside the price and the request value is
+ignored. **This one needs checking against the live Razorpay dashboard** to
+establish which of the two outcomes actually occurred, and whether any customer
+was overcharged.
+
+**Workshop checkout took no payment at all.** `handlePayment` was a two-second
+`setTimeout` followed by a "Payment Successful!" toast and a redirect to the
+success page. No API call, no charge, no seat reserved, no record — while a
+Razorpay logo sat on the page. It now runs the same create-order → Razorpay →
+verify flow as the main checkout. Three supporting fixes were needed:
+
+- `verify()` never registered workshop attendance. Course and product ownership
+  is derived from confirmed orders, but `/api/user/workshops` looks the buyer up
+  in the Workshop's `attendees` array, which nothing ever wrote to — so payment
+  alone would have left a paying customer with no booking on their dashboard.
+- Workshops have finite capacity and nothing checked it, so they could be booked
+  past the seat limit. Now enforced in `create-order`, where the count is
+  authoritative rather than in the browser.
+- `/workshops/[slug]/checkout` is now gated in middleware, matching `/checkout`.
+
+The Razorpay SDK type declarations moved out of `checkout/page.tsx` — where they
+were published globally via `declare global` — into `src/types/razorpay.d.ts`, so
+both checkout pages share one definition.
+
+### Fabricated data
+
+**`/studio/[id]` invented verified instructors.** When a user wasn't found the page
+served made-up people — named, with stock photos, bios, `isVerified: true` and
+`example.com` contact details — and *any* unknown ID returned a plausible fake
+profile rather than 404, generating unlimited indexable pages for creators who
+don't exist. It also overwrote their statistics with invented figures under a
+comment reading "Update stats for mock users to look alive". Unknown and
+non-creator IDs now 404.
+
+**The homepage advertised four artists who don't exist**, with stock portraits,
+verified check badges and invented course/artwork counts, shown whenever the real
+artist list came back empty. The three sibling sections on the same page already
+had honest empty states; this one now matches them.
+
+**The homepage carried fabricated testimonials**, including a named person
+claiming to have earned over ₹10,00,000 teaching on the platform. Real creator
+earnings are ₹0. Section removed rather than rewritten — there are no real
+testimonials to substitute yet.
+
+**Scale claims contradicted by the platform's own database.** "50K+ Community",
+"Join thousands of students", "Join thousands of artists, learners and art
+lovers on the world's most vibrant creative platform" and the same claim on the
+registration page, against real figures of 9 creators and 3 learners. Replaced
+with copy that doesn't assert a scale, and the unsupportable superlative dropped.
+
+**Artists with no ratings were shown 4.5 stars.** Both artist API routes ended
+their rating calculation with `|| 4.5`, so an artist nobody had ever rated
+displayed a solid score. They now return `null` and the UI shows "Not yet rated"
+or omits the figure. The `randomuser.me` "lego" placeholder portrait was replaced
+with an initials avatar generated from the artist's own name.
+
+**The community page was a forum that doesn't exist.** 317 lines of hardcoded
+discussion threads with authors and reply counts, five categories with invented
+topic counts, and a statistics panel reading 12.8K members / 3.5K topics / 45K
+replies / 234 online. There is no forum backend at all — the `Post` model powers
+the blog. The page was orphaned (nothing linked to it, absent from the sitemap),
+so it has been replaced with an honest placeholder carrying `noindex` until the
+feature exists. Deleting the route outright is a reasonable alternative.
+
+### Copy and claims
+
+**`/shipping` promised expedited delivery that checkout doesn't offer.** "Expedited
+options are available at checkout for most items, delivering within 1-2 business
+days" — there is no expedited option anywhere in the checkout flow. Claim removed.
+
+**`/terms`** had "Creators must accuracy represent their items" — corrected.
+
+### `/artists` now server-renders its list
+
+`getArtists()` extracted to `src/lib/artistSearch.ts`, mirroring the existing
+`productSearch.ts` and `courseSearch.ts`. The page is now an async Server
+Component that seeds the client list, which skips its redundant first fetch via a
+`useRef` mount guard. `/api/artists` became a thin wrapper over the same
+function.
+
+### Open, needs your input
+
+- **Razorpay dashboard check** for the currency bug above — were customers
+  overcharged, or were all payments failing?
+- **`support@corecreator.com`** is published as the contact address on `/contact`
+  and `/terms`, but `corecreator.com` resolves to a different server than
+  `corecreator.online`. Confirm it's a mailbox you actually control; left
+  unchanged pending that.
+- **`/terms` states no governing law or jurisdiction.** For an Indian company this
+  should say so explicitly. Not written in, since the jurisdiction city is yours
+  to specify.
+- **`/shipping`'s 3–5 and 7–14 day windows** remain unverified, as does whether
+  international shipping is genuinely offered.
+- **Real social profile URLs** for the footer icons, still `href="#"`.
+
+---
+
 ## Phase 4 — Indexation & trust claims
 
 **Corrected the refund policy sitewide.** The site advertised a 30-day

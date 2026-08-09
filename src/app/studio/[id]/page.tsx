@@ -48,106 +48,66 @@ export default async function StudioPage(props: PageProps) {
             .select("name email avatar bio profile studioProfile artistProfile role isVerified createdAt")
             .lean();
     } catch (e) {
-        console.log("Invalid ID or DB error, checking for mock instructor...");
+        // A malformed ObjectId throws here - that is a bad URL, not a server
+        // fault, so fall through to notFound() rather than surfacing a 500.
+        console.error("Failed to load studio profile:", e);
     }
 
-    // Mock Data Fallback for Workshop Instructors (if user not found in DB)
-    if (!seller) {
-        // Mock instructors based on the ID passed from workshops API
-        const mockInstructors: Record<string, any> = {
-            "65a1234567890abcdef12345": { name: "Emma Rodriguez", role: "studio", bio: "Watercolor enthusiast and nature lover. Specializing in landscapes and botanical art.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop" },
-            "65a1234567890abcdef12346": { name: "Sarah Mitchell", role: "studio", bio: "Classical oil painter with 15 years of teaching experience. Expert in color theory.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop" },
-            "65a1234567890abcdef12347": { name: "Priya Singh", role: "studio", bio: "Keeper of traditions. Practicing Mithila (Madhubani) art for over 20 years.", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=50&h=50&fit=crop" },
-            // ... Add generic fallback for others
-        };
-
-        const mockData = mockInstructors[params.id] || {
-            name: "Instructor Profile",
-            role: "studio",
-            bio: "Passionate creator and educator on Core Creator.",
-            avatar: `https://ui-avatars.com/api/?name=Instructor&background=random`
-        };
-
-        seller = {
-            _id: params.id,
-            name: mockData.name,
-            email: "instructor@example.com",
-            avatar: mockData.avatar,
-            bio: mockData.bio,
-            role: mockData.role,
-            isVerified: true,
-            createdAt: new Date("2024-01-01"),
-            profile: {
-                location: "Global",
-                website: "https://example.com",
-                socialLinks: { instagram: "corecreator" }
-            },
-            studioProfile: { name: mockData.name } // Fallback for header logic
-        };
-    } else if (seller.role !== "studio" && seller.role !== "admin") {
-        // If valid user but not a creator or admin role, just 404 as before
+    // Unknown or non-creator IDs 404. This previously fell back to invented
+    // instructors - named people with stock-photo avatars, a verified badge and
+    // fabricated course/student/rating figures - which meant any unrecognised
+    // ID rendered a convincing profile for a creator who does not exist.
+    if (!seller || (seller.role !== "studio" && seller.role !== "admin")) {
         notFound();
     }
 
-    // Fetch products if real user, otherwise empty for mock
-    if (seller._id && !seller.email.includes("instructor@example.com")) { // Check if real
-        products = await Product.find({
-            seller: params.id,
-            status: "active"
-        })
-            .sort({ createdAt: -1 })
-            .limit(12)
-            .lean();
+    products = await Product.find({
+        seller: params.id,
+        status: "active"
+    })
+        .sort({ createdAt: -1 })
+        .limit(12)
+        .lean();
 
-        courses = await Course.find({
-            instructor: params.id,
-            status: "published"
-        })
-            .sort({ createdAt: -1 })
-            .limit(8)
-            .lean();
-    }
+    courses = await Course.find({
+        instructor: params.id,
+        status: "published"
+    })
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .lean();
 
-    // Calculate seller stats from products (Real DB calc or Mock)
+    // Calculate seller stats from their real catalogue
     let productStats = [];
     let courseStats = [];
 
-    if (seller._id && !seller.email.includes("instructor@example.com")) {
-        productStats = await Product.aggregate([
-            { $match: { seller: seller._id } },
-            {
-                $group: {
-                    _id: null,
-                    totalProducts: { $sum: 1 },
-                    totalSales: { $sum: "$salesCount" },
-                    productAvgRating: { $avg: "$rating" },
-                    productReviews: { $sum: "$reviewCount" }
-                }
+    productStats = await Product.aggregate([
+        { $match: { seller: seller._id } },
+        {
+            $group: {
+                _id: null,
+                totalProducts: { $sum: 1 },
+                totalSales: { $sum: "$salesCount" },
+                productAvgRating: { $avg: "$rating" },
+                productReviews: { $sum: "$reviewCount" }
             }
-        ]);
+        }
+    ]);
 
-        courseStats = await Course.aggregate([
-            { $match: { instructor: seller._id } },
-            {
-                $group: {
-                    _id: null,
-                    totalCourses: { $sum: 1 },
-                    totalStudents: { $sum: "$enrollmentCount" },
-                    courseAvgRating: { $avg: "$rating" }
-                }
+    courseStats = await Course.aggregate([
+        { $match: { instructor: seller._id } },
+        {
+            $group: {
+                _id: null,
+                totalCourses: { $sum: 1 },
+                totalStudents: { $sum: "$enrollmentCount" },
+                courseAvgRating: { $avg: "$rating" }
             }
-        ]);
-    }
+        }
+    ]);
 
     const pStats = productStats[0] || { totalProducts: 0, totalSales: 0, productAvgRating: 0, productReviews: 0 };
     const cStats = courseStats[0] || { totalCourses: 0, totalStudents: 0, courseAvgRating: 0 };
-
-    // Update stats for mock users to look alive
-    if (seller.email.includes("instructor@example.com")) {
-        cStats.totalCourses = 5;
-        cStats.totalStudents = 120;
-        cStats.courseAvgRating = 4.9;
-    }
 
     // Combined stats
     const sellerStats = {

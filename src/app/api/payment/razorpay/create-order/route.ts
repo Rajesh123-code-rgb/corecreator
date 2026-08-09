@@ -7,6 +7,7 @@ import Order from "@/lib/db/models/Order";
 import PromoCode from "@/lib/db/models/PromoCode";
 import Product from "@/lib/db/models/Product";
 import Course from "@/lib/db/models/Course";
+import Workshop from "@/lib/db/models/Workshop";
 import ShippingProfile from "@/lib/db/models/ShippingProfile";
 import mongoose from "mongoose";
 
@@ -19,7 +20,15 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { currency = "INR", items, shippingAddress, promoCode } = body;
+        const { items, shippingAddress, promoCode } = body;
+
+        // Currency is NOT taken from the request. All catalogue prices are
+        // stored in INR (CurrencyContext treats INR as the source currency and
+        // converts only for display), and nothing here converts between
+        // currencies - so the charge must be denominated in INR. Accepting the
+        // client's label meant an INR amount could be stamped as another
+        // currency and sent to Razorpay unconverted.
+        const currency = "INR";
 
         if (!items || items.length === 0) {
             return NextResponse.json({ error: "No items in order" }, { status: 400 });
@@ -49,42 +58,115 @@ export async function POST(request: NextRequest) {
             sellerName: string | undefined;
         }
 
-        const orderItems: ProcessedOrderItem[] = await Promise.all(items.map(async (item: OrderItemRequest) => {
-            const itemTotal = item.price * item.quantity;
-            subtotal += itemTotal;
+        // Prices are re-derived from the database. The request body carries a
+        // price, but it is never trusted: it previously flowed straight into
+        // the Razorpay order amount, so a crafted request could buy anything
+        // for any amount.
+        //
+        // Courses and workshops have a single fixed price, so the stored value
+        // is used outright. Products are configurable (variants, customization
+        // modifiers, add-ons) and the client's selections aren't forwarded to
+        // this route, so an exact recomputation isn't possible here - instead
+        // the client price is floor-checked against the cheapest configuration
+        // the product could legitimately be sold at, which blocks underpayment
+        // while leaving valid configurations alone.
+        const priceErrors: string[] = [];
 
+        const orderItems: ProcessedOrderItem[] = await Promise.all(items.map(async (item: OrderItemRequest) => {
             let sellerId: mongoose.Types.ObjectId | undefined;
             let sellerName: string | undefined;
-
+            let unitPrice = Number(item.price) || 0;
 
             try {
                 if (item.kind === "product") {
-                    const product = await Product.findById(item.id).select("seller sellerName shipping.weight");
-                    if (product) {
+                    const product = await Product.findById(item.id)
+                        .select("seller sellerName shipping.weight price variants customizations")
+                        .lean() as any;
+                    if (!product) {
+                        priceErrors.push(`Product ${item.id} no longer exists`);
+                    } else {
                         sellerId = product.seller;
                         sellerName = product.sellerName;
+
+                        const variantPrices = (product.variants || [])
+                            .map((v: any) => Number(v.price))
+                            .filter((n: number) => Number.isFinite(n));
+                        // Customization modifiers can reduce the price, so allow for them.
+                        const negativeModifiers = (product.customizations || [])
+                            .reduce((sum: number, c: any) => sum + Math.min(0, Number(c.priceModifier) || 0), 0);
+
+                        const floor = Math.min(Number(product.price) || 0, ...(variantPrices.length ? variantPrices : [Number(product.price) || 0]))
+                            + negativeModifiers;
+
+                        // Small tolerance for floating-point noise only.
+                        if (unitPrice < floor - 0.01) {
+                            priceErrors.push(`Price mismatch for "${product.name || item.id}"`);
+                        }
                     }
                 } else if (item.kind === "course") {
-                    const course = await Course.findById(item.id).select("instructor instructorName");
-                    if (course) {
+                    const course = await Course.findById(item.id)
+                        .select("instructor instructorName price")
+                        .lean() as any;
+                    if (!course) {
+                        priceErrors.push(`Course ${item.id} no longer exists`);
+                    } else {
                         sellerId = course.instructor;
                         sellerName = course.instructorName;
+                        unitPrice = Number(course.price) || 0;
                     }
-                } // Add workshop if needed
+                } else if (item.kind === "workshop") {
+                    const workshop = await Workshop.findById(item.id)
+                        .select("instructor instructorName price title capacity enrolledCount")
+                        .lean() as any;
+                    if (!workshop) {
+                        priceErrors.push(`Workshop ${item.id} no longer exists`);
+                    } else {
+                        sellerId = workshop.instructor;
+                        sellerName = workshop.instructorName;
+                        unitPrice = Number(workshop.price) || 0;
+
+                        // Workshops have a finite number of seats, so unlike a
+                        // course they can be oversold. Check here, where the
+                        // seat count is authoritative, not in the browser.
+                        const capacity = Number(workshop.capacity);
+                        if (Number.isFinite(capacity) && capacity > 0) {
+                            const taken = Number(workshop.enrolledCount) || 0;
+                            const remaining = capacity - taken;
+                            if (item.quantity > remaining) {
+                                priceErrors.push(
+                                    remaining > 0
+                                        ? `Only ${remaining} seat(s) left for "${workshop.title}"`
+                                        : `"${workshop.title}" is sold out`
+                                );
+                            }
+                        }
+                    }
+                }
             } catch (e) {
-                console.error(`Failed to fetch seller for item ${item.id}`, e);
+                console.error(`Failed to price item ${item.id}`, e);
+                priceErrors.push(`Could not verify pricing for item ${item.id}`);
             }
+
+            subtotal += unitPrice * item.quantity;
 
             return {
                 itemId: new mongoose.Types.ObjectId(item.id),
-                itemType: item.kind, // "course" or "product"
+                itemType: item.kind,
                 name: item.name,
                 quantity: item.quantity,
-                price: item.price,
+                price: unitPrice,
                 sellerId: sellerId,
                 sellerName: sellerName
             };
         }));
+
+        if (priceErrors.length > 0) {
+            console.warn("Rejected order due to pricing mismatch:", priceErrors);
+            return NextResponse.json(
+                { error: "Your cart is out of date. Please refresh and try again." },
+                { status: 400 }
+            );
+        }
 
         // Calculate Shipping & Tax
         let shipping = 0;

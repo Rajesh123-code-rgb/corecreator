@@ -42,19 +42,20 @@ export async function GET(
 
         // Calculate average rating
         const validRatings = courses.filter((c: any) => c.averageRating > 0);
+        // null, not 4.5 - an artist nobody has rated must not be shown a score.
         const avgRating = validRatings.length > 0
             ? validRatings.reduce((sum, c: any) => sum + c.averageRating, 0) / validRatings.length
-            : 4.5;
+            : null;
 
         const userProfile = (user as any).profile || {};
 
         const artist = {
             id: (user as any)._id.toString(),
             name: (user as any).name || "Artist",
-            avatar: (user as any).avatar || "https://randomuser.me/api/portraits/lego/1.jpg",
+            avatar: (user as any).avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((user as any).name || "Artist")}&background=random`,
             bio: userProfile.bio || "Passionate artist and creator sharing knowledge with the community.",
             specialty: userProfile.specialty || "Artist & Creator",
-            rating: Math.round(avgRating * 10) / 10,
+            rating: avgRating === null ? null : Math.round(avgRating * 10) / 10,
             totalStudents,
             courses: courses.map((c: any) => ({
                 ...c,

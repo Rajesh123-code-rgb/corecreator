@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/atoms";
 import { Card } from "@/components/molecules";
@@ -17,7 +17,7 @@ interface Artist {
     specialty: string;
     courses: number;
     products: number;
-    rating: number;
+    rating: number | null;
 }
 
 const SPECIALTIES = [
@@ -40,16 +40,25 @@ const SORT_OPTIONS = [
     { value: "name", label: "Name (A-Z)" },
 ];
 
-export default function ArtistsClient() {
-    const [artists, setArtists] = useState<Artist[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function ArtistsClient({ initialArtists = [] }: { initialArtists?: Artist[] }) {
+    const [artists, setArtists] = useState<Artist[]>(initialArtists);
+    const [loading, setLoading] = useState(initialArtists.length === 0);
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("rating");
     const [specialty, setSpecialty] = useState("All Specialties");
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [showFilters, setShowFilters] = useState(false);
 
+    // The server already rendered the first sort order; skip the initial
+    // client fetch so the list is not thrown away and refetched on hydration.
+    const skipInitialFetch = useRef(initialArtists.length > 0);
+
     useEffect(() => {
+        if (skipInitialFetch.current) {
+            skipInitialFetch.current = false;
+            return;
+        }
+
         const fetchArtists = async () => {
             try {
                 setLoading(true);
@@ -262,8 +271,14 @@ export default function ArtistsClient() {
                                             </div>
 
                                             <div className="flex items-center justify-center gap-1">
-                                                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                                                <span className="font-semibold">{artist.rating}</span>
+                                                {artist.rating === null ? (
+                                                    <span className="text-sm text-[var(--muted-foreground)]">Not yet rated</span>
+                                                ) : (
+                                                    <>
+                                                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                                                        <span className="font-semibold">{artist.rating}</span>
+                                                    </>
+                                                )}
                                             </div>
                                         </Card>
                                     </Link>
@@ -299,8 +314,14 @@ export default function ArtistsClient() {
                                                         <div className="text-xs text-[var(--muted-foreground)]">Artworks</div>
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                                                        <span className="font-semibold">{artist.rating}</span>
+                                                        {artist.rating === null ? (
+                                                            <span className="text-xs text-[var(--muted-foreground)]">Not yet rated</span>
+                                                        ) : (
+                                                            <>
+                                                                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                                                                <span className="font-semibold">{artist.rating}</span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

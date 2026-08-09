@@ -33,7 +33,7 @@ export default function ShippingPage() {
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Domestic Shipping</h3>
                                 <p className="text-[var(--muted-foreground)]">
-                                    For orders within the same country, standard shipping typically takes 3-5 business days. Expedited options are available at checkout for most items, delivering within 1-2 business days.
+                                    For orders within the same country, standard shipping typically takes 3-5 business days.
                                 </p>
                             </div>
                         </div>

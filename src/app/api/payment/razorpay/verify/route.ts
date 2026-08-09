@@ -64,6 +64,30 @@ export async function POST(request: NextRequest) {
                 order.status = "confirmed";
                 await order.save();
 
+                // Grant workshop attendance. Course and product ownership is
+                // derived from confirmed orders, so nothing extra is needed for
+                // those - but /api/user/workshops looks the user up in the
+                // Workshop's attendees array, so without this a buyer pays and
+                // then finds no booking on their dashboard.
+                try {
+                    const workshopItems = (order.items || []).filter(
+                        (i: any) => i.itemType === "workshop"
+                    );
+                    if (workshopItems.length > 0) {
+                        const Workshop = (await import("@/lib/db/models/Workshop")).default;
+                        for (const item of workshopItems) {
+                            await Workshop.findByIdAndUpdate(item.itemId, {
+                                $addToSet: { attendees: order.user },
+                                $inc: { enrolledCount: item.quantity || 1 },
+                            });
+                        }
+                    }
+                } catch (err) {
+                    // Payment already succeeded - log loudly rather than failing
+                    // the request and leaving the buyer thinking it didn't.
+                    console.error("Failed to register workshop attendance:", err);
+                }
+
                 // Increment Promo Code Usage
                 if (order.promoCode) {
                     try {

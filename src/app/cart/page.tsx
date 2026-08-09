@@ -19,12 +19,16 @@ import {
 } from "lucide-react";
 
 export default function CartPage() {
-    const { items, isHydrated, removeItem, updateQuantity, subtotal, clearCart, applyPromo, removePromo, discount, promoCode } = useCart();
+    const { items, isHydrated, removeItem, updateQuantity, subtotal, shippingTotal, clearCart, applyPromo, removePromo, discount, promoCode } = useCart();
     const { formatPrice } = useCurrency();
     const [inputCode, setInputCode] = React.useState("");
     const [error, setError] = React.useState("");
 
-    const shipping = subtotal > 100 ? 0 : 15;
+    // Use the cart's real per-product shipping, the same figure checkout uses.
+    // This previously applied a hardcoded "free over 100, else 15" rule, so the
+    // cart could quote a different total than the checkout page for the same
+    // basket.
+    const shipping = shippingTotal;
     const tax = subtotal * 0.08;
     const total = subtotal - discount;
 
@@ -234,10 +238,6 @@ export default function CartPage() {
                                 </Button>
 
                                 <div className="mt-6 space-y-3 text-xs text-[var(--muted-foreground)]">
-                                    <div className="flex items-center gap-2">
-                                        <Truck className="w-4 h-4" />
-                                        <span>Free shipping on orders over {formatPrice(100)}</span>
-                                    </div>
                                     <div className="flex items-center gap-2">
                                         <Shield className="w-4 h-4" />
                                         <span>Secure checkout with 256-bit encryption</span>
