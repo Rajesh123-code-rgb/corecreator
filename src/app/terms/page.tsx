@@ -43,7 +43,7 @@ export default function TermsPage() {
 
                         <h2 className="text-2xl font-bold mb-4">4. Selling on Core Creator</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
-                            Creators must accuracy represent their items and courses. We reserve the right to remove any listing that violates our policies or community standards.
+                            Creators must accurately represent their items and courses. We reserve the right to remove any listing that violates our policies or community standards.
                         </p>
 
                         <h2 className="text-2xl font-bold mb-4">5. Intellectual Property</h2>

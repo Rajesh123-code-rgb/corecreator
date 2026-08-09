@@ -77,7 +77,7 @@ export default function RegisterPage() {
                 <div className="relative w-full h-full max-w-2xl text-center flex flex-col items-center justify-center">
                     <GraduationCap className="w-16 h-16 text-white mb-6" />
                     <h2 className="text-4xl font-bold mb-4 text-white">Start Your Journey</h2>
-                    <p className="text-lg text-white/90">Join thousands of artists and creators in the most vibrant community.</p>
+                    <p className="text-lg text-white/90">Join a growing community of artists and creators.</p>
                 </div>
             </div>
 

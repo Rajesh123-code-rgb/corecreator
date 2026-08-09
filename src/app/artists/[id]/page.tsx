@@ -15,7 +15,7 @@ interface Artist {
     avatar: string;
     bio: string;
     specialty: string;
-    rating: number;
+    rating: number | null;
     courses: Course[];
     products: Product[];
     totalStudents: number;
@@ -27,7 +27,7 @@ interface Course {
     slug: string;
     thumbnail: string;
     price: number;
-    rating: number;
+    rating: number | null;
     enrollmentCount: number;
     level: string;
 }
@@ -129,11 +129,13 @@ export default function ArtistProfilePage() {
                             <p className="text-[var(--muted-foreground)] max-w-2xl mb-4">{artist.bio}</p>
 
                             <div className="flex flex-wrap justify-center md:justify-start gap-6">
-                                <div className="flex items-center gap-2">
-                                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                                    <span className="font-bold">{artist.rating}</span>
-                                    <span className="text-[var(--muted-foreground)]">Rating</span>
-                                </div>
+                                {artist.rating !== null && (
+                                    <div className="flex items-center gap-2">
+                                        <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                                        <span className="font-bold">{artist.rating}</span>
+                                        <span className="text-[var(--muted-foreground)]">Rating</span>
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-2">
                                     <GraduationCap className="w-5 h-5 text-blue-500" />
                                     <span className="font-bold">{artist.courses?.length || 0}</span>

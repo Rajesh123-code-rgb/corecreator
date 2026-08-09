@@ -9,7 +9,9 @@ left alone.
 
 ## Phase 5 — "Looks real, isn't": simulated flows and payment integrity
 
-*In progress.*
+A pass over the things that render convincingly but aren't backed by anything —
+payments that don't charge, profiles for people who don't exist, statistics the
+database contradicts.
 
 ### Payment
 
@@ -49,19 +51,110 @@ could legitimately sell at. Any mismatch rejects the whole order.
 through checkout so product prices can be recomputed exactly rather than
 floor-checked.
 
-**Workshop checkout takes no payment at all.** `handlePayment` is a two-second
+**The charge currency was taken from the request body.** All catalogue prices are
+stored in INR — `CurrencyContext` treats INR as the source currency and converts
+only for display — and nothing anywhere converts between currencies. Yet the
+checkout page sent `currency: "USD"` and `create-order` passed that straight to
+Razorpay against the unconverted INR amount. A ₹2,000 item was sent as $2,000.00.
+Depending on whether the Razorpay account accepts USD that is either a ~83×
+overcharge or an outright rejection — and rejection surfaces to the customer as
+"Payment failed. Please try again.", the same symptom as the guest-checkout bug
+above but affecting signed-in buyers too.
+
+Currency is now pinned server-side alongside the price and the request value is
+ignored. **This one needs checking against the live Razorpay dashboard** to
+establish which of the two outcomes actually occurred, and whether any customer
+was overcharged.
+
+**Workshop checkout took no payment at all.** `handlePayment` was a two-second
 `setTimeout` followed by a "Payment Successful!" toast and a redirect to the
 success page. No API call, no charge, no seat reserved, no record — while a
-Razorpay logo sits on the page. Live and reachable. The server half is now built
-(the route had only a bare `// Add workshop if needed` comment); the page still
-needs wiring to it.
+Razorpay logo sat on the page. It now runs the same create-order → Razorpay →
+verify flow as the main checkout. Three supporting fixes were needed:
+
+- `verify()` never registered workshop attendance. Course and product ownership
+  is derived from confirmed orders, but `/api/user/workshops` looks the buyer up
+  in the Workshop's `attendees` array, which nothing ever wrote to — so payment
+  alone would have left a paying customer with no booking on their dashboard.
+- Workshops have finite capacity and nothing checked it, so they could be booked
+  past the seat limit. Now enforced in `create-order`, where the count is
+  authoritative rather than in the browser.
+- `/workshops/[slug]/checkout` is now gated in middleware, matching `/checkout`.
+
+The Razorpay SDK type declarations moved out of `checkout/page.tsx` — where they
+were published globally via `declare global` — into `src/types/razorpay.d.ts`, so
+both checkout pages share one definition.
 
 ### Fabricated data
 
-**`/studio/[id]` invents verified instructors.** When a user isn't found it serves
-made-up people — named, with stock photos, bios, `isVerified: true` and
-`example.com` contact details — and *any* unknown ID returns a plausible fake
-profile instead of 404, generating unlimited indexable fake pages.
+**`/studio/[id]` invented verified instructors.** When a user wasn't found the page
+served made-up people — named, with stock photos, bios, `isVerified: true` and
+`example.com` contact details — and *any* unknown ID returned a plausible fake
+profile rather than 404, generating unlimited indexable pages for creators who
+don't exist. It also overwrote their statistics with invented figures under a
+comment reading "Update stats for mock users to look alive". Unknown and
+non-creator IDs now 404.
+
+**The homepage advertised four artists who don't exist**, with stock portraits,
+verified check badges and invented course/artwork counts, shown whenever the real
+artist list came back empty. The three sibling sections on the same page already
+had honest empty states; this one now matches them.
+
+**The homepage carried fabricated testimonials**, including a named person
+claiming to have earned over ₹10,00,000 teaching on the platform. Real creator
+earnings are ₹0. Section removed rather than rewritten — there are no real
+testimonials to substitute yet.
+
+**Scale claims contradicted by the platform's own database.** "50K+ Community",
+"Join thousands of students", "Join thousands of artists, learners and art
+lovers on the world's most vibrant creative platform" and the same claim on the
+registration page, against real figures of 9 creators and 3 learners. Replaced
+with copy that doesn't assert a scale, and the unsupportable superlative dropped.
+
+**Artists with no ratings were shown 4.5 stars.** Both artist API routes ended
+their rating calculation with `|| 4.5`, so an artist nobody had ever rated
+displayed a solid score. They now return `null` and the UI shows "Not yet rated"
+or omits the figure. The `randomuser.me` "lego" placeholder portrait was replaced
+with an initials avatar generated from the artist's own name.
+
+**The community page was a forum that doesn't exist.** 317 lines of hardcoded
+discussion threads with authors and reply counts, five categories with invented
+topic counts, and a statistics panel reading 12.8K members / 3.5K topics / 45K
+replies / 234 online. There is no forum backend at all — the `Post` model powers
+the blog. The page was orphaned (nothing linked to it, absent from the sitemap),
+so it has been replaced with an honest placeholder carrying `noindex` until the
+feature exists. Deleting the route outright is a reasonable alternative.
+
+### Copy and claims
+
+**`/shipping` promised expedited delivery that checkout doesn't offer.** "Expedited
+options are available at checkout for most items, delivering within 1-2 business
+days" — there is no expedited option anywhere in the checkout flow. Claim removed.
+
+**`/terms`** had "Creators must accuracy represent their items" — corrected.
+
+### `/artists` now server-renders its list
+
+`getArtists()` extracted to `src/lib/artistSearch.ts`, mirroring the existing
+`productSearch.ts` and `courseSearch.ts`. The page is now an async Server
+Component that seeds the client list, which skips its redundant first fetch via a
+`useRef` mount guard. `/api/artists` became a thin wrapper over the same
+function.
+
+### Open, needs your input
+
+- **Razorpay dashboard check** for the currency bug above — were customers
+  overcharged, or were all payments failing?
+- **`support@corecreator.com`** is published as the contact address on `/contact`
+  and `/terms`, but `corecreator.com` resolves to a different server than
+  `corecreator.online`. Confirm it's a mailbox you actually control; left
+  unchanged pending that.
+- **`/terms` states no governing law or jurisdiction.** For an Indian company this
+  should say so explicitly. Not written in, since the jurisdiction city is yours
+  to specify.
+- **`/shipping`'s 3–5 and 7–14 day windows** remain unverified, as does whether
+  international shipping is genuinely offered.
+- **Real social profile URLs** for the footer icons, still `href="#"`.
 
 ---
 
