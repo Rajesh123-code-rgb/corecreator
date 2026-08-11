@@ -235,8 +235,14 @@ export function generateOrganizationJsonLd() {
                 contactPoint: {
                     "@type": "ContactPoint",
                     contactType: "customer support",
-                    email: "support@corecreator.com",
+                    // No email here: corecreator.com resolves to a different
+                    // server than the live site, so publishing it as the
+                    // machine-readable support address - on every page, to
+                    // search engines and AI assistants - pointed people at a
+                    // mailbox that may reach nobody. The phone number and the
+                    // contact form are both real.
                     telephone: "+91 7424888915",
+                    url: `${siteConfig.url}/contact`,
                     areaServed: "IN",
                 },
                 address: {
