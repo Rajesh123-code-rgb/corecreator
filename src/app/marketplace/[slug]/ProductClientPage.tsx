@@ -472,16 +472,21 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="flex items-center border border-[var(--border)] rounded-lg">
+                                // On a phone these three cannot share a line: the
+                                // stepper, a nowrap "Add to Cart - price" and the
+                                // wishlist button need ~529px of min-content, and a
+                                // flex item will not shrink below that, so the
+                                // button takes its own full-width row below.
+                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6">
+                                    <div className="order-1 flex items-center border border-[var(--border)] rounded-lg">
                                         <button onClick={() => handleQuantityChange(-1)} className="p-3 hover:bg-[var(--muted)]"><Minus className="w-4 h-4" /></button>
                                         <span className="w-12 text-center font-medium">{quantity}</span>
                                         <button onClick={() => handleQuantityChange(1)} className="p-3 hover:bg-[var(--muted)]"><Plus className="w-4 h-4" /></button>
                                     </div>
-                                    <Button onClick={handleAddToCart} variant="secondary" size="lg" className="flex-1">
+                                    <Button onClick={handleAddToCart} variant="secondary" size="lg" className="order-3 sm:order-2 w-full sm:w-auto sm:flex-1 min-w-0">
                                         <ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart - {formatPrice(calculatedPrice * quantity, product.currency || "INR")}
                                     </Button>
-                                    <Button onClick={handleToggleWishlist} variant="outline" size="lg" className={isWishlisted ? "text-red-500 border-red-200 bg-red-50" : ""}>
+                                    <Button onClick={handleToggleWishlist} variant="outline" size="lg" className={`order-2 sm:order-3 ${isWishlisted ? "text-red-500 border-red-200 bg-red-50" : ""}`}>
                                         <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />
                                     </Button>
                                 </div>

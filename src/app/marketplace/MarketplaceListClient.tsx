@@ -352,7 +352,11 @@ export function MarketplaceListClient({
                         </aside>
 
                         {/* Product Grid */}
-                        <div className="flex-1">
+                        {/* min-w-0: a flex item will not shrink below its
+                            content's min-content, and the 2-column card grid
+                            inside needs 381px - which pushed the column past a
+                            390px screen. */}
+                        <div className="flex-1 min-w-0">
                             {/* Toolbar */}
                             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                                 <p className="text-sm text-[var(--muted-foreground)]">
