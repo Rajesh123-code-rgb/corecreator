@@ -1,6 +1,5 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db/mongodb";
@@ -28,11 +27,6 @@ export const authOptions: NextAuthOptions = {
                 await connectDB();
 
                 const user = await User.findOne({ email: credentials.email }).select("+password");
-                try {
-                    const fs = require('fs');
-                    fs.appendFileSync('auth-debug.log', `[Authorize] Raw User from DB: ${JSON.stringify(user?.toJSON())}\n`);
-                } catch (e) { }
-
                 if (!user) {
                     throw new Error("No user found with this email");
                 }
@@ -77,46 +71,33 @@ export const authOptions: NextAuthOptions = {
                     severity: "info"
                 });
 
-                try {
-                    const fs = require('fs');
-                    fs.appendFileSync('auth-debug.log', `[Authorize] User: ${JSON.stringify(returnedUser)}\n`);
-                } catch (e) { }
-
                 return returnedUser;
             },
         }),
 
-        // Google OAuth
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID || "",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-            allowDangerousEmailAccountLinking: true,
-            profile(profile) {
-                return {
-                    id: profile.sub,
-                    name: profile.name,
-                    email: profile.email,
-                    image: profile.picture,
-                    role: "user",
-                };
-            },
-        }),
-
-        // Facebook OAuth
-        FacebookProvider({
-            clientId: process.env.FACEBOOK_CLIENT_ID || "",
-            clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
-            allowDangerousEmailAccountLinking: true,
-            profile(profile) {
-                return {
-                    id: profile.id,
-                    name: profile.name,
-                    email: profile.email,
-                    image: profile.picture?.data?.url,
-                    role: "user",
-                };
-            },
-        }),
+        // Google OAuth - only registered when credentials are actually
+        // configured. Registering it with empty strings (the previous
+        // behaviour) still advertised the provider on /api/auth/providers, so
+        // the sign-in button rendered and then failed on click. Gating
+        // registration here lets the UI ask NextAuth what really works.
+        ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+            ? [
+                GoogleProvider({
+                    clientId: process.env.GOOGLE_CLIENT_ID,
+                    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                    allowDangerousEmailAccountLinking: true,
+                    profile(profile) {
+                        return {
+                            id: profile.sub,
+                            name: profile.name,
+                            email: profile.email,
+                            image: profile.picture,
+                            role: "user",
+                        };
+                    },
+                }),
+            ]
+            : []),
     ],
 
     session: {
@@ -132,11 +113,6 @@ export const authOptions: NextAuthOptions = {
 
     callbacks: {
         async jwt({ token, user, trigger, session, account }) {
-            try {
-                const fs = require('fs');
-                fs.appendFileSync('auth-debug.log', `[JWT] Trigger: ${trigger}, User: ${JSON.stringify(user)}, Token before: ${JSON.stringify(token)}\n`);
-            } catch (e) { }
-
             // Initial sign in
             if (user) {
                 token.id = user.id;
@@ -151,31 +127,16 @@ export const authOptions: NextAuthOptions = {
                 token.role = session.role;
             }
 
-            try {
-                const fs = require('fs');
-                fs.appendFileSync('auth-debug.log', `[JWT] Token after: ${JSON.stringify(token)}\n`);
-            } catch (e) { }
-
             return token;
         },
 
         async session({ session, token }) {
-            try {
-                const fs = require('fs');
-                fs.appendFileSync('auth-debug.log', `[Session] Token: ${JSON.stringify(token)}\n`);
-            } catch (e) { }
-
             if (token && session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
                 session.user.adminRole = token.adminRole as string;
                 session.user.permissions = token.permissions as string[];
             }
-
-            try {
-                const fs = require('fs');
-                fs.appendFileSync('auth-debug.log', `[Session] Final Session: ${JSON.stringify(session)}\n`);
-            } catch (e) { }
 
             return session;
         },
@@ -197,7 +158,7 @@ export const authOptions: NextAuthOptions = {
                         accounts: [{ provider: account?.provider || "", providerAccountId: account?.providerAccountId || "" }],
                         preferences: {
                             language: "en",
-                            currency: "USD",
+                            currency: "INR",
                             theme: "system",
                             emailNotifications: true,
                             pushNotifications: true,

@@ -44,9 +44,10 @@ export default function ContactPage() {
                                         <Mail className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold mb-1">Chat to us</h3>
-                                        <p className="text-sm text-[var(--muted-foreground)] mb-1">Our friendly team is here to help.</p>
-                                        <a href="mailto:support@corecreator.com" className="text-[var(--primary-600)] font-medium hover:underline">support@corecreator.com</a>
+                                        <h3 className="font-bold mb-1">Message us</h3>
+                                        <p className="text-sm text-[var(--muted-foreground)]">
+                                            Send us a note using the form and we&apos;ll get back to you by email.
+                                        </p>
                                     </div>
                                 </div>
 

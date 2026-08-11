@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Input } from "@/components/atoms";
+import { SSOButtons } from "@/components/molecules";
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle, CheckCircle, GraduationCap } from "lucide-react";
 
 const registerSchema = z
@@ -99,6 +100,9 @@ function RegisterContent() {
                             <AlertCircle className="w-5 h-5" /><p className="text-sm">{error}</p>
                         </div>
                     )}
+
+                    {/* Renders nothing until an OAuth provider is configured. */}
+                    <SSOButtons callbackUrl={searchParams.get("callbackUrl") || "/user/dashboard"} dividerLabel="Or sign up with email" dividerPlacement="after" />
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <Input label="Full Name" placeholder="Your name" leftIcon={<User className="w-5 h-5" />} error={errors.name?.message} {...register("name")} />

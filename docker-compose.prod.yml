@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   corecreator:
     container_name: corecreator_app
@@ -14,8 +12,14 @@ services:
     # Surfaces real health in `docker ps` rather than just "is the process
     # alive" - /api/health returns 503 if the app can't reach MongoDB.
     # wget is busybox-provided in the node:20-alpine base image.
+    #
+    # 127.0.0.1, NOT localhost. Inside the container localhost resolves to the
+    # IPv6 loopback ::1 first, while the Next.js standalone server binds to
+    # 0.0.0.0 - IPv4 only. wget therefore got "Connection refused" on every
+    # attempt and the container reported unhealthy for hours while serving
+    # traffic perfectly well.
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3

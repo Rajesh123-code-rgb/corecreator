@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header, Footer } from "@/components/organisms";
 
 export default function AccessibilityPage() {
@@ -40,7 +41,9 @@ export default function AccessibilityPage() {
                         <p className="mb-6 text-[var(--muted-foreground)]">
                             If you encounter any accessibility barriers on our site, please let us know. We welcome your feedback and will work to address any issues promptly.
                         </p>
-                        <p className="font-bold">Email: accessibility@corecreator.com</p>
+                        <p className="font-bold">
+                            Tell us through the <Link href="/contact" className="text-[var(--primary-600)] hover:underline">contact form</Link>.
+                        </p>
                     </div>
                 </div>
             </section>

@@ -86,6 +86,16 @@ interface Course {
 
 
 
+// totalDuration is stored in minutes. Sub-hour courses were rounding to
+// "0 hours", so show minutes until there is at least an hour to report.
+function formatCourseLength(minutes: number): string {
+    if (minutes >= 60) {
+        const hours = Math.round((minutes / 60) * 10) / 10;
+        return `${hours} ${hours === 1 ? "hour" : "hours"}`;
+    }
+    return `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+}
+
 export default function CourseClientPage({ initialCourse }: { initialCourse: Course }) {
     const params = useParams();
     const router = useRouter();
@@ -286,10 +296,12 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                             <div className="space-y-4 pt-6 border-t border-gray-100">
                                 <h4 className="font-bold text-gray-900 text-sm">This course includes:</h4>
                                 <ul className="space-y-3 text-sm text-gray-600">
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-8 flex justify-center"><Clock className="w-4 h-4 text-purple-600" /></div>
-                                        <span>{Math.round(course.totalDuration / 60)} hours on-demand video</span>
-                                    </li>
+                                    {course.totalDuration > 0 && (
+                                        <li className="flex items-center gap-3">
+                                            <div className="w-8 flex justify-center"><Clock className="w-4 h-4 text-purple-600" /></div>
+                                            <span>{formatCourseLength(course.totalDuration)} of on-demand video</span>
+                                        </li>
+                                    )}
                                     <li className="flex items-center gap-3">
                                         <div className="w-8 flex justify-center"><BookOpen className="w-4 h-4 text-purple-600" /></div>
                                         <span>{course.totalLectures} lessons</span>
@@ -347,7 +359,8 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-gray-900">Course Content</h2>
                                 <div className="text-sm text-gray-500 font-medium">
-                                    {course.sections.length} sections • {course.totalLectures} lessons • {Math.round(course.totalDuration / 60)}h total length
+                                    {course.sections.length} sections • {course.totalLectures} lessons
+                                    {course.totalDuration > 0 && ` • ${formatCourseLength(course.totalDuration)} total length`}
                                 </div>
                             </div>
 

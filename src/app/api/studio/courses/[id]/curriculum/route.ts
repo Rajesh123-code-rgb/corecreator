@@ -23,8 +23,7 @@ export async function PATCH(
             return NextResponse.json({ error: "Course not found" }, { status: 404 });
         }
 
-        console.log("Updating curriculum for course:", id);
-        console.log("Received sections:", JSON.stringify(data.sections, null, 2));
+        console.log(`Updating curriculum for course ${id} (${data.sections?.length ?? 0} sections)`);
 
         // Update curriculum sections with direct document assignment
         course.sections = data.sections.map((section: any, sIndex: number) => ({
@@ -55,10 +54,26 @@ export async function PATCH(
             }))
         }));
 
+        // Derive the headline totals from the curriculum itself. These were
+        // never recomputed, so totalDuration sat at 0 no matter how many videos
+        // a course had, and the detail page advertised "0 hours on-demand
+        // video".
+        //
+        // Mind the units: lessons store content.videoDuration in SECONDS (see
+        // formatDuration in the curriculum editor), while totalDuration is
+        // consumed as MINUTES - the course page renders totalDuration / 60 as
+        // hours. Summing raw seconds here would overstate every course 60x.
+        const allLessons = course.sections.flatMap((section: any) => section.lessons || []);
+        const totalSeconds = allLessons.reduce(
+            (sum: number, lesson: any) => sum + (Number(lesson?.content?.videoDuration) || 0),
+            0
+        );
+        course.totalLectures = allLessons.length;
+        course.totalDuration = Math.round(totalSeconds / 60);
+
         await course.save();
 
-        console.log("Curriculum updated successfully");
-        console.log("Saved sections:", JSON.stringify(course.sections, null, 2));
+        console.log(`Curriculum updated for course ${id}`);
 
         // Fetch fresh from DB
         const updatedCourse = await Course.findById(id).lean();
