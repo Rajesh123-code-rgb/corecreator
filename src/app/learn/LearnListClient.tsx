@@ -320,8 +320,11 @@ export function LearnListClient({
                         </aside>
 
                         {/* Course Grid */}
-                        <div className="flex-1">
-                            <div className="flex items-center justify-between mb-6">
+                        {/* min-w-0 for the same reason as the marketplace column:
+                            without it this cannot shrink below the card grid's
+                            min-content width. */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                                 <p className="text-sm text-[var(--muted-foreground)]">
                                     Showing <strong>{courses.length > 0 ? (pageParam - 1) * 12 + 1 : 0}-{Math.min(pageParam * 12, totalResults)}</strong> of <strong>{totalResults}</strong> courses
                                 </p>
