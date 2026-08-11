@@ -178,7 +178,7 @@ export default function AdminAnalyticsPage() {
                     </div>
 
                     {/* Charts Grid */}
-                    <div className="grid gap-6 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Revenue Chart */}
                         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-6">Revenue Trend</h3>

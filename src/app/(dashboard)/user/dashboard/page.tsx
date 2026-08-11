@@ -152,7 +152,7 @@ export default function UserDashboard() {
                 ))}
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Recent Courses */}
                 <Card className="flex flex-col h-full">
                     <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">

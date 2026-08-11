@@ -67,7 +67,7 @@ export default function CartPage() {
                         <p className="text-[var(--muted-foreground)] mb-8">
                             Discover amazing artworks and courses from talented creators
                         </p>
-                        <div className="flex justify-center gap-4">
+                        <div className="flex flex-col sm:flex-row justify-center gap-4">
                             <Button variant="secondary" size="lg" asChild>
                                 <Link href="/marketplace">Browse Artworks</Link>
                             </Button>
@@ -90,7 +90,7 @@ export default function CartPage() {
                 <div className="container-app">
                     <h1 className="text-2xl lg:text-3xl font-bold mb-8">Shopping Cart</h1>
 
-                    <div className="grid lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Cart Items */}
                         <div className="lg:col-span-2 space-y-4">
                             {items.map((item) => (

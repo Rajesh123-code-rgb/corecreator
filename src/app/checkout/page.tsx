@@ -317,7 +317,7 @@ export default function CheckoutPage() {
                         ))}
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2">
                             <div className="bg-white rounded-xl border border-[var(--border)] p-6">
                                 {currentStep === 0 && (
@@ -325,7 +325,7 @@ export default function CheckoutPage() {
                                         <h2 className="text-lg font-semibold flex items-center gap-2">
                                             <MapPin className="w-5 h-5" /> Shipping Information
                                         </h2>
-                                        <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <Input label="First Name" name="firstName" placeholder="John" value={address.firstName} onChange={handleInputChange} leftIcon={<User className="w-5 h-5" />} />
                                             <Input label="Last Name" name="lastName" placeholder="Doe" value={address.lastName} onChange={handleInputChange} />
                                             <Input label="Email" name="email" type="email" placeholder="john@example.com" value={address.email} onChange={handleInputChange} leftIcon={<Mail className="w-5 h-5" />} className="md:col-span-2" />

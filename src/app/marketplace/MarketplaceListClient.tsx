@@ -354,7 +354,7 @@ export function MarketplaceListClient({
                         {/* Product Grid */}
                         <div className="flex-1">
                             {/* Toolbar */}
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                                 <p className="text-sm text-[var(--muted-foreground)]">
                                     Showing <strong>{products.length > 0 ? (pageParam - 1) * 12 + 1 : 0}-{Math.min(pageParam * 12, totalResults)}</strong> of <strong>{totalResults}</strong> products
                                 </p>

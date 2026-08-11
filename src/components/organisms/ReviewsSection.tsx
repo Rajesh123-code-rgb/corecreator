@@ -137,7 +137,7 @@ export function ReviewsSection({ targetId, targetType, initialStats }: ReviewsSe
             </h2>
 
             {/* Review Summary */}
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Average Rating */}
                 <div className="text-center p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
                     <div className="text-5xl font-bold text-purple-600 mb-2">{reviewStats.avgRating}</div>

@@ -7,6 +7,63 @@ left alone.
 
 ---
 
+## Phase 8 — Mobile layout
+
+Measured first: every key page was loaded at a 390x844 viewport and checked for
+horizontal overflow, touch-target size and text size, rather than guessed at.
+
+**The core problem was pages being wider than the phone.** Where content
+overflows, the browser zooms the whole page out to fit — which is why the site
+"didn't look right" rather than simply showing a scrollbar. Measured effective
+widths were 535px on product pages (a 73% zoom-out), 412px on `/artists`, 398px
+on `/cart` and 397px on `/marketplace`, against a 390px screen.
+
+**Root cause, and it was systemic:** `grid lg:grid-cols-2` sets no column
+template below the breakpoint, so the mobile track is implicit `auto`, which
+sizes to max-content and is free to exceed the viewport. Tailwind's own
+`grid-cols-*` compiles to `minmax(0, 1fr)`, which is capped at the container —
+so the fix is simply to state the mobile case. 59 grid containers across 40
+files were missing it; all now carry `grid-cols-1`. On the product page that
+alone removed 145px of overflow, caused by the image gallery column.
+
+Four narrower overflows, each a row that could not wrap:
+
+- **The footer payment badges appeared on every page.** "We Accept:" plus five
+  badges in a non-wrapping flex row measured 438px. Now wraps.
+- `/artists` — two filter dropdowns with 150px and 160px minimums, plus a
+  `whitespace-nowrap` result count, in one row. The row wraps and the selects
+  shrink on mobile.
+- `/marketplace` — the results count and sort control could not share a line.
+- `/cart` — the two empty-state buttons now stack on mobile.
+
+**Dark mode was switching itself on, and the site is not built for it.**
+`globals.css` carried `@media (prefers-color-scheme: dark)`, so any visitor
+whose phone was set to dark — which many are, often on an automatic evening
+schedule — got the dark palette without asking for it. The palette itself is
+correct, but roughly 319 components across 106 files hardcode `bg-white` instead
+of `var(--card)`, so those kept white backgrounds while the text turned
+near-white. Measured contrast on the checkout screen: **1.02:1** — text and
+background effectively the same colour. This is the likeliest explanation for
+the site "not looking right" on a phone, and it was a bigger problem than the
+layout overflow above.
+
+The site now renders light for everyone: the media query is gone, the theme
+provider uses `forcedTheme="light"` (which also overrides a stale `dark` sitting
+in a returning visitor's localStorage), and the header toggle is removed since
+it would otherwise set a theme that no longer renders. The `.dark` token block
+is deliberately kept for the migration. Restoring dark mode means moving those
+319 components onto the tokens and verifying both themes visually — worth doing
+as its own phase, not as a side effect of a mobile fix.
+
+**Touch targets.** Against the 44px iOS/Android guidance: header icon buttons
+were 32-40px and footer navigation links 24px tall. Header buttons now have a
+44px minimum, and footer links get their touch height on mobile only, so the
+desktop footer keeps its density. The 1x1 skip link is intentional — it is
+visually hidden until focused — and one 17px "Cookie Policy" link remains below
+the WCAG 2.2 24px minimum.
+
+---
+
 ## Phase 7 — Findings from the live audit of Phases 1-5
 
 Everything from Phases 1-5 was re-tested against the live site, by request. The

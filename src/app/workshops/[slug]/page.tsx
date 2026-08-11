@@ -207,7 +207,7 @@ export default function WorkshopDetailPage() {
             </div>
 
             <div className="container-app py-16 lg:py-24">
-                <div className="grid lg:grid-cols-3 gap-16 lg:gap-24">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 lg:gap-24">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-16 lg:space-y-20">
                         {/* About */}
@@ -234,7 +234,7 @@ export default function WorkshopDetailPage() {
                         {/* Requirements */}
                         <section>
                             <h2 className="text-3xl font-bold mb-8">What You'll Need</h2>
-                            <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {requirements.map((req, i) => (
                                     <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-[var(--muted)]/50">
                                         <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />

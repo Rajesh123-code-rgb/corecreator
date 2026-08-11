@@ -21,7 +21,7 @@ export default function StudioDocumentationPage() {
                 </div>
             </div>
 
-            <main className="container-app py-16 grid lg:grid-cols-4 gap-12">
+            <main className="container-app py-16 grid grid-cols-1 lg:grid-cols-4 gap-12">
                 {/* Sidebar Navigation */}
                 <aside className="hidden lg:block space-y-2 sticky top-24 h-fit">
                     <a href="#products" className="block px-4 py-2 text-sm font-medium text-[var(--foreground)] bg-[var(--muted)] rounded-lg">Product Management</a>

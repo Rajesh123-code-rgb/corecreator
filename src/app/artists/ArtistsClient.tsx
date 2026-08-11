@@ -160,12 +160,12 @@ export default function ArtistsClient({ initialArtists = [] }: { initialArtists?
                             )}
                         </div>
 
-                        <div className="flex items-center gap-3 w-full lg:w-auto">
+                        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                             {/* Specialty Filter */}
                             <select
                                 value={specialty}
                                 onChange={(e) => setSpecialty(e.target.value)}
-                                className="px-3 py-2.5 rounded-lg border border-[var(--border)] bg-white text-sm min-w-[160px]"
+                                className="flex-1 lg:flex-none px-3 py-2.5 rounded-lg border border-[var(--border)] bg-white text-sm min-w-[140px] lg:min-w-[160px]"
                             >
                                 {SPECIALTIES.map(spec => (
                                     <option key={spec} value={spec}>{spec}</option>
@@ -176,7 +176,7 @@ export default function ArtistsClient({ initialArtists = [] }: { initialArtists?
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="px-3 py-2.5 rounded-lg border border-[var(--border)] bg-white text-sm min-w-[150px]"
+                                className="flex-1 lg:flex-none px-3 py-2.5 rounded-lg border border-[var(--border)] bg-white text-sm min-w-[140px] lg:min-w-[150px]"
                             >
                                 {SORT_OPTIONS.map(opt => (
                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -242,7 +242,7 @@ export default function ArtistsClient({ initialArtists = [] }: { initialArtists?
                         </div>
                     ) : sortedArtists.length > 0 ? (
                         viewMode === "grid" ? (
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {sortedArtists.map((artist, index) => (
                                     <Link key={artist.id} href={`/artists/${artist.id}`}>
                                         <Card hover className="p-6 text-center cursor-pointer h-full animate-fade-in-up" style={{ animationDelay: `${index * 0.03}s` }}>

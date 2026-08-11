@@ -64,7 +64,7 @@ export default function AdminFinancePage() {
             <h1 className="text-2xl font-bold tracking-tight">Financial Reports</h1>
 
             {/* Overview Cards */}
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <Card className="p-6 flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Gross Revenue</p>
@@ -151,7 +151,7 @@ export default function AdminFinancePage() {
                 </div>
             </Card>
 
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 {/* Revenue Split Chart */}
                 <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-6">Revenue Source</h3>

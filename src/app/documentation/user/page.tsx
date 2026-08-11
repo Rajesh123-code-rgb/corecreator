@@ -21,7 +21,7 @@ export default function UserDocumentationPage() {
                 </div>
             </div>
 
-            <main className="container-app py-16 grid lg:grid-cols-4 gap-12">
+            <main className="container-app py-16 grid grid-cols-1 lg:grid-cols-4 gap-12">
                 {/* Sidebar Navigation */}
                 <aside className="hidden lg:block space-y-2 sticky top-24 h-fit">
                     <a href="#getting-started" className="block px-4 py-2 text-sm font-medium text-[var(--foreground)] bg-[var(--muted)] rounded-lg">Getting Started</a>
@@ -95,7 +95,7 @@ export default function UserDocumentationPage() {
                             <p>
                                 Access your courses anytime, anywhere.
                             </p>
-                            <div className="grid sm:grid-cols-2 gap-4 mt-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                                 <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
                                     <h4 className="font-semibold text-[var(--foreground)] mb-2">Lifetime Access</h4>
                                     <p className="text-sm">Once you buy a course, it's yours forever. Revisit lessons as often as you like.</p>

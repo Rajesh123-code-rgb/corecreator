@@ -162,7 +162,7 @@ export default function ArtistProfilePage() {
                 <section className="py-12">
                     <div className="container-app">
                         <h2 className="text-2xl font-bold mb-6">Courses by {artist.name}</h2>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {artist.courses.map((course) => (
                                 <Card key={course._id} hover className="overflow-hidden group">
                                     <div className="relative aspect-video">
@@ -206,7 +206,7 @@ export default function ArtistProfilePage() {
                 <section className="py-12 bg-[var(--muted)]">
                     <div className="container-app">
                         <h2 className="text-2xl font-bold mb-6">Artworks by {artist.name}</h2>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {artist.products.map((product) => (
                                 <Card key={product._id} hover className="overflow-hidden">
                                     <div className="relative aspect-square">

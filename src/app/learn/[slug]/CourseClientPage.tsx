@@ -324,14 +324,14 @@ export default function CourseClientPage({ initialCourse }: { initialCourse: Cou
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-12 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 py-12">
                     <div className="lg:col-span-2 space-y-12">
 
                         {/* Learning Outcomes */}
                         {course.learningOutcomes && course.learningOutcomes.length > 0 && (
                             <div className="border border-gray-200 p-8 rounded-2xl bg-white shadow-sm">
                                 <h2 className="text-2xl font-bold mb-6 text-gray-900">What you'll learn</h2>
-                                <div className="grid md:grid-cols-2 gap-y-4 gap-x-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                                     {course.learningOutcomes.map((item, i) => (
                                         <div key={i} className="flex items-start gap-3">
                                             <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />

@@ -38,7 +38,7 @@ export default async function AboutPage() {
             {/* Mission Section */}
             <section className="py-20 bg-[var(--muted)]">
                 <div className="container-app">
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="bg-[var(--card)] p-8 rounded-2xl border border-[var(--border)]">
                             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
                                 <Target className="w-6 h-6" />

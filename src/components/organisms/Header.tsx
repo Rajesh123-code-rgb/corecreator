@@ -25,10 +25,7 @@ import {
     BookOpen,
     LayoutDashboard,
     ChevronDown,
-    Sun,
-    Moon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { CurrencySwitcher } from "@/components/molecules/CurrencySwitcher";
 
 const navigation = [
@@ -54,16 +51,13 @@ const navigation = [
 
 export function Header() {
     const { data: session, status } = useSession();
-    const { theme, setTheme, resolvedTheme } = useTheme();
     const { itemCount } = useCart();
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
-    const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
-        setMounted(true);
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
@@ -146,17 +140,6 @@ export function Header() {
                     {/* Desktop Actions */}
                     <div className="hidden lg:flex items-center gap-2">
                         {/* Theme Toggle */}
-                        {mounted && (
-                            <button
-                                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                                className="p-2.5 rounded-lg hover:bg-[var(--muted)] transition-colors relative"
-                                aria-label="Toggle Theme"
-                            >
-                                <Sun className={cn("w-5 h-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0", headerIconColor)} />
-                                <Moon className={cn("absolute w-5 h-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2", headerIconColor)} />
-                            </button>
-                        )}
-
                         <div className="hidden md:flex items-center gap-2">
                             <GoogleTranslate id="google_translate_desktop" />
                             <CurrencySwitcher className="w-24 border-none bg-transparent hover:bg-[var(--muted)]" />
@@ -165,7 +148,7 @@ export function Header() {
                         {/* Search */}
                         <button
                             onClick={() => setIsSearchOpen(true)}
-                            className="p-2.5 rounded-lg hover:bg-[var(--muted)] transition-colors"
+                            className="p-2.5 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors"
                             aria-label="Search"
                         >
                             <Search className={cn("w-5 h-5", headerIconColor)} />
@@ -176,7 +159,7 @@ export function Header() {
                         {/* Cart */}
                         <Link
                             href="/cart"
-                            className="p-2.5 rounded-lg hover:bg-[var(--muted)] transition-colors relative"
+                            className="p-2.5 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors relative"
                         >
                             <ShoppingCart className={cn("w-5 h-5", headerIconColor)} />
                             {itemCount > 0 && (
@@ -269,7 +252,7 @@ export function Header() {
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="lg:hidden p-2 rounded-lg hover:bg-[var(--muted)] transition-colors"
+                        className="lg:hidden p-2 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors"
                         aria-label="Toggle menu"
                     >
                         {isMobileMenuOpen ? (
@@ -290,20 +273,6 @@ export function Header() {
             {isMobileMenuOpen && (
                 <div className="lg:hidden relative z-50 bg-[var(--background)] border-t border-[var(--border)] animate-fade-in-down">
                     <div className="container-app py-4 space-y-2">
-                        {/* Mobile Theme Toggle & Search */}
-                        {mounted && (
-                            <button
-                                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                                className="p-2 rounded-md hover:bg-[var(--muted)] transition-colors ml-2"
-                                aria-label="Toggle Theme"
-                            >
-                                {resolvedTheme === "dark" ? (
-                                    <Sun className="w-5 h-5 text-yellow-500" />
-                                ) : (
-                                    <Moon className="w-5 h-5 text-[var(--foreground)]" />
-                                )}
-                            </button>
-                        )}
                         <div className="ml-2 flex flex-col gap-2">
                             <GoogleTranslate id="google_translate_mobile" />
                             <CurrencySwitcher />
