@@ -36,6 +36,25 @@ Four narrower overflows, each a row that could not wrap:
 - `/marketplace` — the results count and sort control could not share a line.
 - `/cart` — the two empty-state buttons now stack on mobile.
 
+**Dark mode was switching itself on, and the site is not built for it.**
+`globals.css` carried `@media (prefers-color-scheme: dark)`, so any visitor
+whose phone was set to dark — which many are, often on an automatic evening
+schedule — got the dark palette without asking for it. The palette itself is
+correct, but roughly 319 components across 106 files hardcode `bg-white` instead
+of `var(--card)`, so those kept white backgrounds while the text turned
+near-white. Measured contrast on the checkout screen: **1.02:1** — text and
+background effectively the same colour. This is the likeliest explanation for
+the site "not looking right" on a phone, and it was a bigger problem than the
+layout overflow above.
+
+The site now renders light for everyone: the media query is gone, the theme
+provider uses `forcedTheme="light"` (which also overrides a stale `dark` sitting
+in a returning visitor's localStorage), and the header toggle is removed since
+it would otherwise set a theme that no longer renders. The `.dark` token block
+is deliberately kept for the migration. Restoring dark mode means moving those
+319 components onto the tokens and verifying both themes visually — worth doing
+as its own phase, not as a side effect of a mobile fix.
+
 **Touch targets.** Against the 44px iOS/Android guidance: header icon buttons
 were 32-40px and footer navigation links 24px tall. Header buttons now have a
 44px minimum, and footer links get their touch height on mobile only, so the
