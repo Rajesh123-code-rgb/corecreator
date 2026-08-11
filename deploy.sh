@@ -17,13 +17,24 @@ echo "==> Starting the new container"
 $COMPOSE up -d --force-recreate
 
 echo "==> Waiting for the health check"
-for i in $(seq 1 30); do
+for i in $(seq 1 12); do
     status=$(docker inspect --format='{{.State.Health.Status}}' corecreator_app 2>/dev/null || echo "unknown")
-    case "$status" in
-        healthy) echo "    healthy after ${i}0s"; break ;;
-        unhealthy) echo "    UNHEALTHY - check: docker logs --tail=50 corecreator_app"; break ;;
-        *) printf "    %s...\r" "$status"; sleep 10 ;;
-    esac
+    if [ "$status" = "healthy" ]; then
+        echo "    healthy after $((i * 10))s"
+        break
+    fi
+    if [ "$status" = "unhealthy" ]; then
+        # Docker's flag and reality have disagreed before (the check used to
+        # hit ::1 while the server binds IPv4), so say what the site is
+        # actually returning rather than only what Docker thinks.
+        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:3002/api/health || echo "no-response")
+        echo "    Docker reports UNHEALTHY; /api/health returns: $code"
+        echo "    if that is 200 the app is fine and the check is misconfigured:"
+        echo "      docker inspect --format='{{json .State.Health}}' corecreator_app | head -c 400"
+        break
+    fi
+    printf "    %s...\r" "$status"
+    sleep 10
 done
 
 echo "==> Pruning unused images"
