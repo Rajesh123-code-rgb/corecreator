@@ -163,7 +163,7 @@ export default function StudentProfilePage() {
                     <div className="p-4 border-b border-[var(--border)]">
                         <h2 className="font-semibold">{t("dashboard.profile.personal_info")}</h2>
                     </div>
-                    <CardContent className="p-6 grid md:grid-cols-2 gap-5">
+                    <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
                         <Input
                             label={t("dashboard.profile.full_name")}
                             placeholder={t("dashboard.profile.full_name")}
@@ -248,7 +248,7 @@ export default function StudentProfilePage() {
                                         <Trash2 className="w-4 h-4" />
                                     </button>
 
-                                    <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-sm font-medium mb-1 block">{t("dashboard.profile.label")}</label>
                                             <select

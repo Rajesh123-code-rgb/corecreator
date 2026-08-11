@@ -254,7 +254,7 @@ export default function WorkshopsClient() {
                             </Button>
                         </div>
                     ) : filteredWorkshops.length > 0 ? (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {filteredWorkshops.map((workshop) => (
                                 <Card key={workshop.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-[var(--border)]">
                                     <div className="relative aspect-[4/3] overflow-hidden">

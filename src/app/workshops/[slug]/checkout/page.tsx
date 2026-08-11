@@ -225,7 +225,7 @@ export default function WorkshopCheckoutPage() {
                     <ArrowLeft className="w-4 h-4 mr-2" /> Back to Workshop
                 </Button>
 
-                <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                     {/* Left Column: Form */}
                     <div className="lg:col-span-2 space-y-8">
                         <div>
@@ -240,7 +240,7 @@ export default function WorkshopCheckoutPage() {
                             </h2>
 
                             <form id="checkout-form" onSubmit={handlePayment} className="space-y-6">
-                                <div className="grid md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <Input
                                         label="First Name"
                                         name="firstName"

@@ -38,7 +38,7 @@ export default function MaintenancePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-white flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-4xl grid md:grid-cols-2 gap-12 items-center">
+            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 {/* Left Side: Messaging */}
                 <div className="text-center md:text-left space-y-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-2">

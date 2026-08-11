@@ -33,7 +33,7 @@ export default function CertificatesPage() {
             {/* How it works */}
             <section className="py-20 bg-[var(--muted)]">
                 <div className="container-app">
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="bg-[var(--background)] p-8 rounded-2xl border border-[var(--border)]">
                             <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
                                 <Play className="w-7 h-7 text-blue-600" />

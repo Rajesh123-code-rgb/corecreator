@@ -74,7 +74,7 @@ export default function CertificatesPage() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {certificates.map((cert) => (
                         <Card key={cert._id} className="overflow-hidden flex flex-col h-full group">
                             {/* Certificate Preview / Mockup */}

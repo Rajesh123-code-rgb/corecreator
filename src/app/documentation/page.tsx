@@ -22,7 +22,7 @@ export default function DocumentationHubPage() {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                     {/* User Guide Card */}
                     <div className="group relative bg-[var(--card)] rounded-3xl border border-[var(--border)] p-8 hover:shadow-2xl hover:border-[var(--secondary-500)] transition-all duration-300 overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">

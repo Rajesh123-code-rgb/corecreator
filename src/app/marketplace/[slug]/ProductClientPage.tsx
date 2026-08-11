@@ -322,7 +322,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                         <span className="text-[var(--foreground)] truncate">{product.name}</span>
                     </nav>
 
-                    <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                         {/* Product Images */}
                         <div className="space-y-4">
                             <div className="relative aspect-square rounded-2xl overflow-hidden bg-[var(--muted)]">
@@ -590,7 +590,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
 
                             {activeTab === "details" && (
                                 <div className="space-y-6">
-                                    <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-4">
                                             <h3 className="font-semibold text-lg">Product Specifications</h3>
                                             <div className="space-y-3">
@@ -678,7 +678,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
 
                             {activeTab === "shipping" && (
                                 <div className="space-y-6">
-                                    <div className="grid md:grid-cols-2 gap-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-4">
                                             <h3 className="font-semibold text-lg flex items-center gap-2">
                                                 <Truck className="w-5 h-5 text-[var(--secondary-600)]" />
@@ -739,7 +739,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                             {activeTab === "reviews" && (
                                 <div className="space-y-8">
                                     {/* Review Summary */}
-                                    <div className="grid md:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {/* Average Rating */}
                                         <div className="text-center p-6 bg-[var(--background)] rounded-xl">
                                             <div className="text-5xl font-bold text-[var(--secondary-600)] mb-2">{reviewStats.avgRating}</div>

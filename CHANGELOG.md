@@ -7,6 +7,44 @@ left alone.
 
 ---
 
+## Phase 8 — Mobile layout
+
+Measured first: every key page was loaded at a 390x844 viewport and checked for
+horizontal overflow, touch-target size and text size, rather than guessed at.
+
+**The core problem was pages being wider than the phone.** Where content
+overflows, the browser zooms the whole page out to fit — which is why the site
+"didn't look right" rather than simply showing a scrollbar. Measured effective
+widths were 535px on product pages (a 73% zoom-out), 412px on `/artists`, 398px
+on `/cart` and 397px on `/marketplace`, against a 390px screen.
+
+**Root cause, and it was systemic:** `grid lg:grid-cols-2` sets no column
+template below the breakpoint, so the mobile track is implicit `auto`, which
+sizes to max-content and is free to exceed the viewport. Tailwind's own
+`grid-cols-*` compiles to `minmax(0, 1fr)`, which is capped at the container —
+so the fix is simply to state the mobile case. 59 grid containers across 40
+files were missing it; all now carry `grid-cols-1`. On the product page that
+alone removed 145px of overflow, caused by the image gallery column.
+
+Four narrower overflows, each a row that could not wrap:
+
+- **The footer payment badges appeared on every page.** "We Accept:" plus five
+  badges in a non-wrapping flex row measured 438px. Now wraps.
+- `/artists` — two filter dropdowns with 150px and 160px minimums, plus a
+  `whitespace-nowrap` result count, in one row. The row wraps and the selects
+  shrink on mobile.
+- `/marketplace` — the results count and sort control could not share a line.
+- `/cart` — the two empty-state buttons now stack on mobile.
+
+**Touch targets.** Against the 44px iOS/Android guidance: header icon buttons
+were 32-40px and footer navigation links 24px tall. Header buttons now have a
+44px minimum, and footer links get their touch height on mobile only, so the
+desktop footer keeps its density. The 1x1 skip link is intentional — it is
+visually hidden until focused — and one 17px "Cookie Policy" link remains below
+the WCAG 2.2 24px minimum.
+
+---
+
 ## Phase 7 — Findings from the live audit of Phases 1-5
 
 Everything from Phases 1-5 was re-tested against the live site, by request. The

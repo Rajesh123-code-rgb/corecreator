@@ -200,7 +200,7 @@ export function Footer() {
                                 <ul className="space-y-4">
                                     {section.links.map((link) => (
                                         <li key={link.href}>
-                                            <Link href={link.href} className="text-base text-white/60 hover:text-white transition-colors inline-flex items-center group">
+                                            <Link href={link.href} className="text-base text-white/60 hover:text-white transition-colors inline-flex items-center group py-2 sm:py-0 min-h-11 sm:min-h-0">
                                                 {link.label}
                                                 <ArrowRight className="w-3 h-3 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                             </Link>
@@ -232,11 +232,14 @@ export function Footer() {
                             </div>
 
                             {/* Payment Methods */}
-                            <div className="flex items-center gap-4">
+                            {/* Wraps on narrow screens - as a single non-wrapping
+                                row these five badges were 438px wide and pushed
+                                every page on the site past the viewport. */}
+                            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                                 <span className="text-sm text-white/40">We Accept:</span>
-                                <div className="flex gap-3">
+                                <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                                     {["Visa", "MC", "RuPay", "UPI", "PayPal"].map((method) => (
-                                        <div key={method} className="px-4 py-2 bg-white/10 rounded-lg text-sm font-medium text-white/70 hover:bg-white/15 transition-colors">
+                                        <div key={method} className="px-3 sm:px-4 py-2 bg-white/10 rounded-lg text-sm font-medium text-white/70 hover:bg-white/15 transition-colors">
                                             {method}
                                         </div>
                                     ))}
@@ -277,10 +280,10 @@ export function Footer() {
                                 </div>
 
                                 <div className="flex flex-wrap items-center justify-center gap-6 lg:gap-8 border-l border-white/10 pl-6">
-                                    <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-                                    <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                                    <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
-                                    <Link href="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
+                                    <Link href="/terms" className="hover:text-white transition-colors py-2 sm:py-0 inline-block">Terms of Service</Link>
+                                    <Link href="/privacy" className="hover:text-white transition-colors py-2 sm:py-0 inline-block">Privacy Policy</Link>
+                                    <Link href="/cookies" className="hover:text-white transition-colors py-2 sm:py-0 inline-block">Cookies</Link>
+                                    <Link href="/accessibility" className="hover:text-white transition-colors py-2 sm:py-0 inline-block">Accessibility</Link>
                                 </div>
                             </div>
                         </div>

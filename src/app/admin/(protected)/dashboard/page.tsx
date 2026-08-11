@@ -605,7 +605,7 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Bottom Section - Recent Orders & Top Products */}
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Recent Orders */}
                 <div className="bg-white rounded-xl border border-gray-100">
                     <div className="p-4 border-b border-gray-100 flex items-center justify-between">

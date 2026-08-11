@@ -259,7 +259,7 @@ export default function AnalyticsPage() {
                             <SimpleLineChart data={data?.revenueData || []} />
                         </Card>
 
-                        <div className="grid md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <Card className="p-6">
                                 <h2 className="font-bold text-lg mb-4">Recent Enrolments</h2>
                                 <div className="space-y-4">

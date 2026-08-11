@@ -323,7 +323,7 @@ export default function HomeClient() {
             <p className="text-[var(--muted-foreground)]">Whether you're a creator, learner, or collector—Core Creator has the tools to help you succeed.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <Card key={feature.title} hover className="p-6 animate-fade-in-up group" style={{ animationDelay: `${index * 0.1}s` }}>
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
@@ -358,7 +358,7 @@ export default function HomeClient() {
               <Loader2 className="w-8 h-8 animate-spin text-[var(--secondary-500)]" />
             </div>
           ) : featuredArtworks.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredArtworks.map((art, index) => (
                 <Card key={art._id} hover className="overflow-hidden group animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="relative aspect-square">
@@ -457,7 +457,7 @@ export default function HomeClient() {
               <Loader2 className="w-8 h-8 animate-spin text-[var(--secondary-500)]" />
             </div>
           ) : topCourses.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {topCourses.map((course, index) => (
                 <Card key={course._id} hover className="group overflow-hidden animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
                   <div className="relative aspect-video overflow-hidden">
@@ -605,7 +605,7 @@ export default function HomeClient() {
               <Loader2 className="w-8 h-8 animate-spin text-[var(--secondary-500)]" />
             </div>
           ) : artists.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {artists.map((artist, index) => (
                 <Link key={artist.id} href={`/artists/${artist.id}`}>
                   <Card hover className="p-6 text-center animate-fade-in-up cursor-pointer" style={{ animationDelay: `${index * 0.1}s` }}>
@@ -652,7 +652,7 @@ export default function HomeClient() {
             <p className="text-[var(--muted-foreground)]">Whether you want to learn, shop, or create — getting started is simple</p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* For Learners */}
             <Card className="p-8 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-bl-full" />
@@ -740,14 +740,14 @@ export default function HomeClient() {
       {/* Why Choose Us */}
       <section className="py-20 bg-[var(--neutral-900)] text-white">
         <div className="container-app">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold mb-6">Why Choose Core Creator?</h2>
               <p className="text-white/70 text-lg mb-8">
                 We're building the most comprehensive platform for the art & craft ecosystem — connecting creators, learners, and collectors worldwide.
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
                   { icon: Award, title: "Quality Verified", desc: "Every course and artwork is vetted for quality" },
                   { icon: Users, title: "Creative Community", desc: "Connect with artists, learners and collectors" },

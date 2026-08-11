@@ -360,7 +360,7 @@ export function LearnListClient({
                                     </Button>
                                 </div>
                             ) : courses.length > 0 ? (
-                                <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                     {courses.map((course) => (
                                         <Card key={course._id} hover className="group overflow-hidden">
                                             <div className="relative aspect-video overflow-hidden">

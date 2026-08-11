@@ -27,7 +27,7 @@ export default function ContactPage() {
 
             <section className="py-20">
                 <div className="container-app">
-                    <div className="grid lg:grid-cols-3 gap-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
                         {/* Contact Info */}
                         <div className="space-y-8">
@@ -92,7 +92,7 @@ export default function ContactPage() {
                         {/* Contact Form */}
                         <div className="lg:col-span-2 bg-[var(--card)] p-8 rounded-2xl border border-[var(--border)] shadow-sm">
                             <form className="space-y-6">
-                                <div className="grid md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label htmlFor="first-name" className="text-sm font-medium">First name</label>
                                         <input type="text" id="first-name" className="w-full px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)]" placeholder="First name" />

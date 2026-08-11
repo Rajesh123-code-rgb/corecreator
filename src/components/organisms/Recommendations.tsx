@@ -90,7 +90,7 @@ export function Recommendations({
                 <h2 className="text-xl font-bold">{title}</h2>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {recommendations.map((item) => (
                     <Link key={`${item.type}-${item.id}`} href={getResultLink(item)}>
                         <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full group">

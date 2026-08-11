@@ -328,7 +328,7 @@ function SearchContent() {
                                 </div>
                             ) : results.length > 0 ? (
                                 <>
-                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {results.map((result) => (
                                             <Link key={`${result.type}-${result.id}`} href={getResultLink(result)}>
                                                 <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">

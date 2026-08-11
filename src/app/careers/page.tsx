@@ -43,7 +43,7 @@ export default function CareersPage() {
             <section className="py-20 bg-[var(--muted)]">
                 <div className="container-app">
                     <h2 className="text-3xl font-bold text-center mb-12">Why Work With Us?</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {perks.map((perk, i) => (
                             <div key={i} className="bg-[var(--card)] p-6 rounded-xl border border-[var(--border)]">
                                 <div className="w-10 h-10 bg-[var(--secondary-100)] rounded-lg flex items-center justify-center mb-4 text-[var(--secondary-600)]">

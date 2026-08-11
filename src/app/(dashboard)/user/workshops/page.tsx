@@ -73,7 +73,7 @@ export default function MyWorkshopsPage() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {workshops.map((workshop) => (
                         <Card key={workshop._id} className="overflow-hidden flex flex-col h-full group">
                             <div className="bg-[var(--primary-100)] h-32 flex items-center justify-center">

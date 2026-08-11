@@ -113,7 +113,7 @@ export default function CategoryCourseList({
                     <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
                 </div>
             ) : courses.length > 0 ? (
-                <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {courses.map((course) => (
                         <Card key={course._id} hover className="group overflow-hidden bg-[var(--card)] border-[var(--border)]">
                             <div className="relative aspect-video overflow-hidden">

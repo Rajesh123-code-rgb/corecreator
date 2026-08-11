@@ -149,7 +149,7 @@ export function Header() {
                         {mounted && (
                             <button
                                 onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                                className="p-2.5 rounded-lg hover:bg-[var(--muted)] transition-colors relative"
+                                className="p-2.5 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors relative"
                                 aria-label="Toggle Theme"
                             >
                                 <Sun className={cn("w-5 h-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0", headerIconColor)} />
@@ -165,7 +165,7 @@ export function Header() {
                         {/* Search */}
                         <button
                             onClick={() => setIsSearchOpen(true)}
-                            className="p-2.5 rounded-lg hover:bg-[var(--muted)] transition-colors"
+                            className="p-2.5 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors"
                             aria-label="Search"
                         >
                             <Search className={cn("w-5 h-5", headerIconColor)} />
@@ -176,7 +176,7 @@ export function Header() {
                         {/* Cart */}
                         <Link
                             href="/cart"
-                            className="p-2.5 rounded-lg hover:bg-[var(--muted)] transition-colors relative"
+                            className="p-2.5 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors relative"
                         >
                             <ShoppingCart className={cn("w-5 h-5", headerIconColor)} />
                             {itemCount > 0 && (
@@ -269,7 +269,7 @@ export function Header() {
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="lg:hidden p-2 rounded-lg hover:bg-[var(--muted)] transition-colors"
+                        className="lg:hidden p-2 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors"
                         aria-label="Toggle menu"
                     >
                         {isMobileMenuOpen ? (
