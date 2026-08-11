@@ -203,6 +203,9 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
             cartItem.customizations = customizationValues.map(cv => {
                 const opt = (product.customizations || []).find((c: any) => c.id === cv.id);
                 return {
+                    // id is what the server matches against to re-derive the
+                    // price modifier; without it only the label survives.
+                    id: cv.id,
                     label: opt?.label || cv.id,
                     value: cv.value
                 };
@@ -367,15 +370,24 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
 
                             {/* Rating & Reviews - Now Interactive */}
                             <div className="flex items-center gap-4 mb-6">
-                                <button onClick={scrollToReviews} className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`w-5 h-5 ${i < Math.floor(parseFloat(reviewStats.avgRating)) ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} />
-                                    ))}
-                                    <span className="ml-2 font-medium">{reviewStats.avgRating}</span>
-                                </button>
-                                <button onClick={scrollToReviews} className="text-sm text-[var(--secondary-600)] hover:underline">
-                                    {reviewStats.totalReviews} reviews
-                                </button>
+                                {/* An unreviewed product used to show "0.0" beside five grey
+                                    stars, which reads as a rating of zero rather than an
+                                    absence of one. */}
+                                {reviewStats.totalReviews > 0 ? (
+                                    <>
+                                        <button onClick={scrollToReviews} className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} className={`w-5 h-5 ${i < Math.floor(parseFloat(reviewStats.avgRating)) ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} />
+                                            ))}
+                                            <span className="ml-2 font-medium">{reviewStats.avgRating}</span>
+                                        </button>
+                                        <button onClick={scrollToReviews} className="text-sm text-[var(--secondary-600)] hover:underline">
+                                            {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? "review" : "reviews"}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <span className="text-sm text-[var(--muted-foreground)]">No reviews yet</span>
+                                )}
                                 <button onClick={() => handleShare()} className="flex items-center gap-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                                     <Share2 className="w-4 h-4" /> Share
                                 </button>
@@ -747,13 +759,23 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {/* Average Rating */}
                                         <div className="text-center p-6 bg-[var(--background)] rounded-xl">
-                                            <div className="text-5xl font-bold text-[var(--secondary-600)] mb-2">{reviewStats.avgRating}</div>
-                                            <div className="flex justify-center gap-1 mb-2">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className={`w-5 h-5 ${i < Math.floor(parseFloat(reviewStats.avgRating)) ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} />
-                                                ))}
-                                            </div>
-                                            <p className="text-sm text-[var(--muted-foreground)]">Based on {reviewStats.totalReviews} reviews</p>
+                                            {reviewStats.totalReviews > 0 ? (
+                                                <>
+                                                    <div className="text-5xl font-bold text-[var(--secondary-600)] mb-2">{reviewStats.avgRating}</div>
+                                                    <div className="flex justify-center gap-1 mb-2">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} className={`w-5 h-5 ${i < Math.floor(parseFloat(reviewStats.avgRating)) ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} />
+                                                        ))}
+                                                    </div>
+                                                    <p className="text-sm text-[var(--muted-foreground)]">
+                                                        Based on {reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? "review" : "reviews"}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="text-sm text-[var(--muted-foreground)] py-6">
+                                                    No reviews yet. Be the first to review this piece.
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Rating Distribution */}

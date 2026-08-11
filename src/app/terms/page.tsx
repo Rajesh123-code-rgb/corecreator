@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header, Footer } from "@/components/organisms";
 
 export const metadata = {
@@ -56,9 +57,15 @@ export default function TermsPage() {
                             Core Creator usage is at your own risk. The platform is provided on an "as is" and "as available" basis.
                         </p>
 
-                        <h2 className="text-2xl font-bold mb-4">7. Contact Us</h2>
+                        <h2 className="text-2xl font-bold mb-4 mt-8">7. Governing Law</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
-                            If you have any questions about these Terms, please contact us at support@corecreator.com.
+                            These Terms are governed by and construed in accordance with the laws of India.
+                        </p>
+
+                        <h2 className="text-2xl font-bold mb-4">8. Contact Us</h2>
+                        <p className="mb-6 text-[var(--muted-foreground)]">
+                            If you have any questions about these Terms, please reach us through the{" "}
+                            <Link href="/contact" className="text-[var(--primary-600)] hover:underline">contact page</Link>.
                         </p>
                     </div>
                 </div>

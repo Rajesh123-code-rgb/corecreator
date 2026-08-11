@@ -7,6 +7,99 @@ left alone.
 
 ---
 
+## Phase 9 — Go-live readiness
+
+Everything outstanding before launch except the Razorpay live keys, which stay
+last by decision so the switch to real money happens against a finished system.
+
+### Auth debug logging (security)
+
+`src/lib/auth/index.ts` wrote to `auth-debug.log` in **six** places across the
+authorize, JWT and session callbacks — the raw user document, the JWT, and the
+full session object including id, email, role and permissions.
+
+Three problems in one: a JWT in a log file is a usable credential;
+`appendFileSync` is synchronous, so it blocked the event loop on every session
+read, which is every page load for a signed-in user; and the file grew without
+limit on a VPS already at 78% disk. All six removed, `*-debug.log` added to
+`.gitignore`, and the full-curriculum-payload `console.log` in the course
+curriculum route reduced to a section count.
+
+### Google sign-in on, Facebook off
+
+Both providers were already registered and the OAuth `signIn` callback already
+created and linked users correctly, so no account plumbing was needed.
+
+Facebook is gone — provider, button, icon and env vars. Google is now registered
+**only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are both set**;
+previously it registered with empty strings, which advertised the provider and
+produced a button that failed on click. `SSOButtons` asks NextAuth what is
+actually configured via `getProviders()` and renders from that, so the button
+appears the moment credentials are deployed with no separate feature flag to
+keep in step, and shows nothing before then.
+
+Sign-in with Google was also missing from `/register` entirely — added. While
+doing so, both auth pages had a latent bug: each rendered its own "Or sign in
+with email" divider next to `<SSOButtons showDivider={false} />`, so with no
+providers configured the divider would strand itself with nothing above it.
+`SSOButtons` now owns the divider and renders both or neither.
+
+OAuth-created accounts were being given `preferences.currency: "USD"` while the
+entire catalogue is priced in INR.
+
+### Claims the site could not support
+
+- **`/shipping`** advertised 3-5 day domestic and 7-14 day international
+  delivery, plus worldwide shipping. None of it was confirmed and there is no
+  international shipping configuration. Replaced with what is true: dispatch is
+  per creator, cost and destinations are shown at checkout, tracking follows.
+- **`support@corecreator.com`** was published on `/contact`, `/terms`, the
+  footer and `/accessibility`, but `corecreator.com` resolves to a different
+  server than the live site, so that mail may reach nobody. All four now route
+  to the contact form.
+- **`/terms` had no governing-law clause.** Added: governed by the laws of
+  India. The exclusive-jurisdiction city is still open.
+- **Footer social icons** all pointed at `#` — a dead link on every page.
+  Now the three real profiles (Instagram, YouTube, LinkedIn); Facebook and
+  Twitter removed, since there are no profiles to link.
+
+### Figures that did not exist
+
+- **Products with no reviews showed `0.0` beside five grey stars**, which reads
+  as a rating of zero rather than the absence of one. Now "No reviews yet".
+- **Courses advertised "0 hours on-demand video".** The cause was a data bug,
+  not a display one: lessons store `content.videoDuration`, but the curriculum
+  save route never aggregated it, so `totalDuration` stayed 0 while the course
+  had lessons. Both totals are now recomputed on save. Mind the units — lesson
+  durations are in seconds while `totalDuration` is consumed as minutes, so
+  summing raw seconds would have overstated every course 60x. The label is
+  hidden when unknown, and sub-hour courses report minutes instead of rounding
+  to "0 hours".
+
+### Product prices are now exact, not floor-checked
+
+Phase 5 secured payment amounts by deriving prices server-side, but products
+could only be **floor-checked** — compared against the cheapest configuration a
+product could legitimately sell at — because variant, customization and add-on
+selections were never forwarded from the cart. A premium variant could therefore
+be bought at the base price.
+
+The product page already attached those selections to the cart item at runtime;
+they were simply absent from the `CartItem` type and dropped at checkout. The
+whole path is now typed and forwarded — **ids only, never prices** — and
+`create-order` rebuilds the figure from the stored catalogue, mirroring
+`calculatedPrice` in `ProductClientPage`. A mismatch now rejects the order as a
+stale basket rather than being silently accepted.
+
+### Not changed, deliberately
+
+The "Cookie Policy" link measures 17px tall and was logged in Phase 8 as below
+the WCAG 2.2 AA 24px minimum. That was wrong: SC 2.5.8 exempts targets inline in
+a sentence, where size is constrained by the line-height of the surrounding
+text. Padding it would break the paragraph's spacing for no accessibility gain.
+
+---
+
 ## Phase 8 — Mobile layout
 
 Measured first: every key page was loaded at a 390x844 viewport and checked for

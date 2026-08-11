@@ -33,7 +33,9 @@ export default function ShippingPage() {
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Domestic Shipping</h3>
                                 <p className="text-[var(--muted-foreground)]">
-                                    For orders within the same country, standard shipping typically takes 3-5 business days.
+                                    Orders ship from the creator who made the piece, so delivery time depends on
+                                    where they are based. The estimated cost is shown at checkout, and you&apos;ll
+                                    get tracking details once the parcel is dispatched.
                                 </p>
                             </div>
                         </div>
@@ -43,9 +45,11 @@ export default function ShippingPage() {
                                 <Globe className="w-6 h-6" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold mb-2">International Shipping</h3>
+                                <h3 className="text-xl font-bold mb-2">Shipping Outside India</h3>
                                 <p className="text-[var(--muted-foreground)]">
-                                    Core Creator connects you with artists globally. International shipping times vary by destination but generally range from 7-14 business days. Please note that customs duties and taxes may apply upon arrival and are the responsibility of the buyer.
+                                    Not every creator ships internationally. Where a piece can be sent abroad, the
+                                    destinations and cost are shown at checkout before you pay. Any customs duties
+                                    or import taxes are set by the destination country and are payable by the buyer.
                                 </p>
                             </div>
                         </div>
@@ -57,7 +61,9 @@ export default function ShippingPage() {
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Processing Time</h3>
                                 <p className="text-[var(--muted-foreground)]">
-                                    Since many items on Core Creator are handmade or made-to-order, please allow 1-3 business days for artists to prepare your order before it ships. You will receive a tracking number as soon as your package leaves the studio.
+                                    Most pieces are handmade or made to order, so the creator needs time to
+                                    prepare your order before it ships. You&apos;ll receive tracking details as soon
+                                    as it leaves their studio.
                                 </p>
                             </div>
                         </div>

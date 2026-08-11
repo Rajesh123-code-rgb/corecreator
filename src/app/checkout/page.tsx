@@ -129,7 +129,13 @@ export default function CheckoutPage() {
                         kind: item.type === "course" ? "course" : "product",
                         name: item.name,
                         quantity: item.quantity,
-                        price: item.price
+                        price: item.price,
+                        // Forwarded so the server can recompute the exact price
+                        // from the stored catalogue rather than only checking it
+                        // against the cheapest possible configuration.
+                        variantId: item.variant?.id,
+                        customizationIds: item.customizations?.map(c => c.id).filter(Boolean),
+                        addOnIds: item.addOns?.map(a => a.id).filter(Boolean),
                     }))
                 })
             });

@@ -1,9 +1,12 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import * as React from "react";
+import { signIn, getProviders } from "next-auth/react";
+
+type SupportedProvider = "google";
 
 interface SSOButtonProps {
-    provider: "google" | "facebook";
+    provider: SupportedProvider;
     callbackUrl?: string;
     className?: string;
 }
@@ -22,17 +25,7 @@ const providerConfig = {
         bgColor: "bg-white hover:bg-gray-50",
         textColor: "text-gray-700",
     },
-    facebook: {
-        name: "Facebook",
-        icon: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#1877F2">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-        ),
-        bgColor: "bg-[#1877F2] hover:bg-[#166FE5]",
-        textColor: "text-white",
-    },
-};
+} as const;
 
 export function SSOButton({ provider, callbackUrl = "/", className = "" }: SSOButtonProps) {
     const config = providerConfig[provider];
@@ -52,25 +45,72 @@ export function SSOButton({ provider, callbackUrl = "/", className = "" }: SSOBu
 interface SSOButtonsProps {
     callbackUrl?: string;
     showDivider?: boolean;
+    /** Text in the divider. Defaults to the "Or continue with" lead-in. */
+    dividerLabel?: string;
+    /** "after" puts the divider below the buttons, separating them from an email form. */
+    dividerPlacement?: "before" | "after";
 }
 
-export function SSOButtons({ callbackUrl = "/", showDivider = true }: SSOButtonsProps) {
+/**
+ * Renders sign-in buttons for the OAuth providers NextAuth actually has
+ * configured, asked for at runtime via getProviders().
+ *
+ * The provider list is the single source of truth: authOptions only registers
+ * Google when GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set, so before the
+ * credentials exist nothing renders here at all - rather than a button that
+ * looks available and fails on click. It also means the button appears as soon
+ * as the credentials are deployed, with no separate feature flag to keep in
+ * step.
+ */
+export function SSOButtons({
+    callbackUrl = "/",
+    showDivider = true,
+    dividerLabel = "Or continue with",
+    dividerPlacement = "before",
+}: SSOButtonsProps) {
+    const [available, setAvailable] = React.useState<SupportedProvider[]>([]);
+
+    React.useEffect(() => {
+        let cancelled = false;
+        getProviders()
+            .then((providers) => {
+                if (cancelled || !providers) return;
+                setAvailable(
+                    (Object.keys(providerConfig) as SupportedProvider[]).filter((id) => id in providers)
+                );
+            })
+            .catch(() => {
+                // Never block the password form on this - it is an enhancement.
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    // Nothing configured - render neither the buttons nor the divider, so the
+    // page never shows a stranded "Or sign in with email" separator.
+    if (available.length === 0) return null;
+
+    const divider = showDivider ? (
+        <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[var(--border)]" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-[var(--background)] text-[var(--muted-foreground)]">{dividerLabel}</span>
+            </div>
+        </div>
+    ) : null;
+
     return (
         <div className="space-y-3">
-            {showDivider && (
-                <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-[var(--border)]" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-4 bg-[var(--background)] text-[var(--muted-foreground)]">Or continue with</span>
-                    </div>
-                </div>
-            )}
+            {dividerPlacement === "before" && divider}
             <div className="grid gap-3">
-                <SSOButton provider="google" callbackUrl={callbackUrl} />
-                <SSOButton provider="facebook" callbackUrl={callbackUrl} />
+                {available.map((provider) => (
+                    <SSOButton key={provider} provider={provider} callbackUrl={callbackUrl} />
+                ))}
             </div>
+            {dividerPlacement === "after" && divider}
         </div>
     );
 }

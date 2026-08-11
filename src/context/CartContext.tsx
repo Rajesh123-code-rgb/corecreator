@@ -14,6 +14,13 @@ interface CartItem {
     // Shipping fields (only for physical products)
     shippingPrice?: number;
     isFreeShipping?: boolean;
+    // Product configuration. These were already being written onto cart items
+    // at runtime but were absent from the type, so checkout never forwarded
+    // them and the server could only floor-check the price rather than
+    // recompute it. Declared here so the whole path is typed.
+    variant?: { id: string; label: string; sku?: string };
+    customizations?: { id?: string; label: string; value: string }[];
+    addOns?: { id: string; title?: string; price: number }[];
 }
 
 interface CartContextType {

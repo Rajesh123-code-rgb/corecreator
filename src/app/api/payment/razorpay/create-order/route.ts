@@ -77,6 +77,11 @@ export async function POST(request: NextRequest) {
             name: string;
             quantity: number;
             price: number;
+            // Product configuration, forwarded from the cart. Only ids are
+            // accepted - every price comes from the stored catalogue.
+            variantId?: string;
+            customizationIds?: string[];
+            addOnIds?: string[];
         }
 
         interface ProcessedOrderItem {
@@ -111,7 +116,7 @@ export async function POST(request: NextRequest) {
             try {
                 if (item.kind === "product") {
                     const product = await Product.findById(item.id)
-                        .select("seller sellerName shipping.weight price variants customizations")
+                        .select("name seller sellerName shipping.weight price variants customizations addOns")
                         .lean() as any;
                     if (!product) {
                         priceErrors.push(`Product ${item.id} no longer exists`);
@@ -119,20 +124,47 @@ export async function POST(request: NextRequest) {
                         sellerId = product.seller;
                         sellerName = product.sellerName;
 
-                        const variantPrices = (product.variants || [])
-                            .map((v: any) => Number(v.price))
-                            .filter((n: number) => Number.isFinite(n));
-                        // Customization modifiers can reduce the price, so allow for them.
-                        const negativeModifiers = (product.customizations || [])
-                            .reduce((sum: number, c: any) => sum + Math.min(0, Number(c.priceModifier) || 0), 0);
+                        // Rebuild the price from the stored catalogue using the
+                        // buyer's selections, mirroring calculatedPrice in
+                        // ProductClientPage. This used to be a floor-check
+                        // against the cheapest possible configuration, because
+                        // the selections were never forwarded from the cart -
+                        // which accepted the base price for a premium variant.
+                        let derived = Number(product.price) || 0;
 
-                        const floor = Math.min(Number(product.price) || 0, ...(variantPrices.length ? variantPrices : [Number(product.price) || 0]))
-                            + negativeModifiers;
-
-                        // Small tolerance for floating-point noise only.
-                        if (unitPrice < floor - 0.01) {
-                            priceErrors.push(`Price mismatch for "${product.name || item.id}"`);
+                        if (item.variantId) {
+                            const variant = (product.variants || []).find((v: any) => String(v.id) === String(item.variantId));
+                            if (!variant) {
+                                priceErrors.push(`Selected option is no longer available for "${product.name || item.id}"`);
+                            } else {
+                                derived = Number(variant.price) || 0;
+                            }
                         }
+
+                        for (const id of item.customizationIds || []) {
+                            const option = (product.customizations || []).find((c: any) => String(c.id) === String(id));
+                            if (!option) {
+                                priceErrors.push(`A selected customization is no longer available for "${product.name || item.id}"`);
+                                continue;
+                            }
+                            derived += Number(option.priceModifier) || 0;
+                        }
+
+                        for (const id of item.addOnIds || []) {
+                            const addOn = (product.addOns || []).find((a: any) => String(a.id) === String(id));
+                            if (!addOn) {
+                                priceErrors.push(`A selected add-on is no longer available for "${product.name || item.id}"`);
+                                continue;
+                            }
+                            derived += Number(addOn.price) || 0;
+                        }
+
+                        // The derived figure is what gets charged; the client's
+                        // number is only used to detect a stale basket.
+                        if (Math.abs(unitPrice - derived) > 0.01) {
+                            priceErrors.push(`The price of "${product.name || item.id}" has changed. Please review your cart.`);
+                        }
+                        unitPrice = derived;
                     }
                 } else if (item.kind === "course") {
                     const course = await Course.findById(item.id)

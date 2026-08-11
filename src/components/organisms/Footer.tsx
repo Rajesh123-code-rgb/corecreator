@@ -3,8 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-    Facebook,
-    Twitter,
     Instagram,
     Youtube,
     Linkedin,
@@ -76,12 +74,12 @@ const footerSections = [
     },
 ];
 
+// Only networks Core Creator actually has a profile on. These all pointed at
+// "#" before - a dead link on every page of the site.
 const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Youtube, href: "#", label: "YouTube" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
+    { icon: Instagram, href: "https://www.instagram.com/core.creator/", label: "Instagram" },
+    { icon: Youtube, href: "https://www.youtube.com/@corecreatorstudio/", label: "YouTube" },
+    { icon: Linkedin, href: "https://www.linkedin.com/company/96004962/", label: "LinkedIn" },
 ];
 
 const trustBadges = [
@@ -183,6 +181,8 @@ export function Footer() {
                                         <a
                                             key={social.label}
                                             href={social.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[var(--secondary-500)] hover:border-[var(--secondary-500)] transition-all"
                                             aria-label={social.label}
                                         >
@@ -223,7 +223,7 @@ export function Footer() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Mail className="w-5 h-5 text-[var(--secondary-400)]" />
-                                    <span>support@corecreator.com</span>
+                                    <Link href="/contact" className="hover:text-white transition-colors">Contact us</Link>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <MapPin className="w-5 h-5 text-[var(--secondary-400)]" />

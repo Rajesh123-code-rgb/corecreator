@@ -65,14 +65,7 @@ function LoginContent() {
                         </div>
                     )}
 
-                    <SSOButtons callbackUrl={callbackUrl} showDivider={false} />
-
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[var(--border)]" /></div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-[var(--background)] text-[var(--muted-foreground)]">Or sign in with email</span>
-                        </div>
-                    </div>
+                    <SSOButtons callbackUrl={callbackUrl} dividerLabel="Or sign in with email" dividerPlacement="after" />
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <Input label="Email" type="email" placeholder="Enter your email" leftIcon={<Mail className="w-5 h-5" />} error={errors.email?.message} {...register("email")} />
