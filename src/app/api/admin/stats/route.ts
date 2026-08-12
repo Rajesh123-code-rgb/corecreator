@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
             Course.countDocuments({ status: "published" }),
             Product.countDocuments({ status: "active" }),
             Order.aggregate([
-                { $match: { status: "paid" } },
+                { $match: { paymentStatus: "paid" } },
                 { $group: { _id: null, total: { $sum: "$total" } } }
             ])
         ]);

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/db/mongodb";
 import Course from "@/lib/db/models/Course";
 import "@/lib/db/models/User"; // Ensure User model is registered
+import { hasPurchasedCourse, stripPaidLessonContent } from "@/lib/courseAccess";
 
 export async function GET(
     request: NextRequest,
@@ -47,7 +48,24 @@ export async function GET(
             );
         }
 
-        return NextResponse.json({ course });
+        // Paid lesson media is withheld from anyone who has not bought the
+        // course. This endpoint previously returned the whole document to any
+        // caller, so every lesson's videoUrl was public regardless of price -
+        // there was no purchase check here or on the player route.
+        const session = await getServerSession(authOptions);
+        const courseId = String((course as any)._id);
+        const instructorId = (course as any).instructor?._id ?? (course as any).instructor;
+
+        const isOwner =
+            session?.user?.role === "admin" ||
+            (session?.user?.id && String(instructorId) === String(session.user.id));
+
+        const hasAccess = isOwner || (await hasPurchasedCourse(session?.user?.id, courseId));
+
+        return NextResponse.json({
+            course: hasAccess ? course : stripPaidLessonContent(course as any),
+            hasAccess,
+        });
     } catch (error) {
         console.error("Get course error:", error);
         return NextResponse.json(

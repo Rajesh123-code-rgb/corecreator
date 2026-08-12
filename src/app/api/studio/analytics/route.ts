@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         // Get orders for revenue calculation
         const orders = await Order.find({
             "items.product": { $in: allItemIds },
-            status: "paid",
+            paymentStatus: "paid",
             createdAt: { $gte: startDate }
         })
             .select("items createdAt totalAmount")
