@@ -11,6 +11,8 @@ import Workshop from "@/lib/db/models/Workshop";
 import ShippingProfile from "@/lib/db/models/ShippingProfile";
 import mongoose from "mongoose";
 import { findOrCreateGuestUser } from "@/lib/auth/guestCheckout";
+import { getTaxRate } from "@/lib/tax.server";
+import { applyTax } from "@/lib/tax";
 
 export async function POST(request: NextRequest) {
     try {
@@ -314,7 +316,10 @@ export async function POST(request: NextRequest) {
             shipping += sellerShipping;
         }
 
-        const tax = subtotal * 0.08;
+        // Rate comes from the admin-configured TaxRate, not a constant. 8% was
+        // hardcoded here and matched no Indian GST band.
+        const { rate: taxRate, displayName: taxName } = await getTaxRate(shippingAddress?.country || undefined);
+        const tax = applyTax(subtotal, taxRate, taxName).amount;
 
         // Calculate Discount (existing logic...)
         let discount = 0;

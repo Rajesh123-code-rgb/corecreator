@@ -97,6 +97,9 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
 
     // Variant, Customization, and Add-on state
     const [selectedVariant, setSelectedVariant] = useState<any>(null);
+    // Adding to the cart is instant, so there is nothing to spin on. A brief
+    // confirmed state on the button is what tells the shopper it registered.
+    const [justAdded, setJustAdded] = useState(false);
     const [customizationValues, setCustomizationValues] = useState<{ id: string; value: string; priceModifier: number }[]>([]);
     const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
@@ -171,7 +174,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
         );
 
         if (missingRequired.length > 0) {
-            toast.error(`Please complete required field: ${missingRequired[0].label}`);
+            toast.warning("One more thing", `Please choose ${missingRequired[0].label} before adding to your cart.`);
             return;
         }
 
@@ -225,6 +228,13 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
         }
 
         addItem(cartItem);
+
+        toast.success(
+            "Added to your cart",
+            `${product.name} — ${quantity > 1 ? `${quantity} items` : "1 item"}. Open your cart to check out.`
+        );
+        setJustAdded(true);
+        window.setTimeout(() => setJustAdded(false), 2000);
     };
 
     const handleToggleWishlist = () => {
@@ -496,7 +506,11 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                         <button onClick={() => handleQuantityChange(1)} className="p-3 hover:bg-[var(--muted)]"><Plus className="w-4 h-4" /></button>
                                     </div>
                                     <Button onClick={handleAddToCart} variant="secondary" size="lg" className="order-3 sm:order-2 w-full sm:w-auto sm:flex-1 min-w-0">
-                                        <ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart - {formatPrice(calculatedPrice * quantity, product.currency || "INR")}
+                                        {justAdded ? (
+                                            <><Check className="w-5 h-5 mr-2" /> Added to your cart</>
+                                        ) : (
+                                            <><ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart - {formatPrice(calculatedPrice * quantity, product.currency || "INR")}</>
+                                        )}
                                     </Button>
                                     <Button onClick={handleToggleWishlist} variant="outline" size="lg" className={`order-2 sm:order-3 ${isWishlisted ? "text-red-500 border-red-200 bg-red-50" : ""}`}>
                                         <Heart className={`w-5 h-5 ${isWishlisted ? "fill-current" : ""}`} />

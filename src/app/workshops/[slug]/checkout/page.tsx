@@ -8,6 +8,8 @@ import { useSession } from "next-auth/react";
 import { Header, Footer } from "@/components/organisms";
 import { Button, Input, ImageWithFallback } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useTaxRate } from "@/hooks/useTaxRate";
+import { applyTax } from "@/lib/tax";
 import { Loader2, ArrowLeft, CreditCard, Shield, Users, Calendar, Clock } from "lucide-react";
 
 interface Workshop {
@@ -25,6 +27,7 @@ export default function WorkshopCheckoutPage() {
     const router = useRouter();
     const slug = params?.slug as string;
     const { formatPrice } = useCurrency();
+    const { rate: taxRate, displayName: taxName } = useTaxRate();
 
     const [workshop, setWorkshop] = useState<Workshop | null>(null);
     const [loading, setLoading] = useState(true);
@@ -123,7 +126,7 @@ export default function WorkshopCheckoutPage() {
 
             if (!res.ok) {
                 if (res.status === 401) {
-                    toast.error("Please sign in to complete your booking.");
+                    toast.info("Sign in to continue", "Your seat selection is saved — we'll bring you straight back.");
                     router.push(`/login?callbackUrl=${encodeURIComponent(checkoutPath)}`);
                     setIsProcessing(false);
                     return;
@@ -208,7 +211,10 @@ export default function WorkshopCheckoutPage() {
     }
 
     const subtotal = workshop.price * seats;
-    const tax = subtotal * 0.18; // 18% GST example
+    // Was a hardcoded "18% GST example"; now the same configured rate as
+    // everything else, so workshops and products cannot disagree.
+    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    const tax = taxDetail.amount;
     const total = subtotal + tax;
     const workshopDate = new Date(workshop.date);
 
@@ -378,7 +384,7 @@ export default function WorkshopCheckoutPage() {
                                             <span>{formatPrice(subtotal)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-[var(--muted-foreground)]">Taxes (18%)</span>
+                                            <span className="text-[var(--muted-foreground)]">{taxDetail.label}</span>
                                             <span>{formatPrice(tax)}</span>
                                         </div>
                                         <div className="flex justify-between font-bold text-lg pt-2 border-t border-[var(--border)]">

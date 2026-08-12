@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:duration-75 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     {
         variants: {
             variant: {
@@ -12,17 +12,17 @@ const buttonVariants = cva(
                 secondary:
                     "bg-[var(--secondary-500)] text-white shadow-md hover:bg-[var(--secondary-600)] focus-visible:ring-[var(--secondary-500)] active:scale-[0.98]",
                 accent:
-                    "gradient-gold text-[var(--neutral-900)] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
+                    "gradient-gold text-[var(--neutral-900)] shadow-lg hover:shadow-xl [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
                 destructive:
                     "bg-[var(--error)] text-white shadow-md hover:brightness-110 focus-visible:ring-red-500 active:scale-[0.98]",
                 outline:
-                    "border-2 border-[var(--border)] bg-transparent hover:bg-[var(--muted)] hover:border-[var(--secondary-500)] focus-visible:ring-[var(--secondary-500)]",
+                    "border-2 border-[var(--border)] bg-transparent hover:bg-[var(--muted)] hover:border-[var(--secondary-500)] focus-visible:ring-[var(--secondary-500)] active:scale-[0.98] active:bg-[var(--muted)]",
                 ghost:
-                    "hover:bg-[var(--muted)] hover:text-[var(--foreground)] focus-visible:ring-[var(--secondary-500)]",
+                    "hover:bg-[var(--muted)] hover:text-[var(--foreground)] focus-visible:ring-[var(--secondary-500)] active:scale-[0.98] active:bg-[var(--muted)]",
                 link:
-                    "text-[var(--secondary-500)] underline-offset-4 hover:underline focus-visible:ring-[var(--secondary-500)]",
+                    "text-[var(--secondary-500)] underline-offset-4 hover:underline focus-visible:ring-[var(--secondary-500)] active:opacity-70",
                 gradient:
-                    "gradient-gold text-[var(--neutral-900)] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
+                    "gradient-gold text-[var(--neutral-900)] shadow-lg hover:shadow-xl [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-[var(--accent-500)]",
             },
             size: {
                 sm: "h-9 px-3 text-xs",

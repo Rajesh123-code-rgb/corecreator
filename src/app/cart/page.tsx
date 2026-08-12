@@ -6,7 +6,10 @@ import Image from "next/image";
 import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
 import { useCart } from "@/context";
+import { useToast } from "@/components/molecules";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useTaxRate } from "@/hooks/useTaxRate";
+import { applyTax } from "@/lib/tax";
 import {
     Trash2,
     Minus,
@@ -21,20 +24,26 @@ import {
 export default function CartPage() {
     const { items, isHydrated, removeItem, updateQuantity, subtotal, shippingTotal, clearCart, applyPromo, removePromo, discount, promoCode } = useCart();
     const { formatPrice } = useCurrency();
+    const toast = useToast();
     const [inputCode, setInputCode] = React.useState("");
     const [error, setError] = React.useState("");
+    const [isApplyingPromo, setIsApplyingPromo] = React.useState(false);
 
     // Use the cart's real per-product shipping, the same figure checkout uses.
     // This previously applied a hardcoded "free over 100, else 15" rule, so the
     // cart could quote a different total than the checkout page for the same
     // basket.
     const shipping = shippingTotal;
-    const tax = subtotal * 0.08;
+    // Mirrors the server rate so the displayed total matches the charge.
+    const { rate: taxRate, displayName: taxName } = useTaxRate();
+    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    const tax = taxDetail.amount;
     const total = subtotal - discount;
 
     const handleApplyPromo = async () => {
         if (!inputCode) return;
         setError("");
+        setIsApplyingPromo(true);
 
         try {
             const res = await fetch("/api/promo-codes/validate", {
@@ -46,12 +55,29 @@ export default function CartPage() {
 
             if (res.ok) {
                 applyPromo(data.code, data.discountAmount);
+                toast.success(
+                    "Promo code applied",
+                    `${data.code.toUpperCase()} saves you ${formatPrice(data.discountAmount)}.`
+                );
             } else {
                 setError(data.error || "Invalid code");
             }
         } catch (err) {
             setError("Failed to validate code");
+        } finally {
+            setIsApplyingPromo(false);
         }
+    };
+
+    const handleRemoveItem = (id: string, name: string) => {
+        removeItem(id);
+        toast.success("Removed from cart", `${name} is no longer in your cart.`);
+    };
+
+    const handleClearCart = () => {
+        if (items.length === 0) return;
+        clearCart();
+        toast.info("Cart cleared", "Everything has been removed from your cart.");
     };
 
     if (isHydrated && items.length === 0) {
@@ -118,7 +144,7 @@ export default function CartPage() {
                                                 </span>
                                             </div>
                                             <button
-                                                onClick={() => removeItem(item.id)}
+                                                onClick={() => handleRemoveItem(item.id, item.name)}
                                                 className="p-2 text-[var(--muted-foreground)] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                             >
                                                 <Trash2 className="w-5 h-5" />
@@ -152,7 +178,7 @@ export default function CartPage() {
                             ))}
 
                             <button
-                                onClick={clearCart}
+                                onClick={handleClearCart}
                                 className="text-sm text-[var(--muted-foreground)] hover:text-red-500 transition-colors"
                             >
                                 Clear Cart
@@ -179,7 +205,8 @@ export default function CartPage() {
                                             variant="outline"
                                             size="sm"
                                             onClick={handleApplyPromo}
-                                            disabled={!!promoCode || !inputCode}
+                                            disabled={!!promoCode || !inputCode || isApplyingPromo}
+                                            isLoading={isApplyingPromo}
                                         >
                                             {promoCode ? "Applied" : "Apply"}
                                         </Button>
@@ -193,6 +220,7 @@ export default function CartPage() {
                                                 onClick={() => {
                                                     removePromo();
                                                     setInputCode("");
+                                                    toast.info("Promo code removed");
                                                 }}
                                                 className="hover:text-green-800"
                                             >
@@ -215,7 +243,7 @@ export default function CartPage() {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-[var(--muted-foreground)]">Tax (8%)</span>
+                                        <span className="text-[var(--muted-foreground)]">{taxDetail.label}</span>
                                         <span>{formatPrice(tax)}</span>
                                     </div>
                                     {discount > 0 && (

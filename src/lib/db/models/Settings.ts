@@ -79,7 +79,9 @@ const SettingsSchema = new Schema<ISettings>(
             siteDescription: { type: String, default: "Creative marketplace for artists and learners" },
             defaultCurrency: { type: String, default: "INR" },
             timezone: { type: String, default: "Asia/Kolkata" },
-            supportEmail: { type: String, default: "support@corecreator.com" },
+            // Left empty rather than defaulting to a domain that may not be
+            // deliverable; set it in admin settings once a mailbox is confirmed.
+            supportEmail: { type: String, default: "" },
         },
 
         commission: {

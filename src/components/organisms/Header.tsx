@@ -249,6 +249,24 @@ export function Header() {
                         )}
                     </div>
 
+                    {/* Cart, for viewports below lg. The desktop cart link lives
+                        inside the `hidden lg:flex` actions container, so on a phone
+                        it rendered at 0x0 - the badge counted items on an element
+                        nobody could see or tap, and the mobile menu had no cart
+                        entry either. There was no route to the cart at all. */}
+                    <Link
+                        href="/cart"
+                        className="lg:hidden p-2 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)] transition-colors relative"
+                        aria-label={itemCount > 0 ? `Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}` : "Cart"}
+                    >
+                        <ShoppingCart className={cn("w-6 h-6", headerIconColor)} />
+                        {itemCount > 0 && (
+                            <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-[var(--secondary-500)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                {itemCount > 9 ? "9+" : itemCount}
+                            </span>
+                        )}
+                    </Link>
+
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -295,6 +313,30 @@ export function Header() {
                                 </div>
                             </Link>
                         ))}
+
+                        {/* Cart, in the menu as well as the bar - a shopper who
+                            opens the menu looking for their basket should find it
+                            there, with the count visible. */}
+                        <Link
+                            href="/cart"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--muted)] transition-colors"
+                        >
+                            <ShoppingCart className="w-5 h-5 text-[var(--secondary-500)]" />
+                            <div className="flex-1">
+                                <span className="font-medium">Cart</span>
+                                <p className="text-xs text-[var(--muted-foreground)]">
+                                    {itemCount > 0
+                                        ? `${itemCount} item${itemCount === 1 ? "" : "s"} ready to check out`
+                                        : "Your cart is empty"}
+                                </p>
+                            </div>
+                            {itemCount > 0 && (
+                                <span className="min-w-[22px] h-[22px] px-1.5 bg-[var(--secondary-500)] text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                    {itemCount > 9 ? "9+" : itemCount}
+                                </span>
+                            )}
+                        </Link>
 
                         {/* Mobile Auth Actions */}
                         {session ? (
