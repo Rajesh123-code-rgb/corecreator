@@ -7,6 +7,8 @@ import { Header, Footer } from "@/components/organisms";
 import { Button } from "@/components/atoms";
 import { useCart } from "@/context";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useTaxRate } from "@/hooks/useTaxRate";
+import { applyTax } from "@/lib/tax";
 import {
     Trash2,
     Minus,
@@ -29,7 +31,10 @@ export default function CartPage() {
     // cart could quote a different total than the checkout page for the same
     // basket.
     const shipping = shippingTotal;
-    const tax = subtotal * 0.08;
+    // Mirrors the server rate so the displayed total matches the charge.
+    const { rate: taxRate, displayName: taxName } = useTaxRate();
+    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    const tax = taxDetail.amount;
     const total = subtotal - discount;
 
     const handleApplyPromo = async () => {
@@ -215,7 +220,7 @@ export default function CartPage() {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-[var(--muted-foreground)]">Tax (8%)</span>
+                                        <span className="text-[var(--muted-foreground)]">{taxDetail.label}</span>
                                         <span>{formatPrice(tax)}</span>
                                     </div>
                                     {discount > 0 && (

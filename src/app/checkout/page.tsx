@@ -20,6 +20,8 @@ import {
     ShieldCheck
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useTaxRate } from "@/hooks/useTaxRate";
+import { applyTax } from "@/lib/tax";
 
 const steps = ["Shipping", "Review & Pay"];
 
@@ -82,7 +84,9 @@ export default function CheckoutPage() {
     // Use shippingTotal from cart (calculated from product shipping prices)
     // Courses and workshops have 0 shipping
     const shipping = shippingTotal;
-    const tax = subtotal * 0.08;
+    const { rate: taxRate, displayName: taxName } = useTaxRate();
+    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    const tax = taxDetail.amount;
     const total = subtotal + shipping + tax - discount;
 
     // Load Razorpay Script
