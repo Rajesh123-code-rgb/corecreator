@@ -17,7 +17,10 @@ import {
     Mail,
     Phone,
     Loader2,
-    ShieldCheck
+    ShieldCheck,
+    Minus,
+    Plus,
+    Trash2
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useTaxRate } from "@/hooks/useTaxRate";
@@ -30,7 +33,7 @@ const CHECKOUT_DRAFT_KEY = "checkout-draft";
 export default function CheckoutPage() {
     const router = useRouter();
     const { data: session, status } = useSession();
-    const { items, isHydrated, subtotal, clearCart, discount, promoCode, shippingTotal } = useCart();
+    const { items, isHydrated, subtotal, clearCart, discount, promoCode, shippingTotal, updateQuantity, removeItem } = useCart();
     const { formatPrice } = useCurrency();
     const toast = useToast();
     const [currentStep, setCurrentStep] = React.useState(0);
@@ -110,9 +113,23 @@ export default function CheckoutPage() {
         setAddress({ ...address, [e.target.name]: e.target.value });
     };
 
+    // Removing the last item at the review step would otherwise leave the
+    // shopper on a checkout page with nothing to buy.
+    const handleRemoveItem = (id: string, name: string) => {
+        const wasLast = items.length === 1;
+        removeItem(id);
+        if (wasLast) {
+            // An existing effect already routes an empty cart back to /cart;
+            // this just explains why it happened.
+            toast.info("Your cart is empty", "Add something to it to check out.");
+            return;
+        }
+        toast.success("Removed from your order", `${name} is no longer in this order.`);
+    };
+
     const handlePayment = async () => {
         if (!window.Razorpay) {
-            toast.error("Razorpay SDK failed to load. Are you online?");
+            toast.error("Payment gateway didn't load", "Check your connection and refresh the page to try again.");
             return;
         }
 
@@ -149,7 +166,7 @@ export default function CheckoutPage() {
                 // redirected already, but a session can expire while the form
                 // is open - say so plainly rather than blaming the payment.
                 if (res.status === 401) {
-                    toast.error("Please sign in to complete your purchase.");
+                    toast.info("Sign in to continue", "Your cart is saved — we'll bring you straight back here.");
                     router.push(`/login?callbackUrl=${encodeURIComponent("/checkout")}`);
                     setIsProcessing(false);
                     return;
@@ -197,7 +214,7 @@ export default function CheckoutPage() {
                         if (guestAccountCreated) params.set("newAccount", "1");
                         router.push(`/checkout/success${params.toString() ? `?${params}` : ""}`);
                     } else {
-                        toast.error("Payment verification failed");
+                        toast.error("We couldn't confirm your payment", "If money left your account, contact support with your payment ID — don't pay again.");
                         setIsProcessing(false);
                     }
                 },
@@ -355,15 +372,65 @@ export default function CheckoutPage() {
                                 {currentStep === 1 && (
                                     <div className="space-y-6">
                                         <h2 className="text-lg font-semibold">Review Order</h2>
+                                        {/* Editable at this step. Previously the review
+                                            list was read-only and the only way to change
+                                            a basket was "Back to Cart", which meant
+                                            re-entering the whole shipping form. */}
                                         <div className="divide-y divide-[var(--border)]">
                                             {items.map((item) => (
-                                                <div key={item.id} className="flex gap-4 py-4">
-                                                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
-                                                    <div className="flex-1">
+                                                <div key={item.id} className="flex gap-3 sm:gap-4 py-4">
+                                                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
+                                                    <div className="flex-1 min-w-0">
                                                         <p className="font-medium text-sm">{item.name}</p>
-                                                        <p className="text-xs text-[var(--muted-foreground)]">Qty: {item.quantity}</p>
+                                                        {item.type === "product" ? (
+                                                            <div className="flex items-center gap-2 mt-2">
+                                                                <div className="flex items-center border border-[var(--border)] rounded-lg">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                                        disabled={isProcessing || item.quantity <= 1}
+                                                                        aria-label={`Reduce quantity of ${item.name}`}
+                                                                        className="p-2 min-w-9 min-h-9 flex items-center justify-center hover:bg-[var(--muted)] disabled:opacity-40 disabled:cursor-not-allowed rounded-l-lg"
+                                                                    >
+                                                                        <Minus className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                    <span className="w-9 text-center text-sm font-medium tabular-nums">{item.quantity}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                                        disabled={isProcessing}
+                                                                        aria-label={`Increase quantity of ${item.name}`}
+                                                                        className="p-2 min-w-9 min-h-9 flex items-center justify-center hover:bg-[var(--muted)] disabled:opacity-40 rounded-r-lg"
+                                                                    >
+                                                                        <Plus className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleRemoveItem(item.id, item.name)}
+                                                                    disabled={isProcessing}
+                                                                    aria-label={`Remove ${item.name} from your order`}
+                                                                    className="p-2 min-w-9 min-h-9 flex items-center justify-center text-[var(--muted-foreground)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-2 mt-2">
+                                                                <span className="text-xs text-[var(--muted-foreground)]">Lifetime access</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleRemoveItem(item.id, item.name)}
+                                                                    disabled={isProcessing}
+                                                                    aria-label={`Remove ${item.name} from your order`}
+                                                                    className="p-2 min-w-9 min-h-9 flex items-center justify-center text-[var(--muted-foreground)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-40"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                                                    <p className="font-medium whitespace-nowrap">{formatPrice(item.price * item.quantity)}</p>
                                                 </div>
                                             ))}
                                         </div>

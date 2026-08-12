@@ -7,6 +7,83 @@ left alone.
 
 ---
 
+## Phase 10 — Checkout control, mobile cart, and feedback
+
+### Mobile cart access (reported by the site owner)
+
+The cart link sat inside the header's `hidden lg:flex` actions container, so
+below 1024px the whole container was `display: none`. The link still existed and
+its badge still counted items — on an element measuring 0×0. The mobile menu had
+no cart entry either, so **on a phone there was no route to the cart at all**: a
+shopper could add items and never reach checkout.
+
+A cart button now renders below `lg` beside the hamburger, at a 44×44 target
+with the item count, and the mobile menu carries a Cart row showing how many
+items are waiting. The audit missed this because it reached `/cart` by URL
+rather than by tapping — a reminder that navigating by address bar is not
+testing navigation.
+
+### GST sourced from configuration, at 18%
+
+The rate was a magic number in four files: 8% in the cart, checkout and
+`create-order`, and 18% on workshop checkout under a comment reading
+`// 18% GST example`. **8% matches no Indian GST band** — they are 0/5/12/18/28 —
+so customers were billed an amount reconcilable to no real rate, and products
+and workshops disagreed with each other. A configurable `TaxRate` model with
+admin endpoints already existed and was never consulted by the purchase path.
+
+Now `src/lib/tax.ts` holds dependency-free helpers safe for client import,
+`tax.server.ts` resolves the active rate from `TaxRate` defaulting to 18%, and
+`/api/tax-rate` exposes it so the cart and checkout display the figure the
+server will actually charge rather than guessing. Labels read "GST (18%)".
+Changing the rate is now an admin edit, not a code change in four places.
+
+*Worth confirming with an accountant:* handmade goods often fall under the 5% or
+12% band rather than the 18% standard.
+
+### The cart is editable at checkout
+
+The review step listed items read-only. The only way to change a basket was
+"Back to Cart", which meant re-entering the shipping form. Each line now carries
+a quantity stepper and a remove control, wired to the `updateQuantity` and
+`removeItem` already on the cart context. Removing the last item explains why
+the page returns to the cart rather than silently bouncing.
+
+### Feedback on every press
+
+Three separate causes, all fixed:
+
+- **`outline`, `ghost` and `link` had no pressed state** — the three most-used
+  variants gave no response at all. All eight variants now respond.
+- **About 45% of clickable elements are raw `<button>`**, not the design-system
+  component — icon buttons, steppers, tabs, chips. A single rule in
+  `globals.css` gives them the same quick acknowledgement without touching 329
+  call sites, with a `prefers-reduced-motion` fallback that swaps the transform
+  for an opacity shift.
+- **Hover-scale fired on tap and stuck**, because touch devices have no hover to
+  leave. It is now confined to `@media (hover: hover)`.
+
+### Messages that say something
+
+`toast.error` was used 87 times against 12 for `success`; `warning` and `info`
+existed and were used **zero** times. Non-errors arrived as red error toasts and
+most successes were silent.
+
+The most visible gap: **adding to the cart showed no confirmation at all** — the
+only signal was the badge, which on mobile was the invisible one described
+above. Add to Cart now confirms in place ("Added to your cart") and raises a
+toast naming the item. Because the action is synchronous, a spinner would only
+flash; a brief confirmed state is the honest pattern.
+
+Also: promo codes confirm what was saved, removing an item says what left,
+clearing the cart says so, and sign-in prompts moved from the error channel to
+`info` with the reassurance that the cart is saved. The payment-verification
+failure now tells the customer not to pay twice.
+
+Registration already had a proper success screen and was left alone.
+
+---
+
 ## Phase 9 — Go-live readiness
 
 Everything outstanding before launch except the Razorpay live keys, which stay

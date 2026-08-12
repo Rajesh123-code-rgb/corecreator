@@ -126,7 +126,7 @@ export default function WorkshopCheckoutPage() {
 
             if (!res.ok) {
                 if (res.status === 401) {
-                    toast.error("Please sign in to complete your booking.");
+                    toast.info("Sign in to continue", "Your seat selection is saved — we'll bring you straight back.");
                     router.push(`/login?callbackUrl=${encodeURIComponent(checkoutPath)}`);
                     setIsProcessing(false);
                     return;
