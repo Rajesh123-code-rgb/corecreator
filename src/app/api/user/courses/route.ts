@@ -19,9 +19,13 @@ export async function GET(request: NextRequest) {
         const userId = new mongoose.Types.ObjectId(session.user.id);
 
         // 1. Find all paid orders for this user
+        // paymentStatus, not status. `status` tracks fulfilment
+        // (pending -> confirmed -> shipped -> delivered) and can never hold
+        // "paid", so this query returned nothing and a paying customer saw an
+        // empty course library.
         const orders = await Order.find({
             user: userId,
-            status: "paid",
+            paymentStatus: "paid",
         }).lean();
 
         // 2. Extract course IDs from orders

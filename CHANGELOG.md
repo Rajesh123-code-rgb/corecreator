@@ -7,6 +7,57 @@ left alone.
 
 ---
 
+## Phase 11 — Purchases not appearing after payment (live-mode bug)
+
+Reported immediately after the switch to live Razorpay keys: payments complete
+and the order shows in the customer's account, but the purchased course never
+appears in their library.
+
+**Cause: the wrong field.** `/api/user/courses` queried
+`Order.find({ user, status: "paid" })`. `status` is the fulfilment lifecycle —
+`pending | confirmed | processing | shipped | delivered | cancelled | refunded` —
+and **cannot hold "paid"**; that value belongs to `paymentStatus`. `verify()`
+sets `paymentStatus = "paid"` and `status = "confirmed"`, so the query matched
+nothing and every paying customer saw an empty course library.
+
+The same mistake appeared in three more places, all silently reporting zero:
+
+| Endpoint | Effect |
+|---|---|
+| `api/user/courses` | customers could not see courses they had paid for |
+| `api/studio/analytics` | creator analytics always empty |
+| `api/studio/stats` | creator earnings understated |
+| `api/admin/stats` | platform revenue reported as zero |
+
+All four now use `paymentStatus`. Endpoints that already used it were correct
+and are unchanged — which is why orders appeared while courses did not.
+
+*Physical artwork was never missing:* products have no separate library and are
+listed under Orders, which renders line items correctly.
+
+### Course access control
+
+Checking the rest of the chain surfaced the opposite problem: nothing verified a
+purchase before serving lesson content.
+
+`/api/courses/[slug]` returned the entire course document to any caller, so
+every lesson's `videoUrl` was public regardless of price, and
+`/learn/[slug]/player` was neither in the middleware matcher nor gated on
+ownership — `session` was used only to save progress.
+
+Actual exposure today is limited: the one published course has both lessons
+marked free and hosted on YouTube, so nothing paid was leaking. It would have
+become a straightforward revenue leak the moment a creator published paid video.
+
+Now: `src/lib/courseAccess.ts` holds `hasPurchasedCourse()` — the single place
+ownership is decided, failing closed on error — and `stripPaidLessonContent()`,
+which removes media from non-free lessons while keeping the outline visible so
+the sales page still shows what is included. The API returns `hasAccess`, the
+player redirects non-purchasers to the course page with an explanation, and the
+player route now requires a session.
+
+---
+
 ## Phase 10 — Checkout control, mobile cart, and feedback
 
 ### Mobile cart access (reported by the site owner)

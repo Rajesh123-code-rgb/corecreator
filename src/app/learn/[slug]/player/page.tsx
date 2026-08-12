@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/atoms";
 import { CertificateDownloadButton } from "@/components/molecules/CertificateDownloadButton";
 import { VideoPlayer } from "@/components/molecules/VideoPlayer";
+import { useToast } from "@/components/molecules";
 import {
     ChevronLeft,
     ChevronRight,
@@ -63,6 +64,7 @@ interface Progress {
 
 export default function CoursePlayerPage() {
     const { data: session } = useSession();
+    const toast = useToast();
     const params = useParams();
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -83,6 +85,15 @@ export default function CoursePlayerPage() {
                 const res = await fetch(`/api/courses/${slug}`);
                 if (!res.ok) throw new Error("Course not found");
                 const data = await res.json();
+
+                // The API withholds paid lesson media from anyone who has not
+                // bought the course, so the player would otherwise render an
+                // outline with nothing to play. Say why and send them back.
+                if (data.hasAccess === false) {
+                    toast.info("Enrol to watch this course", "You'll get every lesson as soon as you do.");
+                    router.replace(`/learn/${slug}`);
+                    return;
+                }
                 setCourse(data.course);
             } catch (error) {
                 console.error(error);

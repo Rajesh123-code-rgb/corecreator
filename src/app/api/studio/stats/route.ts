@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
         const recentOrders = await Order.find({
             "items.product": { $in: myProductIds },
-            status: "paid"
+            paymentStatus: "paid"
         })
             .sort({ createdAt: -1 })
             .limit(5)
