@@ -73,7 +73,10 @@ export default function CoursePlayerPage() {
 
     const [course, setCourse] = React.useState<Course | null>(null);
     const [loading, setLoading] = React.useState(true);
-    const [sidebarOpen, setSidebarOpen] = React.useState(true);
+    // Closed by default: below lg the panel overlays the video, so starting
+    // open meant every student landed on the lesson list instead of the lesson.
+    // On lg and up the panel is always visible and this flag is ignored.
+    const [sidebarOpen, setSidebarOpen] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState<"content" | "resources" | "discussion">("content");
     const [userProgress, setUserProgress] = React.useState<Record<string, Progress>>({});
     const [currentLesson, setCurrentLesson] = React.useState<Lesson | null>(null);
@@ -204,7 +207,7 @@ export default function CoursePlayerPage() {
                         Back to Course
                     </Link>
                     <div className="hidden md:block h-6 w-px bg-gray-700" />
-                    <h1 className="hidden md:block text-sm font-medium truncate max-w-[300px]">{course.title}</h1>
+                    <h1 className="text-sm font-medium truncate max-w-[140px] sm:max-w-[260px] lg:max-w-[400px]">{course.title}</h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="hidden sm:flex items-center gap-2 text-sm">
@@ -213,15 +216,20 @@ export default function CoursePlayerPage() {
                         </div>
                         <span className="text-gray-400">{Math.round(progressPercent)}% complete</span>
                     </div>
-                    <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-700 rounded-lg lg:hidden">
+                    <button
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="p-2 min-w-11 min-h-11 flex items-center justify-center hover:bg-gray-700 rounded-lg lg:hidden"
+                        aria-label={sidebarOpen ? "Close course content" : "Open course content"}
+                        aria-expanded={sidebarOpen}
+                    >
                         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                     </button>
                 </div>
             </header>
 
-            <div className="flex h-[calc(100vh-56px)]">
+            <div className="flex h-[calc(100dvh-56px)]">
                 {/* Video Player Area */}
-                <main className={`flex-1 flex flex-col ${sidebarOpen ? "lg:mr-80" : ""}`}>
+                <main className="flex-1 flex flex-col min-w-0 lg:mr-80">
                     {/* Video */}
                     <div className="aspect-video bg-black">
                         {currentLesson?.content?.videoUrl ? (
@@ -241,36 +249,42 @@ export default function CoursePlayerPage() {
                     </div>
 
                     {/* Lesson Info */}
-                    <div className="flex-1 overflow-auto p-6">
+                    <div className="flex-1 overflow-auto p-4 sm:p-6">
                         <div className="max-w-4xl">
                             {/* Navigation */}
-                            <div className="flex items-center justify-between mb-4">
+                            {/* Mark Complete takes its own full-width row on a
+                                phone: the three together needed ~420px of
+                                min-content and a flex item will not shrink
+                                below that. */}
+                            <div className="flex flex-wrap items-center gap-3 mb-4">
                                 <Button
                                     variant="outline"
-                                    className="text-gray-400 border-gray-700 hover:bg-gray-800"
+                                    className="order-1 flex-1 sm:flex-none text-gray-400 border-gray-700 hover:bg-gray-800"
                                     onClick={() => prevLesson && handleLessonChange(prevLesson._id!)}
                                     disabled={!prevLesson}
                                 >
-                                    <ChevronLeft className="w-4 h-4 mr-2" /> Previous
+                                    <ChevronLeft className="w-4 h-4 sm:mr-2" />
+                                    <span className="hidden sm:inline">Previous</span>
+                                    <span className="sm:hidden">Prev</span>
                                 </Button>
                                 <Button
-                                    className="bg-purple-600 hover:bg-purple-700"
+                                    className="order-3 sm:order-2 w-full sm:w-auto sm:flex-1 bg-purple-600 hover:bg-purple-700"
                                     onClick={handleLessonComplete}
                                 >
                                     <CheckCircle className="w-4 h-4 mr-2" /> Mark Complete
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="text-gray-400 border-gray-700 hover:bg-gray-800"
+                                    className="order-2 sm:order-3 flex-1 sm:flex-none text-gray-400 border-gray-700 hover:bg-gray-800"
                                     onClick={() => nextLesson && handleLessonChange(nextLesson._id!)}
                                     disabled={!nextLesson}
                                 >
-                                    Next <ChevronRight className="w-4 h-4 ml-2" />
+                                    Next <ChevronRight className="w-4 h-4 sm:ml-2" />
                                 </Button>
                             </div>
 
                             {/* Info Block */}
-                            <div className="mt-8 p-6 bg-gray-800 rounded-xl border border-gray-700">
+                            <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gray-800 rounded-xl border border-gray-700">
                                 <h3 className="text-lg font-bold mb-4">Course Progress</h3>
                                 <div className="space-y-4">
                                     <div className="flex justify-between text-sm mb-1">
@@ -354,9 +368,22 @@ export default function CoursePlayerPage() {
                     </div>
                 </main>
 
+                {/* Dismiss layer for the mobile overlay. Rendered as a sibling
+                    of the panel, not inside it, so it covers the page rather
+                    than the panel's own box. */}
+                {sidebarOpen && (
+                    <div
+                        className="lg:hidden fixed inset-x-0 top-14 bottom-0 z-30 bg-black/60"
+                        onClick={() => setSidebarOpen(false)}
+                        aria-hidden="true"
+                    />
+                )}
+
                 {/* Course Sidebar */}
-                <aside className={`fixed right-0 top-14 h-[calc(100vh-56px)] w-80 bg-gray-800 border-l border-gray-700 overflow-auto transform transition-transform ${sidebarOpen ? "translate-x-0" : "translate-x-full"
-                    } lg:translate-x-0`}>
+                <aside
+                    className={`fixed right-0 top-14 h-[calc(100dvh-56px)] w-[85vw] max-w-sm lg:w-80 bg-gray-800 border-l border-gray-700 overflow-auto transform transition-transform duration-200 z-40 ${sidebarOpen ? "translate-x-0" : "translate-x-full"} lg:translate-x-0`}
+                    aria-label="Course content"
+                >
                     <div className="p-4 border-b border-gray-700">
                         <h2 className="font-semibold">Course Content</h2>
                         <p className="text-sm text-gray-400">{completedCount}/{allLessons.length} lessons completed</p>

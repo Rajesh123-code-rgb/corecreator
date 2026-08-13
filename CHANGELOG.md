@@ -7,6 +7,53 @@ left alone.
 
 ---
 
+## Phase 12 — Course player on small screens, and order history
+
+### The player opened onto the wrong thing
+
+`sidebarOpen` defaulted to `true`. Below `lg` the course-content panel is a
+fixed overlay, so every student who opened a lesson landed on the lesson **list**
+covering the video, with no backdrop to tap away. It now starts closed, has a
+dismiss layer, and is 85vw rather than a fixed 320px so it fits a 320px phone.
+
+A second bug ran the other way on desktop: the panel is permanently visible at
+`lg` (`lg:translate-x-0`), but the main column only got its `lg:mr-80` offset
+**while `sidebarOpen` was true**. Toggling it slid the video underneath the
+panel. The offset is now unconditional at `lg`, where the panel always is.
+
+Other fixes:
+
+- **`100vh` → `100dvh`.** On mobile browsers `100vh` includes the retracting URL
+  bar, so the bottom of the player sat below the fold.
+- **The lesson controls could not fit.** Previous / Mark Complete / Next needed
+  roughly 420px of min-content in a `justify-between` row. Mark Complete now
+  takes its own full-width row below the two arrows on small screens.
+- The course title was hidden below `md`, leaving the header nearly empty on a
+  phone; it now truncates instead.
+- Padding tightened on small screens, and the panel toggle gained a 44px target
+  with `aria-expanded`.
+
+### Order history
+
+**The order detail page already existed** — tracking timeline, shipping address,
+tax breakdown, its own API route — and **nothing linked to it.** The feature was
+complete and unreachable, which is why orders looked like a dead end. Every
+order now links through to it.
+
+The list itself was thin: one status badge conflated payment with fulfilment, so
+a paid order still awaiting dispatch read simply as "Confirmed". Payment state
+and fulfilment state are now separate chips, the order number is monospaced and
+wraps on a phone, totals use tabular figures, and dates go through the
+timezone-pinned formatter added in Phase 7 rather than raw `toLocaleDateString`.
+
+**Invoices.** A new `InvoiceDownloadButton` renders a plain printable invoice —
+billed-to details, line items with quantity and rate, subtotal, discount,
+shipping, GST and total — on both the list and the detail page, for paid orders
+only. jsPDF is imported on click, the same treatment the certificate download
+already used, so it stays out of the shared bundle.
+
+---
+
 ## Phase 11 — Purchases not appearing after payment (live-mode bug)
 
 Reported immediately after the switch to live Razorpay keys: payments complete
