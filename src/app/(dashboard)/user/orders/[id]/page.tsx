@@ -16,6 +16,8 @@ import {
     Check,
 } from "lucide-react";
 import { Button } from "@/components/atoms";
+import { InvoiceDownloadButton } from "@/components/molecules/InvoiceDownloadButton";
+import { formatDate } from "@/lib/formatDate";
 import { Card, CardContent } from "@/components/molecules";
 import { useCurrency } from "@/context/CurrencyContext";
 
@@ -41,6 +43,8 @@ interface Order {
     subtotal: number;
     tax: number;
     discount: number;
+    shipping?: number;
+    paymentMethod?: string;
     status: string;
     paymentStatus: string;
     items: OrderItem[];
@@ -143,19 +147,14 @@ export default function OrderDetailPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                     <Link href="/user/orders" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-2">
                         <ChevronLeft className="w-4 h-4" /> Back to Orders
                     </Link>
-                    <h1 className="text-2xl font-bold">Order {order.orderNumber}</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold break-all">Order {order.orderNumber}</h1>
                     <p className="text-gray-500">
-                        Placed on {new Date(order.createdAt).toLocaleDateString("en-US", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                        })}
+                        Placed on {formatDate(order.createdAt, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
                     </p>
                 </div>
                 <div>
@@ -166,6 +165,23 @@ export default function OrderDetailPage() {
                         }`}>
                         {STATUS_LABELS[order.status] || order.status}
                     </span>
+                    {order.paymentStatus === "paid" && (
+                        <InvoiceDownloadButton
+                            order={{
+                                orderNumber: order.orderNumber,
+                                createdAt: order.createdAt,
+                                items: order.items,
+                                subtotal: order.subtotal,
+                                tax: order.tax,
+                                shipping: order.shipping,
+                                discount: order.discount,
+                                total: order.total,
+                                paymentMethod: order.paymentMethod,
+                                shippingAddress: order.shippingAddress,
+                            }}
+                            label="Download invoice"
+                        />
+                    )}
                 </div>
             </div>
 
