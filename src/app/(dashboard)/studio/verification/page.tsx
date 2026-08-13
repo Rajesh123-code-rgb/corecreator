@@ -333,6 +333,8 @@ export default function StudioVerificationPage() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-gray-700">Full Name</label>
                                             <Input
+                                                name="legalName"
+                                                autoComplete="name"
                                                 value={personalData.name}
                                                 onChange={(e) => setPersonalData({ ...personalData, name: e.target.value })}
                                                 placeholder="Legal Name"
@@ -342,6 +344,9 @@ export default function StudioVerificationPage() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-gray-700">Mobile Number</label>
                                             <Input
+                                                name="phone"
+                                                type="tel"
+                                                autoComplete="tel"
                                                 value={personalData.phone}
                                                 onChange={(e) => setPersonalData({ ...personalData, phone: e.target.value })}
                                                 placeholder="+91 98765 43210"
@@ -351,6 +356,9 @@ export default function StudioVerificationPage() {
                                         <div className="space-y-2 md:col-span-2">
                                             <label className="text-sm font-medium text-gray-700">Email Address</label>
                                             <Input
+                                                name="email"
+                                                type="email"
+                                                autoComplete="email"
                                                 value={personalData.email}
                                                 disabled
                                                 className="bg-gray-50"
@@ -372,6 +380,8 @@ export default function StudioVerificationPage() {
                                             <Input
                                                 value={personalData.street}
                                                 onChange={(e) => setPersonalData({ ...personalData, street: e.target.value })}
+                                                name="addressLine1"
+                                                autoComplete="address-line1"
                                                 placeholder="123 Studio Lane"
                                                 required
                                             />
@@ -381,6 +391,8 @@ export default function StudioVerificationPage() {
                                             <Input
                                                 value={personalData.city}
                                                 onChange={(e) => setPersonalData({ ...personalData, city: e.target.value })}
+                                                name="city"
+                                                autoComplete="address-level2"
                                                 placeholder="Mumbai"
                                                 required
                                             />
@@ -390,6 +402,8 @@ export default function StudioVerificationPage() {
                                             <Input
                                                 value={personalData.state}
                                                 onChange={(e) => setPersonalData({ ...personalData, state: e.target.value })}
+                                                name="state"
+                                                autoComplete="address-level1"
                                                 placeholder="Maharashtra"
                                                 required
                                             />
@@ -399,6 +413,9 @@ export default function StudioVerificationPage() {
                                             <Input
                                                 value={personalData.zipCode}
                                                 onChange={(e) => setPersonalData({ ...personalData, zipCode: e.target.value })}
+                                                name="postalCode"
+                                                autoComplete="postal-code"
+                                                inputMode="numeric"
                                                 placeholder="400001"
                                                 required
                                             />
@@ -408,6 +425,8 @@ export default function StudioVerificationPage() {
                                             <Input
                                                 value={personalData.country}
                                                 onChange={(e) => setPersonalData({ ...personalData, country: e.target.value })}
+                                                name="country"
+                                                autoComplete="country-name"
                                                 placeholder="India"
                                                 required
                                             />
@@ -486,6 +505,24 @@ export default function StudioVerificationPage() {
                                     </div>
                                 </div>
 
+
+                                {/* The button is disabled until both documents are
+                                    attached. Saying so beats leaving a creator to
+                                    conclude the button is broken. */}
+                                {(!idProof || !addressProof) && (
+                                    <p className="text-sm text-[var(--muted-foreground)] flex items-start gap-2 mb-3">
+                                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
+                                        <span>
+                                            Attach your{" "}
+                                            {!idProof && !addressProof
+                                                ? "ID proof and address proof"
+                                                : !idProof
+                                                    ? "ID proof"
+                                                    : "address proof"}{" "}
+                                            to submit. Images or PDF, up to 5&nbsp;MB each.
+                                        </span>
+                                    </p>
+                                )}
 
                                 <Button
                                     type="submit"

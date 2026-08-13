@@ -80,6 +80,8 @@ export default function StudioLoginPage() {
                             </label>
                             <Input
                                 type="email"
+                                name="email"
+                                autoComplete="email"
                                 required
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -94,6 +96,8 @@ export default function StudioLoginPage() {
                             </label>
                             <Input
                                 type="password"
+                                name="password"
+                                autoComplete="current-password"
                                 required
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
