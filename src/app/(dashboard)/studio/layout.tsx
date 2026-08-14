@@ -61,7 +61,12 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
         <div className="min-h-screen bg-[var(--muted)]">
             {/* Mobile Header */}
             <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-white border-b border-[var(--border)] flex items-center justify-between px-4">
-                <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-[var(--muted)]">
+                <button
+                    onClick={() => setSidebarOpen(true)}
+                    className="p-2 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-[var(--muted)]"
+                    aria-label="Open studio menu"
+                    aria-expanded={sidebarOpen}
+                >
                     <Menu className="w-6 h-6" />
                 </button>
                 <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-8 w-auto" />
@@ -73,20 +78,30 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
             {sidebarOpen && <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)} />}
 
             {/* Sidebar */}
+            {/* Column layout with a scrolling nav. Previously the aside was a
+                plain block with no overflow and "Back to Home" pinned with
+                absolute bottom-4: the item list simply ran past the bottom of
+                the screen with no way to scroll to it, and the pinned link sat
+                on top of whatever it reached. Thirteen items happened to fit;
+                fifteen did not. */}
             <aside className={cn(
-                "fixed top-0 left-0 z-50 h-full w-64 bg-gradient-to-b from-amber-900 to-amber-950 text-white transform transition-transform lg:translate-x-0",
+                "fixed top-0 left-0 z-50 h-dvh w-64 bg-gradient-to-b from-amber-900 to-amber-950 text-white transform transition-transform lg:translate-x-0 flex flex-col",
                 sidebarOpen ? "translate-x-0" : "-translate-x-full"
             )}>
-                <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
+                <div className="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-white/10">
                     <Link href="/">
                         <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-8 w-auto brightness-0 invert" />
                     </Link>
-                    <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 rounded-lg hover:bg-white/10">
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden p-2 min-w-11 min-h-11 flex items-center justify-center rounded-lg hover:bg-white/10"
+                        aria-label="Close studio menu"
+                    >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div className="p-4 border-b border-white/10">
+                <div className="flex-shrink-0 p-4 border-b border-white/10">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full gradient-gold flex items-center justify-center text-white font-medium">
                             <Palette className="w-5 h-5" />
@@ -98,7 +113,7 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
                     </div>
                 </div>
 
-                <nav className="p-4 space-y-1">
+                <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-1">
                     {creatorNavItems.map((item) => {
                         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                         return (
@@ -118,7 +133,10 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
                     })}
                 </nav>
 
-                <div className="absolute bottom-4 left-4 right-4">
+                {/* A normal flex child at the end of the column, not absolutely
+                    positioned - so it sits below the list instead of on top of
+                    it however many items there are. */}
+                <div className="flex-shrink-0 p-4 border-t border-white/10">
                     <Link href="/" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-white/60 hover:bg-white/10 transition-colors">
                         <ChevronLeft className="w-4 h-4" />
                         Back to Home
