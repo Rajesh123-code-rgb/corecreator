@@ -7,6 +7,59 @@ left alone.
 
 ---
 
+## Phase 13 — Studio dashboard audit and fixes
+
+An end-to-end pass over the creator dashboard with a demo studio account: all 20
+routes, desktop and mobile.
+
+**What was already sound.** Every route returned 200 with **zero JavaScript
+errors** and a proper empty state. No horizontal overflow at 390px on any of
+them, and none on desktop. The mobile navigation works properly — the drawer
+opens with a backdrop and dismisses on tap-away. Listing is correctly gated:
+`/studio/products/new`, `/courses/new` and `/workshops/new` all redirect an
+unverified creator to `/studio/verification`.
+
+*That last point corrects an earlier audit finding.* Phase 9's report flagged
+"anyone can self-register as a seller instantly" as a risk. The role is granted
+instantly, but it unlocks nothing — creation is gated behind verification. The
+original finding tested that the role was assigned, not what it permitted.
+
+### Three pages nobody could reach
+
+`/studio/reviews`, `/studio/messages` and `/studio/notifications` are fully
+built and had **zero links anywhere in the codebase** — the same pattern as the
+order detail page in Phase 12. All three are now in the studio navigation.
+
+### Two h1 elements on every studio page
+
+The dashboard layout rendered the current section label as an `<h1>`, and each
+page renders its own — so every studio page had two. The layout's label is page
+context, not a heading, and is now a `<p>`. This also removes the generic
+"Creator Studio" that appeared as the page heading on any route missing from the
+navigation array.
+
+### Autofill on the forms that need it most
+
+No input on any auth or verification form carried `name` or `autocomplete`, so
+browsers and password managers could not fill them. Creators were typing their
+legal name, phone and full address by hand into the longest form in the product.
+Added across studio login, the main login and register, forgot-password, and all
+eight verification fields — which also settles the WCAG 2.2 SC 1.3.5 (Identify
+Input Purpose) failure recorded in the audit.
+
+### The submit button that looked broken
+
+"Submit for Verification" is disabled until both identity documents are
+attached, which is right — but nothing said so, and on a long form the obvious
+reading is that the button does not work. It now names exactly which document is
+missing.
+
+*Checked and found not to be a bug:* the disabled state itself. An automated
+pass reported "no feedback on empty submit", but the button is deliberately
+disabled rather than silently failing.
+
+---
+
 ## Phase 12 — Course player on small screens, and order history
 
 ### The player opened onto the wrong thing

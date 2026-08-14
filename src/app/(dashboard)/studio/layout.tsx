@@ -15,6 +15,8 @@ import {
     Users,
     Settings,
     Bell,
+    Star,
+    MessageSquare,
     Menu,
     X,
     ChevronLeft,
@@ -43,6 +45,8 @@ const creatorNavItems = [
     { label: "Analytics", href: "/studio/analytics", icon: BarChart3 },
     { label: "Earnings", href: "/studio/earnings", icon: DollarSign },
     { label: "Students & Buyers", href: "/studio/audience", icon: Users },
+    { label: "Reviews", href: "/studio/reviews", icon: Star },
+    { label: "Messages", href: "/studio/messages", icon: MessageSquare },
     { label: "Verification", href: "/studio/verification", icon: Shield },
     { label: "Support", href: "/studio/support", icon: Headphones },
     { label: "Settings", href: "/studio/settings", icon: Settings },
@@ -124,9 +128,12 @@ export default function CreatorDashboardLayout({ children }: DashboardLayoutProp
 
             <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
                 <header className="hidden lg:flex items-center justify-between h-16 px-8 bg-white border-b border-[var(--border)]">
-                    <h1 className="text-lg font-semibold">
+                    {/* Context label, not a heading: each page renders its own
+                        h1, and two h1s per page is neither valid structure nor
+                        useful to a screen reader. */}
+                    <p className="text-lg font-semibold">
                         {creatorNavItems.find((item) => pathname.startsWith(item.href))?.label || "Creator Studio"}
-                    </h1>
+                    </p>
                     <div className="flex items-center gap-3">
                         <div className="hidden md:block">
                             <CurrencySwitcher variant="minimal" className="bg-white border-gray-200 text-gray-700 hover:bg-gray-50" />

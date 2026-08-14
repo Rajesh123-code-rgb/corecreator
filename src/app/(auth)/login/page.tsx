@@ -68,9 +68,9 @@ function LoginContent() {
                     <SSOButtons callbackUrl={callbackUrl} dividerLabel="Or sign in with email" dividerPlacement="after" />
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <Input label="Email" type="email" placeholder="Enter your email" leftIcon={<Mail className="w-5 h-5" />} error={errors.email?.message} {...register("email")} />
+                        <Input label="Email" type="email" autoComplete="email" placeholder="Enter your email" leftIcon={<Mail className="w-5 h-5" />} error={errors.email?.message} {...register("email")} />
                         <div className="relative">
-                            <Input label="Password" type={showPassword ? "text" : "password"} placeholder="Enter your password" leftIcon={<Lock className="w-5 h-5" />} error={errors.password?.message} {...register("password")} />
+                            <Input label="Password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="Enter your password" leftIcon={<Lock className="w-5 h-5" />} error={errors.password?.message} {...register("password")} />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-9 text-[var(--muted-foreground)]">
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>

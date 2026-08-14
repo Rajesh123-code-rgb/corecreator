@@ -105,15 +105,15 @@ function RegisterContent() {
                     <SSOButtons callbackUrl={searchParams.get("callbackUrl") || "/user/dashboard"} dividerLabel="Or sign up with email" dividerPlacement="after" />
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <Input label="Full Name" placeholder="Your name" leftIcon={<User className="w-5 h-5" />} error={errors.name?.message} {...register("name")} />
-                        <Input label="Email" type="email" placeholder="your@email.com" leftIcon={<Mail className="w-5 h-5" />} error={errors.email?.message} {...register("email")} />
+                        <Input label="Full Name" autoComplete="name" placeholder="Your name" leftIcon={<User className="w-5 h-5" />} error={errors.name?.message} {...register("name")} />
+                        <Input label="Email" type="email" autoComplete="email" placeholder="your@email.com" leftIcon={<Mail className="w-5 h-5" />} error={errors.email?.message} {...register("email")} />
                         <div className="relative">
-                            <Input label="Password" type={showPassword ? "text" : "password"} placeholder="Min 8 chars, 1 uppercase, 1 number" leftIcon={<Lock className="w-5 h-5" />} error={errors.password?.message} {...register("password")} />
+                            <Input label="Password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Min 8 chars, 1 uppercase, 1 number" leftIcon={<Lock className="w-5 h-5" />} error={errors.password?.message} {...register("password")} />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-9 text-[var(--muted-foreground)]">
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
                         </div>
-                        <Input label="Confirm Password" type={showPassword ? "text" : "password"} placeholder="Repeat password" leftIcon={<Lock className="w-5 h-5" />} error={errors.confirmPassword?.message} {...register("confirmPassword")} />
+                        <Input label="Confirm Password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Repeat password" leftIcon={<Lock className="w-5 h-5" />} error={errors.confirmPassword?.message} {...register("confirmPassword")} />
 
                         <div className="flex items-start gap-2">
                             <input type="checkbox" id="terms" className="mt-1 w-4 h-4 rounded" {...register("acceptTerms")} />
