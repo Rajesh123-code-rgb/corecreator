@@ -55,6 +55,7 @@ const navigation = [
     { name: "Promo Codes", href: "/admin/promo-codes", icon: Tag, permission: PERMISSIONS.MANAGE_MARKETING },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: PERMISSIONS.VIEW_ANALYTICS },
     { name: "Activity Logs", href: "/admin/audit-logs", icon: FileText, permission: PERMISSIONS.MANAGE_SETTINGS },
+    { name: "Email Templates", href: "/admin/email-templates", icon: Mail, permission: PERMISSIONS.MANAGE_SETTINGS },
     { name: "Settings", href: "/admin/settings", icon: Settings, permission: PERMISSIONS.MANAGE_SETTINGS },
 ];
 

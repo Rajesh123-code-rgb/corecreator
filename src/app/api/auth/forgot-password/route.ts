@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
 import { createResetToken, appUrl } from "@/lib/auth/passwordReset";
-import { sendEmail } from "@/lib/email/brevo";
+import { sendTemplatedEmail } from "@/lib/email/send";
 import { getPasswordResetTemplate } from "@/lib/email/templates";
 
 export async function POST(request: NextRequest) {
@@ -25,16 +25,15 @@ export async function POST(request: NextRequest) {
             await user.save();
 
             const resetUrl = `${appUrl()}/reset-password?token=${rawToken}`;
-            await sendEmail({
+            const isGuestClaim = Boolean(user.createdViaGuestCheckout && !user.password);
+            await sendTemplatedEmail({
+                key: isGuestClaim ? "guest_account_invite" : "password_reset",
                 to: [{ email: user.email, name: user.name }],
-                subject: user.createdViaGuestCheckout && !user.password
+                values: { name: user.name, resetUrl },
+                fallbackSubject: isGuestClaim
                     ? "Set a password for your Core Creator account"
                     : "Reset your Core Creator password",
-                htmlContent: getPasswordResetTemplate(
-                    user.name,
-                    resetUrl,
-                    Boolean(user.createdViaGuestCheckout && !user.password)
-                ),
+                fallbackHtml: getPasswordResetTemplate(user.name, resetUrl, isGuestClaim),
             });
         }
 

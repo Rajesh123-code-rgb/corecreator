@@ -82,10 +82,28 @@ export async function sendWelcomeEmail(userName: string, userEmail: string) {
  * Send Order Confirmation Email
  */
 export async function sendOrderConfirmationEmail(order: any, userName: string, userEmail: string) {
-    return sendEmail({
+    const { sendTemplatedEmail } = await import("@/lib/email/send");
+    const ok = await sendTemplatedEmail({
+        key: "order_confirmation",
         to: [{ name: userName, email: userEmail }],
-        subject: `Order Confirmation #${order.orderNumber}`,
-        htmlContent: getOrderConfirmationTemplate(order, userName),
-        tags: ['order', 'transactional'],
+        values: {
+            userName,
+            orderNumber: order.orderNumber,
+            total: String(order.total ?? ""),
+            itemCount: String(order.items?.length ?? 0),
+        },
+        fallbackSubject: `Order Confirmation #${order.orderNumber}`,
+        fallbackHtml: getOrderConfirmationTemplate(order, userName),
     });
+
+    if (!ok) {
+        // A customer who paid and got no receipt has no idea whether the order
+        // exists. Make that greppable rather than leaving it to be discovered
+        // from a support message.
+        console.error(
+            `❌ ORDER CONFIRMATION NOT SENT for ${order.orderNumber} to ${userEmail}. ` +
+            `Check BREVO_API_KEY and that the sender domain is verified in Brevo.`
+        );
+    }
+    return ok;
 }

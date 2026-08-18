@@ -7,6 +7,81 @@ left alone.
 
 ---
 
+## Phase 15 — GST slabs, email templates, sitemap and CSP
+
+### GST is now a property of the product
+
+Physical goods sit in different bands — many handicrafts are 5% or 12% rather
+than the 18% standard — so the rate belongs to the item, chosen by the seller
+from 5/12/18 on the product form. Courses and workshops are electronically
+supplied services taxed at the standard rate, so those are fixed in code behind
+a named `DIGITAL_SERVICE_GST_RATE` rather than being seller-chosen.
+
+Tax is summed per line, because a basket can legitimately mix slabs — a 5%
+handicraft alongside an 18% course. `taxForItems()` does that once and is used
+by the cart, the checkout and `create-order`, so the figure shown and the figure
+charged cannot drift. The slab is stored on the order line, so a reissued
+invoice matches the original even if the product's rate later changes. Where a
+basket mixes slabs the label reads "GST" rather than naming one rate.
+
+The global `TaxRate` lookup, `/api/tax-rate` and the `useTaxRate` hook were
+removed. A configurable platform-wide rate that nothing reads is precisely the
+trap behind the original bug — admin configuration the purchase path ignored.
+
+### Editable email templates, and a way to prove delivery
+
+The site owner reported completing a real payment and never receiving an order
+confirmation. The code path was not the problem: `verify()` does call
+`sendOrderConfirmationEmail`. What was missing was any way to see whether email
+could send at all, and any signal when it failed.
+
+`/admin/email-templates` now lists the four transactional emails — welcome,
+order confirmation, password reset, guest account invite — with subject and HTML
+editable per template. Editing is placeholder-based (`{{name}}`, `{{orderNumber}}`)
+rather than a code editor, so an email can be reworded without touching a
+template literal in a running send path. Each template shows when it is sent and
+which placeholders it understands, with a live preview rendered from sample
+values.
+
+Two things make this diagnostic rather than cosmetic:
+
+- **Delivery status is shown at the top** — whether `BREVO_API_KEY` is set and
+  which sender address is in use, so "email is not configured" is visible in the
+  dashboard instead of discovered from a customer.
+- **Send yourself a test** delivers the template with sample values. If it
+  arrives, delivery works end to end. The response distinguishes "the API key is
+  missing" from "Brevo rejected the send", because those need different fixes.
+
+Defaults stay in code and a stored row overrides them, so deleting an edit
+reverts to the shipped version — a bad edit is never unrecoverable. Every lookup
+falls back to the default on error: a template problem must not be able to stop
+a receipt going out.
+
+A failed order confirmation now logs loudly and greppably. Previously it was
+swallowed, so a customer who paid and got no receipt left no trace in the logs.
+
+### Creator profiles in the sitemap
+
+`/artists/[id]` pages were never listed, so no creator profile was discoverable.
+Only creators with something published are included; an empty profile is a thin
+page.
+
+### Content-Security-Policy, in Report-Only
+
+The site takes live payments, and a policy that is even slightly wrong silently
+breaks the Razorpay modal — the customer sees a checkout that will not open, and
+we would learn about it from lost revenue. Report-Only sends violation reports
+without blocking, so the policy can be proven against a real checkout before it
+is enforced. The host list covers Razorpay, Cloudinary, Bunny Stream, YouTube,
+Google Analytics and Translate.
+
+`'unsafe-inline'` on `script-src` is required by Next's App Router, which injects
+inline bootstrap scripts without a nonce. It limits what the policy can do, but
+it still constrains which hosts can be reached — the part that matters for
+exfiltration and injected third-party scripts.
+
+---
+
 ## Phase 14 — Studio sidebar could not reach its own menu items
 
 Reported after Phase 13 added Reviews and Messages to the studio navigation.
