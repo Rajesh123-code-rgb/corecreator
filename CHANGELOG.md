@@ -7,6 +7,43 @@ left alone.
 
 ---
 
+## Phase 14 — Studio sidebar could not reach its own menu items
+
+Reported after Phase 13 added Reviews and Messages to the studio navigation.
+
+The `<aside>` was a plain block with **no `overflow-y`**, and "Back to Home" was
+pinned with `absolute bottom-4`. The item list simply ran past the bottom of the
+screen with no way to scroll to it, and the pinned link painted over whatever it
+reached. Thirteen items happened to fit; fifteen did not.
+
+Measured on the live site at 390px wide:
+
+| Usable height | Items unreachable | Overlapped by "Back to Home" |
+|---|---|---|
+| 844px | none | Settings |
+| 750px | Support, Settings | Verification |
+| 700px | Verification, Support, Settings | Messages |
+| 667px | Messages, Verification, Support, Settings | Reviews |
+| 620px | Reviews, Messages, Verification, Support, Settings | Students & Buyers |
+
+Even at a full 844px viewport — before any browser chrome — Settings already sat
+underneath the footer link. On a realistic ~700px phone, three to five menu
+items could not be reached at all.
+
+The aside is now a flex column: header and profile block fixed, the nav
+`flex-1 min-h-0 overflow-y-auto` so it scrolls, and "Back to Home" a normal flex
+child at the end rather than absolutely positioned — so it sits below the list
+however many items exist. `h-full` became `h-dvh` so the column measures the
+visible viewport rather than including the retracting URL bar.
+
+Both drawer toggles also gained 44px targets and accessible names.
+
+*The two Phase 13 additions exposed this; they did not create it.* A sidebar
+that cannot scroll fails as soon as the menu outgrows the screen, and this one
+was one item away from that.
+
+---
+
 ## Phase 13 — Studio dashboard audit and fixes
 
 An end-to-end pass over the creator dashboard with a demo studio account: all 20
