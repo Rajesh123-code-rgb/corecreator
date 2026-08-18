@@ -208,7 +208,7 @@ export default function ProductSettingsManager({
                             {settings.metaTitle || productName || "Product Title"}
                         </p>
                         <p className="text-green-700 text-sm">
-                            corecreator.com › marketplace › product
+                            corecreator.online › marketplace › product
                         </p>
                         <p className="text-sm text-gray-600 line-clamp-2">
                             {settings.metaDescription || "Product description will appear here..."}

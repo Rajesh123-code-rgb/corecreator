@@ -59,7 +59,7 @@ export async function GET() {
     // discovering it from a customer who never got their receipt.
     const delivery = {
         configured: Boolean(process.env.BREVO_API_KEY),
-        senderEmail: process.env.BREVO_SENDER_EMAIL || "(not set — using noreply@corecreator.com)",
+        senderEmail: process.env.BREVO_SENDER_EMAIL || "(not set — using noreply@corecreator.online)",
         senderName: process.env.BREVO_SENDER_NAME || "(not set — using Core Creator)",
     };
 

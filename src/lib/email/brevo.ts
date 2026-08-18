@@ -20,7 +20,7 @@ interface BrevoEmailPayload {
  */
 export async function sendEmail(payload: Omit<BrevoEmailPayload, 'sender'>) {
     const apiKey = process.env.BREVO_API_KEY;
-    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@corecreator.com';
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@corecreator.online';
     const senderName = process.env.BREVO_SENDER_NAME || 'Core Creator';
 
     if (!apiKey) {
