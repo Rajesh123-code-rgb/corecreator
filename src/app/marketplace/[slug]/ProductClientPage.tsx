@@ -190,6 +190,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
             // Include shipping data from product
             shippingPrice: product.shipping?.shippingPrice || 0,
             isFreeShipping: product.shipping?.isFreeShipping || false,
+            taxRate: product.taxRate,
         };
 
         // Add variant info if selected

@@ -9,6 +9,9 @@ export interface IOrderItem {
     price: number;
     quantity: number;
     image?: string;
+    /** GST slab charged on this line, stored so a reissued invoice matches the
+     *  original even if the product's rate later changes. */
+    taxRate?: number;
     // Payout tracking
     payoutStatus?: "pending" | "included" | "paid" | "refunded";
     payoutId?: mongoose.Types.ObjectId;
@@ -102,6 +105,7 @@ const orderItemSchema = new Schema<IOrderItem>({
     price: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
     image: { type: String },
+    taxRate: { type: Number },
     payoutStatus: { type: String, enum: ["pending", "included", "paid", "refunded"], default: "pending" },
     payoutId: { type: Schema.Types.ObjectId, ref: "Payout" }
 });

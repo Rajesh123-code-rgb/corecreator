@@ -44,6 +44,9 @@ export interface IProduct extends Document {
     price: number; // Base price
     compareAtPrice?: number;
     currency: string;
+    /** GST slab for this item: 5, 12 or 18 percent. Handmade goods vary by
+     *  category, so the seller picks the band their product falls under. */
+    taxRate: number;
 
     // Categorization
     category: string;
@@ -170,6 +173,10 @@ const productSchema = new Schema<IProduct>(
         price: { type: Number, required: true, min: 0 },
         compareAtPrice: { type: Number, min: 0 },
         currency: { type: String, enum: ["USD", "INR", "EUR", "GBP"], default: "INR" },
+        // Physical goods sit in different GST slabs - many handicrafts are 5%
+        // or 12% rather than the 18% standard - so the rate belongs to the
+        // product, not the platform. Existing rows default to 18%.
+        taxRate: { type: Number, enum: [5, 12, 18], default: 18 },
 
         category: { type: String, required: true, index: true },
         subcategory: { type: String, index: true },

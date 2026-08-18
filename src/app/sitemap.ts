@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import connectDB from "@/lib/db/mongodb";
 import Product from "@/lib/db/models/Product";
+import { getArtists } from "@/lib/artistSearch";
 import Course from "@/lib/db/models/Course";
 import Workshop from "@/lib/db/models/Workshop";
 import Post from "@/lib/db/models/Post";
@@ -72,13 +73,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ),
     ];
 
-    const [products, courses, workshops, posts] = await Promise.all([
+    const [products, courses, workshops, posts, artists] = await Promise.all([
         Product.find({ status: "active" }).select("slug updatedAt").lean(),
         Course.find({ status: "published" }).select("slug updatedAt").lean(),
         Workshop.find({ status: { $in: ["upcoming", "completed"] } })
             .select("slug updatedAt")
             .lean(),
         Post.find({ status: "published" }).select("slug updatedAt").lean(),
+        // Creator profiles. Only those with something published - an empty
+        // profile is a thin page and should not be submitted for indexing.
+        getArtists({ limit: 500, sort: "courses" }),
     ]);
 
     const productRoutes: MetadataRoute.Sitemap = products.map((p: any) =>
@@ -113,6 +117,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })
     );
 
+    const artistRoutes: MetadataRoute.Sitemap = (artists || []).map((a: any) =>
+        url(`/artists/${a.id}`, {
+            changeFrequency: "weekly",
+            priority: 0.6,
+        })
+    );
+
     return [
         ...staticRoutes,
         ...categoryRoutes,
@@ -120,5 +131,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...courseRoutes,
         ...workshopRoutes,
         ...postRoutes,
+        ...artistRoutes,
     ];
 }

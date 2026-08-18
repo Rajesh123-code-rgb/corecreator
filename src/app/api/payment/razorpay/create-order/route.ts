@@ -11,8 +11,7 @@ import Workshop from "@/lib/db/models/Workshop";
 import ShippingProfile from "@/lib/db/models/ShippingProfile";
 import mongoose from "mongoose";
 import { findOrCreateGuestUser } from "@/lib/auth/guestCheckout";
-import { getTaxRate } from "@/lib/tax.server";
-import { applyTax } from "@/lib/tax";
+import { rateForItem, taxForItems } from "@/lib/tax";
 
 export async function POST(request: NextRequest) {
     try {
@@ -94,6 +93,9 @@ export async function POST(request: NextRequest) {
             price: number;
             sellerId: mongoose.Types.ObjectId | undefined;
             sellerName: string | undefined;
+            /** The GST slab charged on this line, stored so an invoice can be
+             *  reproduced even if the product's rate changes later. */
+            taxRate: number;
         }
 
         // Prices are re-derived from the database. The request body carries a
@@ -114,11 +116,14 @@ export async function POST(request: NextRequest) {
             let sellerId: mongoose.Types.ObjectId | undefined;
             let sellerName: string | undefined;
             let unitPrice = Number(item.price) || 0;
+            // Physical goods carry their own slab; courses and workshops are
+            // electronically supplied services and are always 18%.
+            let itemTaxRate = rateForItem(item.kind, undefined);
 
             try {
                 if (item.kind === "product") {
                     const product = await Product.findById(item.id)
-                        .select("name seller sellerName shipping.weight price variants customizations addOns")
+                        .select("name seller sellerName shipping.weight price variants customizations addOns taxRate")
                         .lean() as any;
                     if (!product) {
                         priceErrors.push(`Product ${item.id} no longer exists`);
@@ -167,6 +172,7 @@ export async function POST(request: NextRequest) {
                             priceErrors.push(`The price of "${product.name || item.id}" has changed. Please review your cart.`);
                         }
                         unitPrice = derived;
+                        itemTaxRate = rateForItem("product", product.taxRate);
                     }
                 } else if (item.kind === "course") {
                     const course = await Course.findById(item.id)
@@ -221,7 +227,8 @@ export async function POST(request: NextRequest) {
                 quantity: item.quantity,
                 price: unitPrice,
                 sellerId: sellerId,
-                sellerName: sellerName
+                sellerName: sellerName,
+                taxRate: itemTaxRate
             };
         }));
 
@@ -316,10 +323,14 @@ export async function POST(request: NextRequest) {
             shipping += sellerShipping;
         }
 
-        // Rate comes from the admin-configured TaxRate, not a constant. 8% was
-        // hardcoded here and matched no Indian GST band.
-        const { rate: taxRate, displayName: taxName } = await getTaxRate(shippingAddress?.country || undefined);
-        const tax = applyTax(subtotal, taxRate, taxName).amount;
+        // GST is summed per line, because a basket can legitimately mix slabs -
+        // a 5% handicraft alongside an 18% course. Rates come from the stored
+        // product, never from the request.
+        const { amount: tax } = taxForItems(
+            orderItems.map((i: any) => ({
+                price: i.price, quantity: i.quantity, itemType: i.itemType, taxRate: i.taxRate,
+            }))
+        );
 
         // Calculate Discount (existing logic...)
         let discount = 0;

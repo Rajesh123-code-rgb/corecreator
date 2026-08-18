@@ -23,8 +23,7 @@ import {
     Trash2
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
-import { useTaxRate } from "@/hooks/useTaxRate";
-import { applyTax } from "@/lib/tax";
+import { taxForItems } from "@/lib/tax";
 
 const steps = ["Shipping", "Review & Pay"];
 
@@ -87,8 +86,9 @@ export default function CheckoutPage() {
     // Use shippingTotal from cart (calculated from product shipping prices)
     // Courses and workshops have 0 shipping
     const shipping = shippingTotal;
-    const { rate: taxRate, displayName: taxName } = useTaxRate();
-    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    const taxDetail = taxForItems(
+        items.map((i) => ({ price: i.price, quantity: i.quantity, itemType: i.type, taxRate: i.taxRate }))
+    );
     const tax = taxDetail.amount;
     const total = subtotal + shipping + tax - discount;
 
