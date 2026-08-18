@@ -36,12 +36,12 @@ export default function UserDocumentationPage() {
                     {/* Section 1 */}
                     <section id="getting-started" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+                            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
                                 <span className="font-bold">1</span>
                             </div>
                             <h2 className="text-2xl font-bold">Getting Started</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 Welcome to Core Creator! As a user, you have access to a global marketplace of unique artworks and a world-class learning platform.
                             </p>
@@ -58,12 +58,12 @@ export default function UserDocumentationPage() {
                     {/* Section 2 */}
                     <section id="shopping" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
+                            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
                                 <ShoppingBag className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Shopping & Orders</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <h3 className="text-[var(--foreground)] font-semibold text-lg mt-0 mb-3">Buying Artwork</h3>
                             <p>
                                 Core Creator hosts thousands of verified artists. When you buy a product:
@@ -86,12 +86,12 @@ export default function UserDocumentationPage() {
                     {/* Section 3 */}
                     <section id="learning" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
+                            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
                                 <BookOpen className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Learning Platform</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 Access your courses anytime, anywhere.
                             </p>
@@ -113,12 +113,12 @@ export default function UserDocumentationPage() {
                     {/* Section 4 */}
                     <section id="account" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">
+                            <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600">
                                 <Shield className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Account Security</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 Your security is our top priority. We recommend:
                             </p>
@@ -127,7 +127,7 @@ export default function UserDocumentationPage() {
                                 <li>Use a strong, unique password.</li>
                                 <li>Check your active sessions regularly.</li>
                             </ul>
-                            <p className="mt-4 text-sm bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 p-4 rounded-lg border border-yellow-200 dark:border-yellow-900">
+                            <p className="mt-4 text-sm bg-yellow-50 text-yellow-800 p-4 rounded-lg border border-yellow-200">
                                 <strong>Note:</strong> We will never ask for your password via email.
                             </p>
                         </div>

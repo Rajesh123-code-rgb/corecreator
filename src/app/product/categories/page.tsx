@@ -94,7 +94,7 @@ export default function CategoriesPage() {
                             <p className="text-[var(--muted-foreground)]">Try searching for something else.</p>
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="mt-4 text-[var(--primary-600)] hover:underline font-medium"
+                                className="mt-4 text-[var(--primary-700)] hover:underline font-medium"
                             >
                                 Clear search
                             </button>

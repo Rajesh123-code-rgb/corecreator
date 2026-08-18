@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { cdnImage, cdnSrcSet } from "@/lib/imageCdn";
 import { formatDate } from "@/lib/formatDate";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -341,7 +342,9 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                         <div className="space-y-4">
                             <div className="relative aspect-square rounded-2xl overflow-hidden bg-[var(--muted)]">
                                 <img
-                                    src={activeImage || "/placeholder.png"}
+                                    src={cdnImage(activeImage || "/placeholder.png", { width: 1024 })}
+                                    srcSet={cdnSrcSet(activeImage, [480, 768, 1024])}
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
                                     alt={product.name}
                                     className="w-full h-full object-cover transition-opacity duration-300"
                                     onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.png"; }}
@@ -355,7 +358,8 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                         className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${activeImage === img.url ? "border-[var(--secondary-500)] ring-2 ring-[var(--secondary-500)]/30" : "border-transparent hover:border-[var(--border)]"}`}
                                     >
                                         <img
-                                            src={img.url || "/placeholder.png"}
+                                            src={cdnImage(img.url || "/placeholder.png", { width: 200 })}
+                                            loading="lazy"
                                             alt=""
                                             className="w-full h-full object-cover"
                                             onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.png"; }}
@@ -593,7 +597,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                         <div className="bg-[var(--muted)]/30 rounded-2xl p-6 lg:p-8">
                             {activeTab === "description" && (
                                 <div className="space-y-6">
-                                    <div className="prose prose-lg max-w-none dark:prose-invert">
+                                    <div className="prose prose-lg max-w-none">
                                         {product.description ? (
                                             <div dangerouslySetInnerHTML={{ __html: product.description }} />
                                         ) : (

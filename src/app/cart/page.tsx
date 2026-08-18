@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cdnImage } from "@/lib/imageCdn";
 import Link from "next/link";
 import Image from "next/image";
 import { Header, Footer } from "@/components/organisms";
@@ -126,8 +127,9 @@ export default function CartPage() {
                                     className="flex gap-4 p-4 bg-white rounded-xl border border-[var(--border)]"
                                 >
                                     <img
-                                        src={item.image}
+                                        src={cdnImage(item.image, { width: 200 })}
                                         alt={item.name}
+                                        loading="lazy"
                                         className="w-24 h-24 object-cover rounded-lg"
                                     />
                                     <div className="flex-1 min-w-0">

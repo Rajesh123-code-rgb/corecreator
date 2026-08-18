@@ -164,10 +164,10 @@ export default function StudioRegisterPage() {
                     </div>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
-                        Want to learn instead? <Link href="/register" className="font-medium text-[var(--primary-600)] hover:underline">Create Learner Account</Link>
+                        Want to learn instead? <Link href="/register" className="font-medium text-[var(--primary-700)] hover:underline">Create Learner Account</Link>
                     </p>
                     <p className="mt-2 text-center text-sm text-[var(--muted-foreground)]">
-                        Already have an account? <Link href="/login" className="font-medium text-[var(--primary-600)] hover:underline">Sign in</Link>
+                        Already have an account? <Link href="/login" className="font-medium text-[var(--primary-700)] hover:underline">Sign in</Link>
                     </p>
                 </div>
             </div>

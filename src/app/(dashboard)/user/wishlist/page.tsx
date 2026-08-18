@@ -70,7 +70,7 @@ export default function WishlistPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-[50vh]">
-                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-700)]" />
             </div>
         );
     }

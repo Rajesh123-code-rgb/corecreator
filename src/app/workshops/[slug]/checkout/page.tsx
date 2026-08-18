@@ -190,7 +190,7 @@ export default function WorkshopCheckoutPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
-                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-700)]" />
             </div>
         );
     }
@@ -240,7 +240,7 @@ export default function WorkshopCheckoutPage() {
 
                         <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6 lg:p-8 shadow-sm">
                             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                <Users className="w-5 h-5 text-[var(--primary-600)]" />
+                                <Users className="w-5 h-5 text-[var(--primary-700)]" />
                                 Participant Details
                             </h2>
 
@@ -307,7 +307,7 @@ export default function WorkshopCheckoutPage() {
 
                         <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6 lg:p-8 shadow-sm">
                             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[var(--primary-600)]" />
+                                <CreditCard className="w-5 h-5 text-[var(--primary-700)]" />
                                 Payment Method
                             </h2>
                             <div className="p-4 rounded-lg bg-[var(--muted)]/50 border border-[var(--border)] flex items-center gap-4">

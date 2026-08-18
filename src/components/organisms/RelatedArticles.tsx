@@ -52,7 +52,7 @@ export const RelatedArticles = ({ articles, title = "Related Articles" }: Relate
                                 <span>{article.readTime} min</span>
                             </div>
 
-                            <h3 className="font-bold mb-2 group-hover:text-[var(--primary-600)] transition-colors line-clamp-2">
+                            <h3 className="font-bold mb-2 group-hover:text-[var(--primary-700)] transition-colors line-clamp-2">
                                 {article.title}
                             </h3>
 
@@ -60,7 +60,7 @@ export const RelatedArticles = ({ articles, title = "Related Articles" }: Relate
                                 {article.excerpt}
                             </p>
 
-                            <div className="flex items-center text-[var(--primary-600)] font-medium text-sm">
+                            <div className="flex items-center text-[var(--primary-700)] font-medium text-sm">
                                 Read More
                                 <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                             </div>

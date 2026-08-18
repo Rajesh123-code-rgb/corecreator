@@ -61,7 +61,7 @@ export default function ReportPage() {
                     </form>
 
                     <p className="text-center text-sm text-[var(--muted-foreground)] mt-8">
-                        For immediate assistance with an order, please visit our <a href="/help" className="text-[var(--primary-600)] underline">Help Center</a> or contact support directly.
+                        For immediate assistance with an order, please visit our <a href="/help" className="text-[var(--primary-700)] underline">Help Center</a> or contact support directly.
                     </p>
                 </div>
             </section>

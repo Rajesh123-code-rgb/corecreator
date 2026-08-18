@@ -68,7 +68,7 @@ export default function FAQPage() {
                                         <details key={j} className="group bg-[var(--card)] rounded-xl border border-[var(--border)] overflow-hidden">
                                             <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-medium hover:bg-[var(--secondary-50)] transition-colors">
                                                 {item.q}
-                                                <span className="text-[var(--primary-600)] transition-transform group-open:rotate-45">
+                                                <span className="text-[var(--primary-700)] transition-transform group-open:rotate-45">
                                                     <Plus className="w-5 h-5 block group-open:hidden" />
                                                     <Minus className="w-5 h-5 hidden group-open:block" />
                                                 </span>

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
 
 /* ========================================
    CORE CREATOR DESIGN SYSTEM
@@ -98,27 +97,6 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Dark Mode - intentionally NOT applied from the OS preference.
-   This block used to be `@media (prefers-color-scheme: dark)`, which switched
-   the palette automatically for any visitor whose phone was in dark mode. The
-   palette itself is fine; the components are not - most hardcode `bg-white`
-   rather than `var(--card)`, so they kept white backgrounds while the text went
-   near-white. Re-enable this only once those components use the tokens.
-   The .dark block below is kept for that migration. */
-
-/* Dark mode class support */
-.dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --muted: #262626;
-  --muted-foreground: #a3a3a3;
-  --card: #171717;
-  --card-foreground: #fafafa;
-  --border: #404040;
-  --input: #404040;
-  --ring: #60a5fa;
 }
 
 @theme inline {

@@ -148,7 +148,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                     {/* Article Content */}
                     <div
-                        className="prose prose-lg max-w-none mt-12 mb-12 dark:prose-invert"
+                        className="prose prose-lg max-w-none mt-12 mb-12"
                         dangerouslySetInnerHTML={{ __html: postData.content }}
                     />
 

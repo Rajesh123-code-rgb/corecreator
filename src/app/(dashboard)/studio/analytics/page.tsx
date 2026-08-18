@@ -218,7 +218,7 @@ export default function AnalyticsPage() {
                     <button
                         onClick={() => setActiveTab("overview")}
                         className={`pb-4 text-sm font-medium border-b-2 transition-colors ${activeTab === "overview"
-                            ? "border-[var(--primary-600)] text-[var(--primary-600)]"
+                            ? "border-[var(--primary-600)] text-[var(--primary-700)]"
                             : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                             }`}
                     >
@@ -227,7 +227,7 @@ export default function AnalyticsPage() {
                     <button
                         onClick={() => setActiveTab("students")}
                         className={`pb-4 text-sm font-medium border-b-2 transition-colors ${activeTab === "students"
-                            ? "border-[var(--primary-600)] text-[var(--primary-600)]"
+                            ? "border-[var(--primary-600)] text-[var(--primary-700)]"
                             : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                             }`}
                     >
@@ -236,7 +236,7 @@ export default function AnalyticsPage() {
                     <button
                         onClick={() => setActiveTab("courses")}
                         className={`pb-4 text-sm font-medium border-b-2 transition-colors ${activeTab === "courses"
-                            ? "border-[var(--primary-600)] text-[var(--primary-600)]"
+                            ? "border-[var(--primary-600)] text-[var(--primary-700)]"
                             : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                             }`}
                     >

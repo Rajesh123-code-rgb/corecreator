@@ -152,7 +152,7 @@ export default function StudioDashboard() {
                                 <BookOpen className="w-5 h-5 text-purple-600" />
                                 My Courses
                             </h2>
-                            <Link href="/studio/courses" className="text-sm text-[var(--primary-600)] hover:underline flex items-center gap-1">
+                            <Link href="/studio/courses" className="text-sm text-[var(--primary-700)] hover:underline flex items-center gap-1">
                                 View All <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
@@ -207,7 +207,7 @@ export default function StudioDashboard() {
                             <Package className="w-5 h-5 text-amber-600" />
                             My Artworks
                         </h2>
-                        <Link href="/studio/products" className="text-sm text-[var(--primary-600)] hover:underline flex items-center gap-1">
+                        <Link href="/studio/products" className="text-sm text-[var(--primary-700)] hover:underline flex items-center gap-1">
                             View All <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -241,7 +241,7 @@ export default function StudioDashboard() {
                 <Card>
                     <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
                         <h2 className="font-semibold">Recent Sales</h2>
-                        <Link href="/studio/earnings" className="text-sm text-[var(--primary-600)] hover:underline flex items-center gap-1">
+                        <Link href="/studio/earnings" className="text-sm text-[var(--primary-700)] hover:underline flex items-center gap-1">
                             View All <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -261,7 +261,7 @@ export default function StudioDashboard() {
                                     {data?.recentOrders && data.recentOrders.length > 0 ? (
                                         data.recentOrders.map((order) => (
                                             <tr key={order.id} className="hover:bg-[var(--muted)]/50">
-                                                <td className="px-4 py-3 font-medium text-sm text-[var(--primary-600)]">{order.id}</td>
+                                                <td className="px-4 py-3 font-medium text-sm text-[var(--primary-700)]">{order.id}</td>
                                                 <td className="px-4 py-3 text-sm">{order.customer}</td>
                                                 <td className="px-4 py-3 text-sm hidden md:table-cell truncate max-w-[200px]">{order.product}</td>
                                                 <td className="px-4 py-3">

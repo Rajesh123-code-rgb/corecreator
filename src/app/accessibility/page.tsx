@@ -17,7 +17,7 @@ export default function AccessibilityPage() {
 
             <section className="py-20">
                 <div className="container-app max-w-3xl">
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <div className="prose prose-lg max-w-none">
 
                         <h2 className="text-2xl font-bold mb-4">Our Commitment</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
@@ -42,7 +42,7 @@ export default function AccessibilityPage() {
                             If you encounter any accessibility barriers on our site, please let us know. We welcome your feedback and will work to address any issues promptly.
                         </p>
                         <p className="font-bold">
-                            Tell us through the <Link href="/contact" className="text-[var(--primary-600)] hover:underline">contact form</Link>.
+                            Tell us through the <Link href="/contact" className="text-[var(--primary-700)] hover:underline">contact form</Link>.
                         </p>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
-import { AuthProvider, ThemeProvider } from "@/components/providers";
+import { AuthProvider } from "@/components/providers";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { CartProvider } from "@/context";
@@ -143,25 +143,10 @@ export default async function RootLayout({
           <AuthProvider>
             <LanguageProvider>
               <CurrencyProvider>
-                {/* Light only, deliberately. The dark palette is defined and
-                    correct, but ~319 components hardcode `bg-white` instead of
-                    `var(--card)`, so in dark mode they render white cards
-                    behind near-white text - about 1.02:1 contrast, i.e.
-                    invisible. Until those are migrated, forcing light is the
-                    only way every visitor sees the design that was built.
-                    forcedTheme also overrides a stale "dark" already stored in
-                    a returning visitor's localStorage. */}
-                <ThemeProvider
-                  attribute="class"
-                  defaultTheme="light"
-                  forcedTheme="light"
-                  enableSystem={false}
-                  disableTransitionOnChange
-                >
+
                   <CartProvider>
                     <ToastProvider>{children}</ToastProvider>
                   </CartProvider>
-                </ThemeProvider>
               </CurrencyProvider>
             </LanguageProvider>
           </AuthProvider>

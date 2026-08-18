@@ -3,10 +3,22 @@ import connectDB from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
 import { createResetToken, appUrl } from "@/lib/auth/passwordReset";
 import { sendTemplatedEmail } from "@/lib/email/send";
+import { rateLimit, clientKey } from "@/lib/rateLimit";
 import { getPasswordResetTemplate } from "@/lib/email/templates";
 
 export async function POST(request: NextRequest) {
     try {
+        // Each accepted request sends an email, so an unlimited caller can
+        // flood any address's inbox and burn the mail quota. Five per fifteen
+        // minutes is far above what a real person needs.
+        const limit = rateLimit(clientKey(request, "forgot-password"), 5, 15 * 60_000);
+        if (!limit.allowed) {
+            return NextResponse.json(
+                { error: "Too many reset requests. Please wait a few minutes and try again." },
+                { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
+            );
+        }
+
         const { email } = await request.json();
 
         if (!email || typeof email !== "string") {

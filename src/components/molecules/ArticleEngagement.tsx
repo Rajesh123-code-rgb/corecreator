@@ -89,7 +89,7 @@ export const ArticleEngagement = ({ metrics, articleSlug }: ArticleEngagementPro
                 <button
                     onClick={handleBookmark}
                     className={`p-2 rounded-lg transition-all ${bookmarked
-                            ? "bg-[var(--primary-100)] text-[var(--primary-600)]"
+                            ? "bg-[var(--primary-100)] text-[var(--primary-700)]"
                             : "bg-[var(--muted)] text-[var(--muted-foreground)] hover:bg-[var(--secondary-100)]"
                         }`}
                     aria-label="Bookmark"

@@ -36,12 +36,12 @@ export default function StudioDocumentationPage() {
                     {/* Section 1 */}
                     <section id="products" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600">
+                            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
                                 <Package className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Product Management</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 Manage your inventory and listings efficiently.
                             </p>
@@ -59,17 +59,17 @@ export default function StudioDocumentationPage() {
                     {/* Section 2 */}
                     <section id="courses" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+                            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
                                 <Video className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Course Creation Studio</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 The Course Studio helps you build structured learning experiences.
                             </p>
-                            <div className="my-6 border-l-4 border-blue-500 pl-4 bg-blue-50 dark:bg-blue-900/20 py-2 pr-4 rounded-r-lg">
-                                <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                            <div className="my-6 border-l-4 border-blue-500 pl-4 bg-blue-50 py-2 pr-4 rounded-r-lg">
+                                <p className="text-sm font-medium text-blue-700">
                                     <strong>Pro Tip:</strong> Break your course into small, digestible chapters (5-10 mins video length) to maximize student engagement.
                                 </p>
                             </div>
@@ -87,12 +87,12 @@ export default function StudioDocumentationPage() {
                     {/* Section 3 */}
                     <section id="orders" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
+                            <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
                                 <BarChart3 className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Orders & Fulfillment</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 When you receive an order, you must fulfill it within your specified handling time.
                             </p>
@@ -110,12 +110,12 @@ export default function StudioDocumentationPage() {
                     {/* Section 4 */}
                     <section id="payouts" className="scroll-mt-24">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
+                            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
                                 <CreditCard className="w-5 h-5" />
                             </div>
                             <h2 className="text-2xl font-bold">Payouts & Fees</h2>
                         </div>
-                        <div className="prose dark:prose-invert max-w-none text-[var(--muted-foreground)]">
+                        <div className="prose max-w-none text-[var(--muted-foreground)]">
                             <p>
                                 We believe in transparency. Here's how finances work on Core Creator.
                             </p>

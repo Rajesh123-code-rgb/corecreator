@@ -16,7 +16,7 @@ export default function CookiesPage() {
 
             <section className="py-20">
                 <div className="container-app max-w-3xl">
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <div className="prose prose-lg max-w-none">
                         <h2 className="text-2xl font-bold mb-4">1. What are Cookies?</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
                             Cookies are small text files stored on your device when you visit a website. They help us recognize you and remember your preferences.
