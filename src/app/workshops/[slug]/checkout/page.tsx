@@ -8,8 +8,7 @@ import { useSession } from "next-auth/react";
 import { Header, Footer } from "@/components/organisms";
 import { Button, Input, ImageWithFallback } from "@/components/atoms";
 import { useCurrency } from "@/context/CurrencyContext";
-import { useTaxRate } from "@/hooks/useTaxRate";
-import { applyTax } from "@/lib/tax";
+import { applyTax, DIGITAL_SERVICE_GST_RATE } from "@/lib/tax";
 import { Loader2, ArrowLeft, CreditCard, Shield, Users, Calendar, Clock } from "lucide-react";
 
 interface Workshop {
@@ -27,7 +26,6 @@ export default function WorkshopCheckoutPage() {
     const router = useRouter();
     const slug = params?.slug as string;
     const { formatPrice } = useCurrency();
-    const { rate: taxRate, displayName: taxName } = useTaxRate();
 
     const [workshop, setWorkshop] = useState<Workshop | null>(null);
     const [loading, setLoading] = useState(true);
@@ -192,7 +190,7 @@ export default function WorkshopCheckoutPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
-                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-700)]" />
             </div>
         );
     }
@@ -213,7 +211,8 @@ export default function WorkshopCheckoutPage() {
     const subtotal = workshop.price * seats;
     // Was a hardcoded "18% GST example"; now the same configured rate as
     // everything else, so workshops and products cannot disagree.
-    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    // A workshop is an electronically supplied service: 18%, not seller-chosen.
+    const taxDetail = applyTax(subtotal, DIGITAL_SERVICE_GST_RATE);
     const tax = taxDetail.amount;
     const total = subtotal + tax;
     const workshopDate = new Date(workshop.date);
@@ -241,7 +240,7 @@ export default function WorkshopCheckoutPage() {
 
                         <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6 lg:p-8 shadow-sm">
                             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                <Users className="w-5 h-5 text-[var(--primary-600)]" />
+                                <Users className="w-5 h-5 text-[var(--primary-700)]" />
                                 Participant Details
                             </h2>
 
@@ -308,7 +307,7 @@ export default function WorkshopCheckoutPage() {
 
                         <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6 lg:p-8 shadow-sm">
                             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[var(--primary-600)]" />
+                                <CreditCard className="w-5 h-5 text-[var(--primary-700)]" />
                                 Payment Method
                             </h2>
                             <div className="p-4 rounded-lg bg-[var(--muted)]/50 border border-[var(--border)] flex items-center gap-4">

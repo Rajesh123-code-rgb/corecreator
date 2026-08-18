@@ -7,6 +7,142 @@ left alone.
 
 ---
 
+## Phase 16 — Image delivery, contrast, rate limits, and the end of dark mode
+
+### Images: 2.1 MB down to roughly a tenth
+
+The catalogue was served straight from Cloudinary with no transformation, so a
+card thumbnail rendering at ~180px downloaded the full-size original. One
+product image measured **499 KB** as JPEG; the same image with
+`f_auto,q_auto,w_400` comes back as a **47 KB WebP** — a 90.7% reduction with no
+re-upload and no new infrastructure.
+
+`src/lib/imageCdn.ts` inserts those transforms, and returns anything that is not
+a Cloudinary upload URL untouched, so it is safe to apply across a mixed list of
+local files, unsplash and generated avatars. `ImageWithFallback` — the shared
+atom behind most catalogue imagery — now uses it, with a `srcset` so a phone
+never fetches a desktop-sized file, and `loading="lazy"` by default. The raw
+`<img>` tags in the product gallery, cart, checkout and order history were given
+the same treatment at sizes matched to how they actually render.
+
+Kept separate from `lib/cloudinary.ts`, which is the server-side upload SDK and
+pulls in Node APIs; this one is safe to import from client components.
+
+### Contrast
+
+`--primary-600` (`#b8860b`) measured **3.25:1** on white and was used as text in
+70 places — below the 4.5:1 WCAG 2.2 AA minimum for body text.
+
+No new colour was needed: `--primary-700` (`#92650a`) already existed in the
+palette and passes at **5.14:1**. Text usages moved to it; gradients and
+backgrounds still use `--primary-600`, so the brand gold is unchanged wherever
+contrast rules do not apply.
+
+### Rate limiting
+
+`/api/auth/forgot-password` sends an email per request and had no ceiling, so it
+was both a way to flood any address's inbox and a way to burn the mail quota.
+Now five requests per fifteen minutes per client, with `Retry-After`.
+Registration, which writes a user row per call, is capped at ten.
+
+The limiter is a per-process map rather than Redis: this app runs as a single
+container, so that is accurate and adds no infrastructure. If it is ever scaled
+to multiple replicas each holds its own counter and the effective limit becomes
+limit x replicas — still a useful ceiling, but it should move to a shared store
+at that point. That trade-off is written into the file.
+
+### Dark mode removed
+
+Deferred since Phase 8 and now removed rather than left half-present. Gone: the
+`.dark` token block, the `@custom-variant`, all 44 `dark:` utilities across 14
+files, the `ThemeProvider`, and the `next-themes` dependency.
+
+The utilities were already inert — the provider forced light — but an inert
+`dark:` class is worse than none: it reads as support that exists. Anyone
+restoring dark mode should start from the token system rather than from
+whatever those 44 classes happened to say.
+
+### Also
+
+`/contact` linked three times to `/faq`, which 404s. The page is `/faqs`.
+
+---
+
+## Phase 15 — GST slabs, email templates, sitemap and CSP
+
+### GST is now a property of the product
+
+Physical goods sit in different bands — many handicrafts are 5% or 12% rather
+than the 18% standard — so the rate belongs to the item, chosen by the seller
+from 5/12/18 on the product form. Courses and workshops are electronically
+supplied services taxed at the standard rate, so those are fixed in code behind
+a named `DIGITAL_SERVICE_GST_RATE` rather than being seller-chosen.
+
+Tax is summed per line, because a basket can legitimately mix slabs — a 5%
+handicraft alongside an 18% course. `taxForItems()` does that once and is used
+by the cart, the checkout and `create-order`, so the figure shown and the figure
+charged cannot drift. The slab is stored on the order line, so a reissued
+invoice matches the original even if the product's rate later changes. Where a
+basket mixes slabs the label reads "GST" rather than naming one rate.
+
+The global `TaxRate` lookup, `/api/tax-rate` and the `useTaxRate` hook were
+removed. A configurable platform-wide rate that nothing reads is precisely the
+trap behind the original bug — admin configuration the purchase path ignored.
+
+### Editable email templates, and a way to prove delivery
+
+The site owner reported completing a real payment and never receiving an order
+confirmation. The code path was not the problem: `verify()` does call
+`sendOrderConfirmationEmail`. What was missing was any way to see whether email
+could send at all, and any signal when it failed.
+
+`/admin/email-templates` now lists the four transactional emails — welcome,
+order confirmation, password reset, guest account invite — with subject and HTML
+editable per template. Editing is placeholder-based (`{{name}}`, `{{orderNumber}}`)
+rather than a code editor, so an email can be reworded without touching a
+template literal in a running send path. Each template shows when it is sent and
+which placeholders it understands, with a live preview rendered from sample
+values.
+
+Two things make this diagnostic rather than cosmetic:
+
+- **Delivery status is shown at the top** — whether `BREVO_API_KEY` is set and
+  which sender address is in use, so "email is not configured" is visible in the
+  dashboard instead of discovered from a customer.
+- **Send yourself a test** delivers the template with sample values. If it
+  arrives, delivery works end to end. The response distinguishes "the API key is
+  missing" from "Brevo rejected the send", because those need different fixes.
+
+Defaults stay in code and a stored row overrides them, so deleting an edit
+reverts to the shipped version — a bad edit is never unrecoverable. Every lookup
+falls back to the default on error: a template problem must not be able to stop
+a receipt going out.
+
+A failed order confirmation now logs loudly and greppably. Previously it was
+swallowed, so a customer who paid and got no receipt left no trace in the logs.
+
+### Creator profiles in the sitemap
+
+`/artists/[id]` pages were never listed, so no creator profile was discoverable.
+Only creators with something published are included; an empty profile is a thin
+page.
+
+### Content-Security-Policy, in Report-Only
+
+The site takes live payments, and a policy that is even slightly wrong silently
+breaks the Razorpay modal — the customer sees a checkout that will not open, and
+we would learn about it from lost revenue. Report-Only sends violation reports
+without blocking, so the policy can be proven against a real checkout before it
+is enforced. The host list covers Razorpay, Cloudinary, Bunny Stream, YouTube,
+Google Analytics and Translate.
+
+`'unsafe-inline'` on `script-src` is required by Next's App Router, which injects
+inline bootstrap scripts without a nonce. It limits what the policy can do, but
+it still constrains which hosts can be reached — the part that matters for
+exfiltration and injected third-party scripts.
+
+---
+
 ## Phase 14 — Studio sidebar could not reach its own menu items
 
 Reported after Phase 13 added Reviews and Messages to the studio navigation.

@@ -37,7 +37,7 @@ export default function ReportPage() {
 
                         <div className="space-y-2">
                             <label htmlFor="url" className="font-medium">Related URL (Optional)</label>
-                            <input type="url" id="url" placeholder="https://corecreator.com/..." className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)]" />
+                            <input type="url" id="url" placeholder="https://corecreator.online/..." className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)]" />
                         </div>
 
                         <div className="space-y-2">
@@ -61,7 +61,7 @@ export default function ReportPage() {
                     </form>
 
                     <p className="text-center text-sm text-[var(--muted-foreground)] mt-8">
-                        For immediate assistance with an order, please visit our <a href="/help" className="text-[var(--primary-600)] underline">Help Center</a> or contact support directly.
+                        For immediate assistance with an order, please visit our <a href="/help" className="text-[var(--primary-700)] underline">Help Center</a> or contact support directly.
                     </p>
                 </div>
             </section>

@@ -1,6 +1,6 @@
 import User from "@/lib/db/models/User";
 import { createResetToken, appUrl } from "@/lib/auth/passwordReset";
-import { sendEmail } from "@/lib/email/brevo";
+import { sendTemplatedEmail } from "@/lib/email/send";
 import { getPasswordResetTemplate } from "@/lib/email/templates";
 import Workshop from "@/lib/db/models/Workshop";
 
@@ -58,9 +58,12 @@ export async function sendGuestAccountInvite(order: { user?: any }, alreadyPaid:
     user.resetPasswordExpires = expiresAt;
     await user.save();
 
-    await sendEmail({
+    const resetUrl = `${appUrl()}/reset-password?token=${rawToken}`;
+    await sendTemplatedEmail({
+        key: "guest_account_invite",
         to: [{ email: user.email, name: user.name }],
-        subject: "Set a password for your Core Creator account",
-        htmlContent: getPasswordResetTemplate(user.name, `${appUrl()}/reset-password?token=${rawToken}`, true),
+        values: { name: user.name, resetUrl },
+        fallbackSubject: "Set a password for your Core Creator account",
+        fallbackHtml: getPasswordResetTemplate(user.name, resetUrl, true),
     });
 }

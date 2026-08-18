@@ -24,7 +24,7 @@ export default function TermsPage() {
 
             <section className="py-20">
                 <div className="container-app max-w-3xl">
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <div className="prose prose-lg max-w-none">
                         <p className="text-sm text-[var(--muted-foreground)] mb-8">Last Updated: January 1, 2026</p>
 
                         <h2 className="text-2xl font-bold mb-4">1. Acceptance of Terms</h2>
@@ -65,7 +65,7 @@ export default function TermsPage() {
                         <h2 className="text-2xl font-bold mb-4">8. Contact Us</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
                             If you have any questions about these Terms, please reach us through the{" "}
-                            <Link href="/contact" className="text-[var(--primary-600)] hover:underline">contact page</Link>.
+                            <Link href="/contact" className="text-[var(--primary-700)] hover:underline">contact page</Link>.
                         </p>
                     </div>
                 </div>

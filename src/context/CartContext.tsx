@@ -21,6 +21,9 @@ interface CartItem {
     variant?: { id: string; label: string; sku?: string };
     customizations?: { id?: string; label: string; value: string }[];
     addOns?: { id: string; title?: string; price: number }[];
+    /** GST slab for this line. Products carry their own; courses and workshops
+     *  are electronically supplied services and resolve to 18%. */
+    taxRate?: number;
 }
 
 interface CartContextType {

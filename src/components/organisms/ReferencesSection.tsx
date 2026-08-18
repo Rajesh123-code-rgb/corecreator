@@ -22,7 +22,7 @@ export const ReferencesSection = ({ sources, factChecked, factCheckDate }: Refer
         <div className="mt-12 pt-8 border-t border-[var(--border)]">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <FileText className="w-6 h-6 text-[var(--primary-600)]" />
+                    <FileText className="w-6 h-6 text-[var(--primary-700)]" />
                     Sources & References
                 </h2>
 
@@ -49,7 +49,7 @@ export const ReferencesSection = ({ sources, factChecked, factCheckDate }: Refer
                                 {source.type === "internal" ? (
                                     <Link
                                         href={source.url}
-                                        className="text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium hover:underline"
+                                        className="text-[var(--primary-700)] hover:text-[var(--primary-700)] font-medium hover:underline"
                                     >
                                         {source.title}
                                     </Link>
@@ -58,7 +58,7 @@ export const ReferencesSection = ({ sources, factChecked, factCheckDate }: Refer
                                         href={source.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium hover:underline inline-flex items-center gap-1"
+                                        className="text-[var(--primary-700)] hover:text-[var(--primary-700)] font-medium hover:underline inline-flex items-center gap-1"
                                     >
                                         {source.title}
                                         <ExternalLink className="w-3 h-3" />

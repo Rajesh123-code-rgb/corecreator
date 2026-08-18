@@ -162,7 +162,7 @@ export default function CoursesPage() {
                                 <div className="flex-1 flex flex-col justify-between min-w-0">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
-                                            <h3 className="text-xl font-bold text-gray-900 group-hover:text-[var(--primary-600)] transition-colors line-clamp-1 mb-2">
+                                            <h3 className="text-xl font-bold text-gray-900 group-hover:text-[var(--primary-700)] transition-colors line-clamp-1 mb-2">
                                                 {course.title}
                                             </h3>
 
@@ -207,14 +207,14 @@ export default function CoursesPage() {
                                         <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
                                             <Link
                                                 href={`/studio/courses/${course.id}/curriculum`}
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--primary-600)] hover:bg-[var(--primary-50)] rounded-lg transition-colors whitespace-nowrap"
+                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--primary-700)] hover:bg-[var(--primary-50)] rounded-lg transition-colors whitespace-nowrap"
                                             >
                                                 <FileText className="w-4 h-4 mr-2" />
                                                 Curriculum
                                             </Link>
                                             <Link
                                                 href={`/studio/courses/${course.id}/pricing`}
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--primary-600)] hover:bg-[var(--primary-50)] rounded-lg transition-colors whitespace-nowrap"
+                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--primary-700)] hover:bg-[var(--primary-50)] rounded-lg transition-colors whitespace-nowrap"
                                             >
                                                 <DollarSign className="w-4 h-4 mr-2" />
                                                 Pricing
@@ -222,7 +222,7 @@ export default function CoursesPage() {
                                             <Link
                                                 href={`/learn/${course.slug}`}
                                                 target="_blank"
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--primary-600)] hover:bg-[var(--primary-50)] rounded-lg transition-colors whitespace-nowrap"
+                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--primary-700)] hover:bg-[var(--primary-50)] rounded-lg transition-colors whitespace-nowrap"
                                             >
                                                 <Eye className="w-4 h-4 mr-2" />
                                                 Preview

@@ -30,7 +30,7 @@ export const ArticleMetadata = ({
                 {hasBeenUpdated && (
                     <div className="flex items-center gap-1.5">
                         <Calendar className="w-4 h-4" />
-                        <span className="text-[var(--primary-600)] font-medium">
+                        <span className="text-[var(--primary-700)] font-medium">
                             Updated {format(updatedAt, "MMM dd, yyyy")}
                         </span>
                     </div>

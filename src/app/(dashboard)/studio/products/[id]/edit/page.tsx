@@ -36,6 +36,7 @@ interface ProductData {
     productType: "physical" | "digital" | "service";
     price: number;
     compareAtPrice?: number;
+    taxRate?: number;
     category: string;
     tags: string[];
     status: "draft" | "pending" | "active" | "sold" | "archived" | "rejected";
@@ -433,6 +434,32 @@ export default function ProductEditPage() {
                                             onChange={(e) => handleUpdate("compareAtPrice", parseFloat(e.target.value))}
                                             placeholder="0.00"
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            GST rate
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[5, 12, 18].map((rate) => (
+                                                <button
+                                                    key={rate}
+                                                    type="button"
+                                                    onClick={() => handleUpdate("taxRate", rate)}
+                                                    className={`px-4 py-2 min-h-11 rounded-lg border-2 text-sm font-medium transition-all ${(product.taxRate ?? 18) === rate
+                                                        ? "border-[var(--secondary-500)] bg-[var(--secondary-50)] text-[var(--secondary-700)]"
+                                                        : "border-[var(--border)] hover:border-[var(--secondary-300)]"
+                                                        }`}
+                                                    aria-pressed={(product.taxRate ?? 18) === rate}
+                                                >
+                                                    {rate}%
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <p className="mt-2 text-xs text-[var(--muted-foreground)]">
+                                            The GST slab this item falls under. Many handicrafts are 5% or 12%
+                                            rather than the 18% standard — check the rate for your category, as
+                                            this is what buyers are charged.
+                                        </p>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">SKU (Stock Keeping Unit)</label>

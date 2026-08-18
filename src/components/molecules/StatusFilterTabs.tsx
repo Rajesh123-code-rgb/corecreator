@@ -41,7 +41,7 @@ export function StatusFilterTabs({ activeFilter, onFilterChange, counts }: Statu
                                 relative px-4 py-3 font-medium text-sm whitespace-nowrap
                                 transition-colors duration-200
                                 ${isActive
-                                    ? "text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]"
+                                    ? "text-[var(--primary-700)] border-b-2 border-[var(--primary-600)]"
                                     : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                                 }
                             `}

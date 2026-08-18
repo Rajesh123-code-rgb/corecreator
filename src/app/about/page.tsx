@@ -75,19 +75,19 @@ export default async function AboutPage() {
                 <div className="container-app">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                         <div>
-                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">{stats.creators}+</div>
+                            <div className="text-4xl font-bold text-[var(--primary-700)] mb-2">{stats.creators}+</div>
                             <div className="text-sm text-[var(--muted-foreground)]">Active Creators</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">100+</div>
+                            <div className="text-4xl font-bold text-[var(--primary-700)] mb-2">100+</div>
                             <div className="text-sm text-[var(--muted-foreground)]">Countries</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">2.5M</div>
+                            <div className="text-4xl font-bold text-[var(--primary-700)] mb-2">2.5M</div>
                             <div className="text-sm text-[var(--muted-foreground)]">Lessons Watched</div>
                         </div>
                         <div>
-                            <div className="text-4xl font-bold text-[var(--primary-600)] mb-2">{formatCurrency(stats.creatorEarnings, "INR")}+</div>
+                            <div className="text-4xl font-bold text-[var(--primary-700)] mb-2">{formatCurrency(stats.creatorEarnings, "INR")}+</div>
                             <div className="text-sm text-[var(--muted-foreground)]">Paid to Artists</div>
                         </div>
                     </div>

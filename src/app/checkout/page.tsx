@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cdnImage } from "@/lib/imageCdn";
 import { useToast } from "@/components/molecules";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,8 +24,7 @@ import {
     Trash2
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
-import { useTaxRate } from "@/hooks/useTaxRate";
-import { applyTax } from "@/lib/tax";
+import { taxForItems } from "@/lib/tax";
 
 const steps = ["Shipping", "Review & Pay"];
 
@@ -87,8 +87,9 @@ export default function CheckoutPage() {
     // Use shippingTotal from cart (calculated from product shipping prices)
     // Courses and workshops have 0 shipping
     const shipping = shippingTotal;
-    const { rate: taxRate, displayName: taxName } = useTaxRate();
-    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    const taxDetail = taxForItems(
+        items.map((i) => ({ price: i.price, quantity: i.quantity, itemType: i.type, taxRate: i.taxRate }))
+    );
     const tax = taxDetail.amount;
     const total = subtotal + shipping + tax - discount;
 
@@ -379,7 +380,7 @@ export default function CheckoutPage() {
                                         <div className="divide-y divide-[var(--border)]">
                                             {items.map((item) => (
                                                 <div key={item.id} className="flex gap-3 sm:gap-4 py-4">
-                                                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
+                                                    <img src={cdnImage(item.image, { width: 160 })} alt={item.name} loading="lazy" className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-medium text-sm">{item.name}</p>
                                                         {item.type === "product" ? (

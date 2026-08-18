@@ -24,7 +24,7 @@ export default function ShippingPage() {
 
             <section className="py-20">
                 <div className="container-app max-w-3xl">
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <div className="prose prose-lg max-w-none">
 
                         <div className="flex items-start gap-4 mb-8">
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 flex-shrink-0">

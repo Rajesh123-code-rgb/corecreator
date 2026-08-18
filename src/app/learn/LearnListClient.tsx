@@ -348,13 +348,13 @@ export function LearnListClient({
 
                             {loading ? (
                                 <div className="flex justify-center py-20">
-                                    <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                                    <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-700)]" />
                                 </div>
                             ) : error ? (
-                                <div className="text-center py-16 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                                <div className="text-center py-16 bg-red-50/50 border border-red-200 rounded-2xl">
                                     <BookOpen className="w-12 h-12 mx-auto text-red-500 mb-3" />
-                                    <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">Unable to load courses</h3>
-                                    <p className="text-red-600/80 dark:text-red-300 text-sm mt-1 mb-4">There was an issue connecting to the server. Please check your connection and try again.</p>
+                                    <h3 className="text-lg font-semibold text-red-700">Unable to load courses</h3>
+                                    <p className="text-red-600/80 text-sm mt-1 mb-4">There was an issue connecting to the server. Please check your connection and try again.</p>
                                     <Button
                                         variant="outline"
                                         onClick={() => fetchCourses()}

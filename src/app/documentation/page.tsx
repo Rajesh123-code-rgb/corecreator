@@ -29,7 +29,7 @@ export default function DocumentationHubPage() {
                             <Users className="w-32 h-32" />
                         </div>
 
-                        <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                        <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
                             <Book className="w-7 h-7" />
                         </div>
 
@@ -51,7 +51,7 @@ export default function DocumentationHubPage() {
                             <Palette className="w-32 h-32" />
                         </div>
 
-                        <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
+                        <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
                             <Palette className="w-7 h-7" />
                         </div>
 
@@ -71,7 +71,7 @@ export default function DocumentationHubPage() {
                 <div className="mt-20 text-center bg-[var(--muted)]/50 rounded-2xl p-8 max-w-2xl mx-auto">
                     <h3 className="text-xl font-semibold mb-2">Looking for something else?</h3>
                     <p className="text-[var(--muted-foreground)] mb-6">Check our Frequently Asked Questions for quick answers.</p>
-                    <Link href="/help" className="text-[var(--primary-600)] font-medium hover:underline">
+                    <Link href="/help" className="text-[var(--primary-700)] font-medium hover:underline">
                         Visit Help Center &rarr;
                     </Link>
                 </div>

@@ -156,7 +156,7 @@ export default function HelpClient() {
                             <div className="space-y-8">
                                 {filteredCategories.map((cat) => (
                                     <div key={cat.id}>
-                                        <h3 className="font-bold text-[var(--primary-600)] mb-3 flex items-center gap-2">
+                                        <h3 className="font-bold text-[var(--primary-700)] mb-3 flex items-center gap-2">
                                             <cat.icon className="w-5 h-5" /> {cat.title}
                                         </h3>
                                         <div className="space-y-4">
@@ -211,9 +211,9 @@ export default function HelpClient() {
                                 <div className="w-14 h-14 bg-[var(--secondary-50)] rounded-2xl flex items-center justify-center mb-6 text-[var(--secondary-600)] group-hover:scale-110 transition-transform">
                                     <cat.icon className="w-7 h-7" />
                                 </div>
-                                <h3 className="font-bold text-xl mb-3 group-hover:text-[var(--primary-600)] transition-colors">{cat.title}</h3>
+                                <h3 className="font-bold text-xl mb-3 group-hover:text-[var(--primary-700)] transition-colors">{cat.title}</h3>
                                 <p className="text-[var(--muted-foreground)] leading-relaxed mb-6">{cat.description}</p>
-                                <div className="flex items-center text-sm font-medium text-[var(--primary-600)] opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0 duration-300">
+                                <div className="flex items-center text-sm font-medium text-[var(--primary-700)] opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0 duration-300">
                                     View Articles <ArrowRight className="w-4 h-4 ml-1" />
                                 </div>
                             </button>
@@ -246,7 +246,7 @@ function ArticleItem({ article }: { article: Article }) {
         <details className="group bg-[var(--card)] rounded-xl border border-[var(--border)] overflow-hidden">
             <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-medium hover:bg-[var(--secondary-50)] transition-colors">
                 {article.question}
-                <span className="text-[var(--primary-600)] transition-transform group-open:rotate-180">
+                <span className="text-[var(--primary-700)] transition-transform group-open:rotate-180">
                     <ChevronDownIcon />
                 </span>
             </summary>

@@ -10,9 +10,47 @@
  * that reconciled to no real rate - and products and workshops disagreed.
  */
 
-/** Used when the admin has not configured a rate for the country. */
+/** Used when a product carries no rate of its own. */
 export const DEFAULT_GST_RATE = 18;
 export const DEFAULT_TAX_COUNTRY = "IN";
+
+/** The slabs a seller may choose from for a physical product. */
+export const PRODUCT_GST_SLABS = [5, 12, 18] as const;
+export type ProductGstSlab = (typeof PRODUCT_GST_SLABS)[number];
+
+/**
+ * Online courses and workshops are supplied electronically and are taxed at the
+ * 18% standard rate, so unlike physical goods the seller does not choose. Kept
+ * as a named constant so the reason travels with the number.
+ */
+export const DIGITAL_SERVICE_GST_RATE = 18;
+
+/** The GST rate that applies to a single line item. */
+export function rateForItem(itemType: string | undefined, productTaxRate?: number | null): number {
+    if (itemType === "course" || itemType === "workshop") return DIGITAL_SERVICE_GST_RATE;
+    const rate = Number(productTaxRate);
+    return PRODUCT_GST_SLABS.includes(rate as ProductGstSlab) ? rate : DEFAULT_GST_RATE;
+}
+
+/** Sums GST across a basket where each line may sit in a different slab. */
+export function taxForItems(
+    items: { price: number; quantity: number; itemType?: string; taxRate?: number | null }[]
+): { amount: number; rates: number[] } {
+    let amount = 0;
+    const rates = new Set<number>();
+    for (const item of items) {
+        const rate = rateForItem(item.itemType, item.taxRate);
+        rates.add(rate);
+        amount += (Number(item.price) || 0) * (Number(item.quantity) || 0) * (rate / 100);
+    }
+    return { amount: Math.round(amount * 100) / 100, rates: [...rates].sort((a, b) => a - b) };
+}
+
+/** "GST (18%)" for one rate, "GST" when a basket mixes slabs. */
+export function taxLabelForRates(rates: number[], displayName = "GST"): string {
+    if (rates.length === 1) return `${displayName} (${rates[0]}%)`;
+    return displayName;
+}
 
 export interface AppliedTax {
     /** Percentage, e.g. 18 for 18%. */

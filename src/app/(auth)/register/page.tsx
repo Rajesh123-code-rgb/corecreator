@@ -126,7 +126,7 @@ function RegisterContent() {
                     </form>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
-                        Already have an account? <Link href="/login" className="font-medium text-[var(--primary-600)] hover:underline">Sign in</Link>
+                        Already have an account? <Link href="/login" className="font-medium text-[var(--primary-700)] hover:underline">Sign in</Link>
                     </p>
                 </div>
             </div>

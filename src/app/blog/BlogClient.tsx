@@ -147,10 +147,10 @@ export default function BlogClient() {
                             <Loader2 className="w-8 h-8 animate-spin text-[var(--secondary-500)]" />
                         </div>
                     ) : error ? (
-                        <div className="text-center py-16 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                        <div className="text-center py-16 bg-red-50/50 border border-red-200 rounded-2xl">
                             <Calendar className="w-12 h-12 text-red-500 mx-auto mb-3" />
-                            <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">Unable to load articles</h3>
-                            <p className="text-red-600/80 dark:text-red-300 text-sm mt-1 mb-4">There was an issue connecting to the server. Please try again.</p>
+                            <h3 className="text-lg font-semibold text-red-700">Unable to load articles</h3>
+                            <p className="text-red-600/80 text-sm mt-1 mb-4">There was an issue connecting to the server. Please try again.</p>
                             <Button variant="outline" onClick={() => fetchPosts(1, false)}>
                                 Try Again
                             </Button>
@@ -194,7 +194,7 @@ export default function BlogClient() {
                                                     <User className="w-3 h-3" /> {post.author.name}
                                                 </span>
                                             </div>
-                                            <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--primary-600)] transition-colors line-clamp-2">
+                                            <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--primary-700)] transition-colors line-clamp-2">
                                                 {post.title}
                                             </h3>
                                             {post.excerpt && (
@@ -202,7 +202,7 @@ export default function BlogClient() {
                                                     {post.excerpt}
                                                 </p>
                                             )}
-                                            <div className="flex items-center text-[var(--primary-600)] font-medium text-sm mt-auto">
+                                            <div className="flex items-center text-[var(--primary-700)] font-medium text-sm mt-auto">
                                                 Read Article <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                                             </div>
                                         </div>

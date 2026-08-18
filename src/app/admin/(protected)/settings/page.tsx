@@ -593,7 +593,7 @@ export default function AdminSettingsPage() {
                                         type="email"
                                         value={settings.email?.fromEmail || ""}
                                         onChange={(e) => updateField("email", "fromEmail", e.target.value)}
-                                        placeholder="noreply@corecreator.com"
+                                        placeholder="noreply@corecreator.online"
                                         className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
                                     />
                                 </div>

@@ -245,10 +245,10 @@ export default function WorkshopsClient() {
                             <p>Loading workshops...</p>
                         </div>
                     ) : error ? (
-                        <div className="text-center py-16 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                        <div className="text-center py-16 bg-red-50/50 border border-red-200 rounded-2xl">
                             <Calendar className="w-12 h-12 text-red-500 mx-auto mb-3" />
-                            <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">Unable to load workshops</h3>
-                            <p className="text-red-600/80 dark:text-red-300 text-sm mt-1 mb-4">There was an issue connecting to the server. Please try again.</p>
+                            <h3 className="text-lg font-semibold text-red-700">Unable to load workshops</h3>
+                            <p className="text-red-600/80 text-sm mt-1 mb-4">There was an issue connecting to the server. Please try again.</p>
                             <Button variant="outline" onClick={() => fetchWorkshops()}>
                                 Try Again
                             </Button>
@@ -321,7 +321,7 @@ export default function WorkshopsClient() {
 
                                         <div className="pt-4 border-t border-[var(--border)] flex items-center justify-between">
                                             <div>
-                                                <span className="block text-lg font-bold text-[var(--primary-600)]">{formatPrice(workshop.price)}</span>
+                                                <span className="block text-lg font-bold text-[var(--primary-700)]">{formatPrice(workshop.price)}</span>
                                             </div>
                                             <Button size="sm" asChild>
                                                 <Link href={`/workshops/${workshop.slug}`}>View Details</Link>

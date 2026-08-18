@@ -50,7 +50,7 @@ export default function MyWorkshopsPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-[50vh]">
-                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-700)]" />
             </div>
         );
     }
@@ -77,7 +77,7 @@ export default function MyWorkshopsPage() {
                     {workshops.map((workshop) => (
                         <Card key={workshop._id} className="overflow-hidden flex flex-col h-full group">
                             <div className="bg-[var(--primary-100)] h-32 flex items-center justify-center">
-                                <Calendar className="w-12 h-12 text-[var(--primary-600)]" />
+                                <Calendar className="w-12 h-12 text-[var(--primary-700)]" />
                             </div>
                             <CardContent className="p-5 flex-1 flex flex-col">
                                 <div className="mb-2">

@@ -66,7 +66,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
         return (
             <Card className="p-6">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-[var(--primary-600)]" />
+                    <TrendingUp className="w-5 h-5 text-[var(--primary-700)]" />
                     Recent Activity
                 </h3>
                 <div className="text-center py-8 text-[var(--muted-foreground)]">
@@ -81,7 +81,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
     return (
         <Card className="p-6">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[var(--primary-600)]" />
+                <TrendingUp className="w-5 h-5 text-[var(--primary-700)]" />
                 Recent Activity
             </h3>
             <div className="space-y-4">
@@ -125,7 +125,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
             </div>
             {activities.length > 10 && (
                 <div className="mt-4 text-center">
-                    <button className="text-sm text-[var(--primary-600)] hover:underline">
+                    <button className="text-sm text-[var(--primary-700)] hover:underline">
                         View all activity
                     </button>
                 </div>

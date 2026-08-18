@@ -76,7 +76,7 @@ function LoginContent() {
                             </button>
                         </div>
                         <div className="flex justify-end">
-                            <Link href="/forgot-password" className="text-sm font-medium text-[var(--primary-600)] hover:underline">
+                            <Link href="/forgot-password" className="text-sm font-medium text-[var(--primary-700)] hover:underline">
                                 Forgot password?
                             </Link>
                         </div>
@@ -84,7 +84,7 @@ function LoginContent() {
                     </form>
 
                     <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
-                        Don't have an account? <Link href="/register" className="font-medium text-[var(--primary-600)] hover:underline">Create one</Link>
+                        Don't have an account? <Link href="/register" className="font-medium text-[var(--primary-700)] hover:underline">Create one</Link>
                     </p>
                 </div>
             </div>

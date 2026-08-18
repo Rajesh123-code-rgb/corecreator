@@ -23,7 +23,7 @@ export default function PrivacyPage() {
 
             <section className="py-20">
                 <div className="container-app max-w-3xl">
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <div className="prose prose-lg max-w-none">
                         <p className="text-sm text-[var(--muted-foreground)] mb-8">Last Updated: January 1, 2026</p>
 
                         <h2 className="text-2xl font-bold mb-4">1. Information We Collect</h2>

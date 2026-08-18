@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, clientKey } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db/mongodb";
 import User from "@/lib/db/models/User";
@@ -6,6 +7,16 @@ import { createNotification, NotificationType } from "@/lib/db/models/Notificati
 
 export async function POST(req: NextRequest) {
     try {
+        // Creates a user row per call; a ceiling keeps automated signups from
+        // filling the collection.
+        const limit = rateLimit(clientKey(req, "register"), 10, 15 * 60_000);
+        if (!limit.allowed) {
+            return NextResponse.json(
+                { message: "Too many sign-up attempts. Please wait a few minutes and try again." },
+                { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
+            );
+        }
+
         const { name, email, password, role } = await req.json();
 
         // Validate required fields

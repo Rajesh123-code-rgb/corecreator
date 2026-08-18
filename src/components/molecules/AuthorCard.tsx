@@ -44,7 +44,7 @@ export const AuthorCard = ({ author, variant = "full", showBio = true }: AuthorC
                         <div>
                             <Link
                                 href={`/blog/authors/${author.id}`}
-                                className="font-bold text-lg hover:text-[var(--primary-600)] transition-colors"
+                                className="font-bold text-lg hover:text-[var(--primary-700)] transition-colors"
                             >
                                 {author.name}
                             </Link>
@@ -58,7 +58,7 @@ export const AuthorCard = ({ author, variant = "full", showBio = true }: AuthorC
                                         href={author.socialLinks.twitter}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-600)] transition-colors"
+                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-700)] transition-colors"
                                         aria-label="Twitter"
                                     >
                                         <Twitter className="w-4 h-4" />
@@ -69,7 +69,7 @@ export const AuthorCard = ({ author, variant = "full", showBio = true }: AuthorC
                                         href={author.socialLinks.linkedin}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-600)] transition-colors"
+                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-700)] transition-colors"
                                         aria-label="LinkedIn"
                                     >
                                         <Linkedin className="w-4 h-4" />
@@ -80,7 +80,7 @@ export const AuthorCard = ({ author, variant = "full", showBio = true }: AuthorC
                                         href={author.socialLinks.instagram}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-600)] transition-colors"
+                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-700)] transition-colors"
                                         aria-label="Instagram"
                                     >
                                         <Instagram className="w-4 h-4" />
@@ -91,7 +91,7 @@ export const AuthorCard = ({ author, variant = "full", showBio = true }: AuthorC
                                         href={author.socialLinks.website}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-600)] transition-colors"
+                                        className="text-[var(--muted-foreground)] hover:text-[var(--primary-700)] transition-colors"
                                         aria-label="Website"
                                     >
                                         <Globe className="w-4 h-4" />

@@ -189,7 +189,7 @@ export default function UserSettingsPage() {
                 <Card>
                     <div className="p-4 border-b border-[var(--border)]">
                         <h2 className="font-semibold flex items-center gap-2">
-                            <Globe className="w-5 h-5 text-[var(--primary-600)]" />
+                            <Globe className="w-5 h-5 text-[var(--primary-700)]" />
                             {t("settings.preferences")}
                         </h2>
                     </div>
@@ -214,7 +214,7 @@ export default function UserSettingsPage() {
                 <Card>
                     <div className="p-4 border-b border-[var(--border)]">
                         <h2 className="font-semibold flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-[var(--primary-600)]" />
+                            <Bell className="w-5 h-5 text-[var(--primary-700)]" />
                             Notifications
                         </h2>
                     </div>
@@ -258,7 +258,7 @@ export default function UserSettingsPage() {
                 <Card>
                     <div className="p-4 border-b border-[var(--border)]">
                         <h2 className="font-semibold flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-[var(--primary-600)]" />
+                            <Shield className="w-5 h-5 text-[var(--primary-700)]" />
                             Security
                         </h2>
                     </div>
@@ -274,7 +274,7 @@ export default function UserSettingsPage() {
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-[var(--primary-600)] px-2 py-1 bg-[var(--primary-100)] rounded-full border border-[var(--primary-200)]">
+                                <span className="text-xs font-bold text-[var(--primary-700)] px-2 py-1 bg-[var(--primary-100)] rounded-full border border-[var(--primary-200)]">
                                     COMING SOON
                                 </span>
                                 <label className="relative inline-flex items-center cursor-not-allowed opacity-50">

@@ -40,7 +40,7 @@ export default function ContactPage() {
 
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 bg-[var(--primary-100)] rounded-lg flex items-center justify-center text-[var(--primary-600)] flex-shrink-0">
+                                    <div className="w-10 h-10 bg-[var(--primary-100)] rounded-lg flex items-center justify-center text-[var(--primary-700)] flex-shrink-0">
                                         <Mail className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -69,7 +69,7 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-bold mb-1">Call us</h3>
                                         <p className="text-sm text-[var(--muted-foreground)] mb-1">Mon-Fri from 8am to 5pm.</p>
-                                        <a href="tel:+917424888915" className="text-[var(--primary-600)] font-medium hover:underline">+91 7424888915</a>
+                                        <a href="tel:+917424888915" className="text-[var(--primary-700)] font-medium hover:underline">+91 7424888915</a>
                                     </div>
                                 </div>
                             </div>
@@ -77,13 +77,13 @@ export default function ContactPage() {
                             <div className="pt-8 border-t border-[var(--border)]">
                                 <h3 className="font-bold mb-4">Frequently Asked Questions</h3>
                                 <div className="space-y-3">
-                                    <Link href="/faq" className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--primary-600)] hover:underline flex items-center gap-2">
+                                    <Link href="/faqs" className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--primary-700)] hover:underline flex items-center gap-2">
                                         <ArrowRight className="w-4 h-4" /> How do I start selling?
                                     </Link>
-                                    <Link href="/faq" className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--primary-600)] hover:underline flex items-center gap-2">
+                                    <Link href="/faqs" className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--primary-700)] hover:underline flex items-center gap-2">
                                         <ArrowRight className="w-4 h-4" /> What are the platform fees?
                                     </Link>
-                                    <Link href="/faq" className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--primary-600)] hover:underline flex items-center gap-2">
+                                    <Link href="/faqs" className="block text-sm text-[var(--muted-foreground)] hover:text-[var(--primary-700)] hover:underline flex items-center gap-2">
                                         <ArrowRight className="w-4 h-4" /> Improving course quality?
                                     </Link>
                                 </div>

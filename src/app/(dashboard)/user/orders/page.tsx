@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cdnImage } from "@/lib/imageCdn";
 import { formatDate } from "@/lib/formatDate";
 import { InvoiceDownloadButton } from "@/components/molecules/InvoiceDownloadButton";
 import { Loader2, Package, ExternalLink, AlertCircle, ChevronRight } from "lucide-react";
@@ -65,7 +66,7 @@ export default function OrdersPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-[50vh]">
-                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-600)]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[var(--primary-700)]" />
             </div>
         );
     }
@@ -139,7 +140,7 @@ export default function OrdersPage() {
                                     {order.items.map((item, idx) => (
                                         <li key={idx} className="flex items-center gap-4">
                                             {item.image ? (
-                                                <img src={item.image} alt={item.name} className="w-16 h-16 rounded-md object-cover border border-[var(--border)]" />
+                                                <img src={cdnImage(item.image, { width: 160 })} alt={item.name} loading="lazy" className="w-16 h-16 rounded-md object-cover border border-[var(--border)]" />
                                             ) : (
                                                 <div className="w-16 h-16 rounded-md bg-[var(--muted)] flex items-center justify-center">
                                                     <Package className="w-6 h-6 text-[var(--muted-foreground)]" />

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cdnImage } from "@/lib/imageCdn";
 import Link from "next/link";
 import Image from "next/image";
 import { Header, Footer } from "@/components/organisms";
@@ -8,8 +9,7 @@ import { Button } from "@/components/atoms";
 import { useCart } from "@/context";
 import { useToast } from "@/components/molecules";
 import { useCurrency } from "@/context/CurrencyContext";
-import { useTaxRate } from "@/hooks/useTaxRate";
-import { applyTax } from "@/lib/tax";
+import { taxForItems, taxLabelForRates } from "@/lib/tax";
 import {
     Trash2,
     Minus,
@@ -34,9 +34,11 @@ export default function CartPage() {
     // cart could quote a different total than the checkout page for the same
     // basket.
     const shipping = shippingTotal;
-    // Mirrors the server rate so the displayed total matches the charge.
-    const { rate: taxRate, displayName: taxName } = useTaxRate();
-    const taxDetail = applyTax(subtotal, taxRate, taxName);
+    // Summed per line: a basket can legitimately mix slabs, e.g. a 5% handicraft
+    // alongside an 18% course. Mirrors exactly what create-order will charge.
+    const taxDetail = taxForItems(
+        items.map((i) => ({ price: i.price, quantity: i.quantity, itemType: i.type, taxRate: i.taxRate }))
+    );
     const tax = taxDetail.amount;
     const total = subtotal - discount;
 
@@ -125,8 +127,9 @@ export default function CartPage() {
                                     className="flex gap-4 p-4 bg-white rounded-xl border border-[var(--border)]"
                                 >
                                     <img
-                                        src={item.image}
+                                        src={cdnImage(item.image, { width: 200 })}
                                         alt={item.name}
+                                        loading="lazy"
                                         className="w-24 h-24 object-cover rounded-lg"
                                     />
                                     <div className="flex-1 min-w-0">
@@ -243,7 +246,7 @@ export default function CartPage() {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-[var(--muted-foreground)]">{taxDetail.label}</span>
+                                        <span className="text-[var(--muted-foreground)]">{taxLabelForRates(taxDetail.rates)}</span>
                                         <span>{formatPrice(tax)}</span>
                                     </div>
                                     {discount > 0 && (
