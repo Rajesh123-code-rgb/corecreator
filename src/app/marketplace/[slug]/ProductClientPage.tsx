@@ -564,7 +564,7 @@ export default function ProductClientPage({ product, relatedProducts }: ProductC
                                         )}
                                     </div>
                                 </div>
-                                <Link href={`/studio/${product.seller._id || product.seller}`}>
+                                <Link href={`/artists/${product.seller._id || product.seller}`}>
                                     <Button variant="outline" size="sm">View Studio</Button>
                                 </Link>
                             </div>

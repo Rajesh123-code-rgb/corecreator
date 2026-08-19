@@ -28,6 +28,20 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  async redirects() {
+    return [
+      {
+        // The public creator profile used to live under /studio/<id>, which
+        // collided with the creator dashboard namespace and duplicated
+        // /artists/<id>. One canonical URL now, with the old one preserved for
+        // links and bookmarks already in the wild.
+        source: "/studio/:id((?!login|register|dashboard|products|courses|workshops|orders|earnings|inventory|analytics|audience|reviews|returns|messages|notifications|settings|verification|support)[a-f0-9]{24})",
+        destination: "/artists/:id",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     // Content-Security-Policy, in REPORT-ONLY mode.
     //
