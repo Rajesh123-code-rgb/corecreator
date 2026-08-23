@@ -1,5 +1,6 @@
 import { withAuth, type NextRequestWithAuth } from "next-auth/middleware";
 import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
+import { APEX_HOST as APEX } from "@/lib/portals";
 
 /* ---------------------------------------------------------------------------
  * Portals
@@ -21,7 +22,6 @@ import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server
  * for all three hosts.
  * ------------------------------------------------------------------------- */
 
-const APEX = "corecreator.online";
 
 type Portal = "main" | "studio" | "admin";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { APEX_URL } from "@/lib/portals";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
@@ -54,9 +55,9 @@ export default function StudioLoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-block mb-6">
+                    <a href={APEX_URL} className="inline-block mb-6">
                         <Image src="/logo.png" alt="Core Creator" width={150} height={80} className="h-12 w-auto" />
-                    </Link>
+                    </a>
                     <div className="flex items-center justify-center gap-2 mb-2">
                         <div className="w-12 h-12 rounded-full gradient-gold flex items-center justify-center">
                             <Palette className="w-6 h-6 text-white" />
@@ -122,9 +123,9 @@ export default function StudioLoginPage() {
                         </div>
 
                         <div className="text-center">
-                            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-700">
+                            <a href={`${APEX_URL}/login`} className="text-sm text-gray-500 hover:text-gray-700">
                                 ← Back to regular login
-                            </Link>
+                            </a>
                         </div>
                     </form>
                 </Card>

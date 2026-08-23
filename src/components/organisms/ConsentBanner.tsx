@@ -42,7 +42,15 @@ export function ConsentBanner() {
                             <p className="text-sm text-[var(--muted-foreground)]">
                                 We use essential cookies to make this site work. With your permission we&apos;d also
                                 like to use analytics, functional, and marketing cookies — read more in our{" "}
-                                <Link href="/cookies" className="underline hover:text-[var(--foreground)]">
+                                {/* prefetch disabled: the banner renders on every
+                                    host, and on studio./admin. this link is
+                                    cross-origin. Next's prefetch sends an RSC
+                                    header, which is non-simple, so the browser
+                                    fires a CORS preflight - and a page route does
+                                    not accept OPTIONS, giving a 405 on every
+                                    portal page load. Clicking still works; the
+                                    prefetch never could. */}
+                                <Link href="/cookies" prefetch={false} className="underline hover:text-[var(--foreground)]">
                                     Cookie Policy
                                 </Link>
                                 .
