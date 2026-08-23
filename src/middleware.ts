@@ -92,27 +92,36 @@ const authMiddleware = withAuth(
             authorized: ({ req, token }) => {
                 const pathname = req.nextUrl.pathname;
 
-                // Always allow maintenance page
-                if (pathname === "/maintenance") {
-                    return true;
-                }
+                // PUBLIC BY DEFAULT.
+                //
+                // This matters: the matcher now covers every page so that
+                // hostname routing can see ordinary requests. When it only
+                // matched /studio, /user and /admin, defaulting to "deny
+                // without a token" was safe. Under the wide matcher the same
+                // default sends the entire storefront to the login page.
+                //
+                // So protection is opt-in and enumerated here. Adding a new
+                // protected area means adding it to this list.
+                const needsSession =
+                    pathname.startsWith("/user/") ||
+                    pathname === "/admin" ||
+                    pathname.startsWith("/admin/") ||
+                    (pathname.startsWith("/studio") && isStudioDashboardPath(pathname)) ||
+                    /^\/learn\/[^/]+\/player/.test(pathname);
 
-                // Allow access to login/register pages without auth
+                if (!needsSession) return true;
+
+                // Sign-in and registration pages must stay reachable even
+                // though they sit under a protected prefix.
                 if (pathname.match(/\/(studio|user|admin)\/login/) ||
                     pathname.match(/\/(studio|user)\/register/)) {
                     return true;
                 }
 
-                // Non-dashboard /studio paths stay public.
-                if (pathname.startsWith("/studio/") && !isStudioDashboardPath(pathname)) {
-                    return true;
-                }
-
-                // Require auth for other protected routes
                 if (!token) return false;
 
                 // Role-based protection
-                if (pathname.startsWith("/admin")) {
+                if (pathname === "/admin" || pathname.startsWith("/admin/")) {
                     return token.role === "admin";
                 }
 
