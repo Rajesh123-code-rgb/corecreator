@@ -1,0 +1,42 @@
+# Core Creator
+
+> An Indian art and craft marketplace and learning platform. Artists and makers
+> sell original handmade work and teach their craft; buyers purchase artwork and
+> enrol in courses and live workshops. Operated by Digital Boostup, Jaipur,
+> Rajasthan, India. Prices are in INR and include GST.
+
+Core Creator is two things in one place: a marketplace for original handmade
+work, and a school where the people who make that work teach it. Creators keep
+the majority of every sale — the platform takes a flat commission with no
+listing fees, no monthly fees, and weekly payouts.
+
+## For buyers
+
+- [Marketplace](https://corecreator.online/marketplace): Original handmade artwork and craft, sold directly by the artist who made it.
+- [Courses](https://corecreator.online/learn): Recorded art and craft courses taught by working creators, with lifetime access.
+- [Workshops](https://corecreator.online/workshops): Live, scheduled sessions with limited seats.
+- [Artists](https://corecreator.online/artists): Profiles of the creators selling and teaching on the platform.
+
+## For creators
+
+- [Sell on Core Creator](https://corecreator.online/studio/register): Open a studio to sell artwork, publish courses, or run workshops.
+- [Pricing and commission](https://corecreator.online/pricing): The exact commission, what it covers, and the payout schedule.
+
+## Policies
+
+- [Returns and refunds](https://corecreator.online/returns): Physical items are returnable within 7 days for damage or a wrong item only. Customised items are not returnable. Digital purchases are final, because access is granted immediately.
+- [Shipping](https://corecreator.online/shipping): Orders ship from the creator who made the piece; cost and destinations are shown at checkout.
+- [Terms of Service](https://corecreator.online/terms)
+- [Privacy Policy](https://corecreator.online/privacy)
+
+## Help
+
+- [Help centre](https://corecreator.online/help)
+- [Frequently asked questions](https://corecreator.online/faqs)
+- [Contact](https://corecreator.online/contact)
+
+## Not for indexing or citation
+
+The creator dashboard (/studio/dashboard and related paths), the buyer account
+area (/user/), administration (/admin/), and checkout are private. They contain
+no reference content and should not be cited.

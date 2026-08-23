@@ -141,7 +141,7 @@ export default function WorkshopDetailPage() {
 
     const handleInstructorProfile = () => {
         if (workshop.instructor.id) {
-            router.push(`/studio/${workshop.instructor.id}`);
+            router.push(`/artists/${workshop.instructor.id}`);
         } else {
             toast.error("Instructor profile coming soon!");
         }

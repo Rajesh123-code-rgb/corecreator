@@ -7,6 +7,80 @@ left alone.
 
 ---
 
+## Phase 17 — One creator profile, and honest crawl rules
+
+Groundwork for the three-portal split, but valuable on its own: it untangles the
+`/studio` namespace, which currently holds a public profile and a private
+dashboard under the same path.
+
+### Two creator profiles became one
+
+`/studio/[id]` and `/artists/[id]` were both public creator profiles — duplicate
+content, neither carrying a canonical tag. They were also unequal:
+`/studio/[id]` was 558 lines, server-rendered, showing products, courses,
+workshops and reviews; `/artists/[id]` was 238 lines, client-rendered, showing
+products and courses only. Eleven internal links pointed at the first, three at
+the second.
+
+The better implementation now serves the semantically correct URL: profiles live
+at `/artists/[id]`, internal links point there directly, and `/studio/[id]`
+**301s** to it so existing links and bookmarks survive. The redirect pattern
+excludes the dashboard segments, so `/studio/products` is untouched.
+
+Neither page had `generateMetadata` or structured data, so every creator profile
+competed for the same site-wide title while sitting in the sitemap. Each now has
+its own title, description, canonical and OpenGraph tags, plus `ProfilePage` +
+`Person` JSON-LD linking the creator to the works listed on their page.
+
+With the profile moved, `/studio/*` is **purely the creator dashboard** — which
+is what makes the subdomain split clean.
+
+### robots.txt
+
+Previously it excluded `/studio/dashboard` and nothing else, leaving the other
+**24 dashboard paths** unlisted. They are auth-gated, so a crawler is redirected
+rather than shown anything, but they were never explicitly excluded.
+
+The rule now reflects the distinction that matters: the creator **portal** is
+discoverable, the creator **dashboard** is not. Creator signup and public
+profiles are explicitly allowed; all 16 dashboard sections, admin, the buyer
+account area, cart, checkout and the auth utility pages are disallowed.
+
+### llms.txt
+
+New — the site had none. Describes what Core Creator is in terms an assistant
+can quote, then links the pages worth citing: marketplace, courses, workshops,
+artists, pricing, and the real refund and shipping policies rather than a
+summary of them. It closes by naming the surfaces that should never be cited —
+dashboard, admin, account area, checkout — mirroring robots.
+
+### A contradiction in the sitemap
+
+`/login` was listed in the sitemap **and** marked `noindex` — two opposite
+instructions to the same crawler. `/studio/login` was listed and indexable,
+inconsistent with its own counterpart. Both are utilities rather than content;
+neither is in the sitemap now, and `/studio/login` gained the same `noindex`
+treatment `/login` already had. The two signup pages stay indexed, since
+creator acquisition is exactly what should be findable.
+
+### Phase 0 of the portal plan is resolved
+
+The one risk that could have derailed the three-portal split was NextAuth v4
+taking a single `NEXTAUTH_URL`. Reading the installed source settles it:
+
+```js
+function detectOrigin(forwardedHost, protocol) {
+  if (process.env.VERCEL ?? process.env.AUTH_TRUST_HOST)
+    return `${protocol === "http" ? "http" : "https"}://${forwardedHost}`;
+  return process.env.NEXTAUTH_URL;
+}
+```
+
+Setting `AUTH_TRUST_HOST=true` makes v4 derive the origin per request from the
+forwarded host. No spike, no throwaway subdomain, no upgrade to Auth.js v5.
+
+---
+
 ## Phase 16 — Image delivery, contrast, rate limits, and the end of dark mode
 
 ### Images: 2.1 MB down to roughly a tenth

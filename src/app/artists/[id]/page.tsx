@@ -1,196 +1,457 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Header, Footer } from "@/components/organisms";
-import { Card, CardContent } from "@/components/molecules";
 import { Button } from "@/components/atoms";
-import { Star, GraduationCap, ShoppingBag, Award, ArrowLeft, Loader2, Play } from "lucide-react";
-import { useCurrency } from "@/context/CurrencyContext";
+import { Card, CardContent } from "@/components/molecules";
+import connectDB from "@/lib/db/mongodb";
+import User from "@/lib/db/models/User";
+import Product from "@/lib/db/models/Product";
+import Course from "@/lib/db/models/Course";
+import {
+    Star,
+    MapPin,
+    Globe,
+    Instagram,
+    ShoppingBag,
+    ChevronRight,
+    BadgeCheck,
+    Heart,
+    Share2,
+    Award,
+    Calendar,
+    Palette,
+    Package,
+    Sparkles,
+    BookOpen,
+    Users,
+    Clock,
+    PlayCircle,
+} from "lucide-react";
+import FollowShopButton from "./FollowShopButton";
+import JsonLd from "@/components/atoms/JsonLd";
+import { siteConfig } from "@/lib/seo";
 
-interface Artist {
-    id: string;
-    name: string;
-    avatar: string;
-    bio: string;
-    specialty: string;
-    rating: number | null;
-    courses: Course[];
-    products: Product[];
-    totalStudents: number;
+
+interface PageProps {
+    params: Promise<{ id: string }>;
 }
 
-interface Course {
-    _id: string;
-    title: string;
-    slug: string;
-    thumbnail: string;
-    price: number;
-    rating: number | null;
-    enrollmentCount: number;
-    level: string;
-}
+/**
+ * Creator profiles are indexed and listed in the sitemap, but carried no title,
+ * description or structured data - so every profile competed for the same
+ * generic site-wide title.
+ */
+export async function generateMetadata(props: PageProps) {
+    const params = await props.params;
+    try {
+        await connectDB();
+        const creator = await User.findById(params.id)
+            .select("name bio profile studioProfile role")
+            .lean() as any;
 
-interface Product {
-    _id: string;
-    name: string;
-    slug: string;
-    price: number;
-    images: { url: string }[];
-    category: string;
-}
-
-export default function ArtistProfilePage() {
-    const params = useParams();
-    const artistId = params.id as string;
-    const { formatPrice } = useCurrency();
-
-    const [artist, setArtist] = useState<Artist | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchArtist = async () => {
-            try {
-                setLoading(true);
-                const res = await fetch(`/api/artists/${artistId}`);
-                if (!res.ok) {
-                    throw new Error("Artist not found");
-                }
-                const data = await res.json();
-                setArtist(data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load artist");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (artistId) {
-            fetchArtist();
+        if (!creator || (creator.role !== "studio" && creator.role !== "admin")) {
+            return { title: "Creator not found" };
         }
-    }, [artistId]);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[var(--background)]">
-                <Header />
-                <div className="flex justify-center items-center py-40">
-                    <Loader2 className="w-10 h-10 animate-spin text-[var(--secondary-500)]" />
-                </div>
-                <Footer />
-            </div>
-        );
+        const name = creator.studioProfile?.name || creator.name || "Creator";
+        const description =
+            (creator.bio || creator.profile?.bio || "").slice(0, 155) ||
+            `Browse original artwork and courses by ${name} on Core Creator.`;
+
+        return {
+            title: `${name} — Artist & Instructor`,
+            description,
+            alternates: { canonical: `/artists/${params.id}` },
+            openGraph: {
+                title: `${name} on Core Creator`,
+                description,
+                url: `/artists/${params.id}`,
+                type: "profile",
+            },
+        };
+    } catch {
+        // Metadata must never break the page.
+        return { title: "Artist & Instructor" };
+    }
+}
+
+export default async function StudioPage(props: PageProps) {
+    const params = await props.params;
+    await connectDB();
+
+    // Fetch seller/artist details
+    let seller;
+    let products: any[] = [];
+    let courses: any[] = [];
+
+    try {
+        seller = await User.findById(params.id)
+            .select("name email avatar bio profile studioProfile artistProfile role isVerified createdAt")
+            .lean();
+    } catch (e) {
+        // A malformed ObjectId throws here - that is a bad URL, not a server
+        // fault, so fall through to notFound() rather than surfacing a 500.
+        console.error("Failed to load studio profile:", e);
     }
 
-    if (error || !artist) {
-        return (
-            <div className="min-h-screen bg-[var(--background)]">
-                <Header />
-                <div className="container-app py-20 text-center">
-                    <h1 className="text-2xl font-bold mb-4">Artist Not Found</h1>
-                    <p className="text-[var(--muted-foreground)] mb-6">{error || "The artist you're looking for doesn't exist."}</p>
-                    <Button asChild>
-                        <Link href="/artists"><ArrowLeft className="w-4 h-4 mr-2" /> Back to Artists</Link>
-                    </Button>
-                </div>
-                <Footer />
-            </div>
-        );
+    // Unknown or non-creator IDs 404. This previously fell back to invented
+    // instructors - named people with stock-photo avatars, a verified badge and
+    // fabricated course/student/rating figures - which meant any unrecognised
+    // ID rendered a convincing profile for a creator who does not exist.
+    if (!seller || (seller.role !== "studio" && seller.role !== "admin")) {
+        notFound();
     }
+
+    products = await Product.find({
+        seller: params.id,
+        status: "active"
+    })
+        .sort({ createdAt: -1 })
+        .limit(12)
+        .lean();
+
+    courses = await Course.find({
+        instructor: params.id,
+        status: "published"
+    })
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .lean();
+
+    // Calculate seller stats from their real catalogue
+    let productStats = [];
+    let courseStats = [];
+
+    productStats = await Product.aggregate([
+        { $match: { seller: seller._id } },
+        {
+            $group: {
+                _id: null,
+                totalProducts: { $sum: 1 },
+                totalSales: { $sum: "$salesCount" },
+                productAvgRating: { $avg: "$rating" },
+                productReviews: { $sum: "$reviewCount" }
+            }
+        }
+    ]);
+
+    courseStats = await Course.aggregate([
+        { $match: { instructor: seller._id } },
+        {
+            $group: {
+                _id: null,
+                totalCourses: { $sum: 1 },
+                totalStudents: { $sum: "$enrollmentCount" },
+                courseAvgRating: { $avg: "$rating" }
+            }
+        }
+    ]);
+
+    const pStats = productStats[0] || { totalProducts: 0, totalSales: 0, productAvgRating: 0, productReviews: 0 };
+    const cStats = courseStats[0] || { totalCourses: 0, totalStudents: 0, courseAvgRating: 0 };
+
+    // Combined stats
+    const sellerStats = {
+        totalProducts: pStats.totalProducts,
+        totalCourses: cStats.totalCourses,
+        totalSales: pStats.totalSales,
+        totalStudents: cStats.totalStudents,
+        avgRating: pStats.productAvgRating || cStats.courseAvgRating || 0,
+        totalReviews: pStats.productReviews
+    };
+
+    // Serialize data
+    const sellerData = JSON.parse(JSON.stringify(seller));
+    const productsData = JSON.parse(JSON.stringify(products));
+    const coursesData = JSON.parse(JSON.stringify(courses));
+
+
+    // Fetch Workshops (Real)
+    let workshops: any[] = [];
+    try {
+        const Workshop = (await import("@/lib/db/models/Workshop")).default;
+        workshops = await Workshop.find({
+            instructor: params.id,
+            status: "published"
+        })
+            .sort({ date: 1 })
+            .lean();
+    } catch (e) {
+        console.error("Error fetching workshops:", e);
+    }
+
+    // Serialize workshops
+    const workshopsData = JSON.parse(JSON.stringify(workshops));
+    const hasWorkshops = workshopsData.length > 0;
+
+    // Update stats with workshops
+    if (hasWorkshops) {
+        // logic to add workshop stats if needed
+    }
+
+    // Calculate member since
+    const memberSince = new Date(sellerData.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric"
+    });
+
+    const hasProducts = productsData.length > 0;
+    const hasCourses = coursesData.length > 0;
+
+
+
+    // Person + ProfilePage so a creator can be understood as an entity rather
+    // than an anonymous page, and so search engines can connect a profile to the
+    // works listed on it.
+    const profileJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        mainEntity: {
+            "@type": "Person",
+            name: sellerData.studioProfile?.name || sellerData.name,
+            description: sellerData.bio || sellerData.profile?.bio || undefined,
+            image: sellerData.avatar || undefined,
+            url: `${siteConfig.url}/artists/${sellerData._id}`,
+            jobTitle: "Artist & Instructor",
+            worksFor: { "@type": "Organization", name: "Core Creator", url: siteConfig.url },
+        },
+    };
 
     return (
         <div className="min-h-screen bg-[var(--background)]">
+            <JsonLd data={profileJsonLd} />
             <Header />
 
-            {/* Hero Section */}
-            <section className="bg-gradient-to-b from-[var(--muted)] to-white pt-24 pb-12">
-                <div className="container-app">
-                    <Link href="/artists" className="inline-flex items-center text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] mb-6">
-                        <ArrowLeft className="w-4 h-4 mr-1" /> Back to Artists
-                    </Link>
+            <main className="pt-20 pb-16">
+                {/* Hero Section with Gradient Background */}
+                <div className="relative overflow-hidden">
+                    {/* Animated gradient background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--secondary-900)] via-[var(--secondary-800)] to-[var(--secondary-700)]" />
+                    <div className="absolute inset-0 opacity-30">
+                        <div className="absolute top-0 left-0 w-96 h-96 bg-[var(--secondary-500)] rounded-full filter blur-3xl animate-pulse" />
+                        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl animate-pulse delay-1000" />
+                    </div>
 
-                    <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                        <div className="relative">
-                            <img
-                                src={artist.avatar}
-                                alt={artist.name}
-                                className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-xl"
-                            />
-                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[var(--secondary-500)] rounded-full flex items-center justify-center text-white font-bold shadow">
-                                ✓
-                            </div>
-                        </div>
+                    {/* Pattern overlay */}
+                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-                        <div className="text-center md:text-left flex-1">
-                            <h1 className="text-3xl font-bold mb-2">{artist.name}</h1>
-                            <p className="text-[var(--secondary-600)] font-medium mb-3">{artist.specialty}</p>
-                            <p className="text-[var(--muted-foreground)] max-w-2xl mb-4">{artist.bio}</p>
+                    <div className="container-app relative z-10 py-16 md:py-24 pb-24 md:pb-32">
+                        {/* Breadcrumb */}
+                        <nav className="flex items-center gap-2 text-sm text-white/70 mb-8">
+                            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                            <ChevronRight className="w-4 h-4" />
+                            <Link href="/marketplace" className="hover:text-white transition-colors">Marketplace</Link>
+                            <ChevronRight className="w-4 h-4" />
+                            <span className="text-white">{sellerData.studioProfile?.name || sellerData.name}&apos;s Studio</span>
+                        </nav>
 
-                            <div className="flex flex-wrap justify-center md:justify-start gap-6">
-                                {artist.rating !== null && (
-                                    <div className="flex items-center gap-2">
-                                        <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                                        <span className="font-bold">{artist.rating}</span>
-                                        <span className="text-[var(--muted-foreground)]">Rating</span>
+                        {/* Profile Card */}
+                        <div className="flex flex-col lg:flex-row gap-8 items-start">
+                            {/* Left: Avatar and Info */}
+                            <div className="flex flex-col sm:flex-row gap-6 flex-1">
+                                {/* Avatar */}
+                                <div className="relative group">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-[var(--secondary-400)] to-purple-400 rounded-full blur opacity-75 group-hover:opacity-100 transition-opacity" />
+                                    <img
+                                        src={sellerData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerData.name)}&size=160&background=random`}
+                                        alt={sellerData.name}
+                                        className="relative w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white/20 object-cover shadow-2xl"
+                                    />
+                                    {sellerData.isVerified && (
+                                        <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-full shadow-lg border-2 border-white/20">
+                                            <BadgeCheck className="w-5 h-5" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Name and Info */}
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <h1 className="text-3xl md:text-4xl font-bold text-white">
+                                            {sellerData.studioProfile?.name || sellerData.name}
+                                        </h1>
+                                        {sellerData.isVerified && (
+                                            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-medium rounded-full border border-blue-500/30">
+                                                Verified
+                                            </span>
+                                        )}
                                     </div>
-                                )}
-                                <div className="flex items-center gap-2">
-                                    <GraduationCap className="w-5 h-5 text-blue-500" />
-                                    <span className="font-bold">{artist.courses?.length || 0}</span>
-                                    <span className="text-[var(--muted-foreground)]">Courses</span>
+
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <span className="px-3 py-1 bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium rounded-full capitalize flex items-center gap-1.5">
+                                            <Palette className="w-3.5 h-3.5" />
+                                            {sellerData.role}
+                                        </span>
+                                        <span className="text-white/60 text-sm flex items-center gap-1.5">
+                                            <Calendar className="w-3.5 h-3.5" />
+                                            Member since {memberSince}
+                                        </span>
+                                    </div>
+
+                                    {sellerData.bio && (
+                                        <p className="text-white/80 max-w-xl leading-relaxed mb-4">
+                                            {sellerData.studioProfile?.description || sellerData.bio}
+                                        </p>
+                                    )}
+
+                                    {/* Quick Links */}
+                                    <div className="flex flex-wrap gap-3 text-sm">
+                                        {sellerData.profile?.location && (
+                                            <span className="flex items-center gap-1.5 text-white/70 bg-white/5 px-3 py-1.5 rounded-full">
+                                                <MapPin className="w-4 h-4" />
+                                                {sellerData.profile.location}
+                                            </span>
+                                        )}
+                                        {sellerData.profile?.website && (
+                                            <a
+                                                href={sellerData.profile.website}
+                                                target="_blank"
+                                                rel="noopener"
+                                                className="flex items-center gap-1.5 text-white/70 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors"
+                                            >
+                                                <Globe className="w-4 h-4" />
+                                                Website
+                                            </a>
+                                        )}
+                                        {sellerData.profile?.socialLinks?.instagram && (
+                                            <a
+                                                href={`https://instagram.com/${sellerData.profile.socialLinks.instagram}`}
+                                                target="_blank"
+                                                rel="noopener"
+                                                className="flex items-center gap-1.5 text-white/70 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors"
+                                            >
+                                                <Instagram className="w-4 h-4" />
+                                                @{sellerData.profile.socialLinks.instagram}
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <ShoppingBag className="w-5 h-5 text-emerald-500" />
-                                    <span className="font-bold">{artist.products?.length || 0}</span>
-                                    <span className="text-[var(--muted-foreground)]">Artworks</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Award className="w-5 h-5 text-purple-500" />
-                                    <span className="font-bold">{artist.totalStudents?.toLocaleString() || 0}</span>
-                                    <span className="text-[var(--muted-foreground)]">Students</span>
-                                </div>
+                            </div>
+
+                            {/* Right: Action Buttons */}
+                            <div className="flex flex-col gap-3 w-full sm:w-auto">
+                                <FollowShopButton sellerId={params.id} sellerName={sellerData.name} />
+                                <Button variant="ghost" className="w-full sm:w-auto px-8 py-3 text-base text-white/70 hover:text-white hover:bg-white/5">
+                                    <Share2 className="w-5 h-5 mr-2" />
+                                    Share
+                                </Button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            {/* Courses Section */}
-            {artist.courses && artist.courses.length > 0 && (
-                <section className="py-12">
-                    <div className="container-app">
-                        <h2 className="text-2xl font-bold mb-6">Courses by {artist.name}</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {artist.courses.map((course) => (
-                                <Card key={course._id} hover className="overflow-hidden group">
-                                    <div className="relative aspect-video">
+                {/* Stats Section */}
+                <div className="container-app py-12 relative z-20">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="bg-[var(--card)] backdrop-blur-lg border border-[var(--border)] rounded-2xl p-6 text-center shadow-xl hover:shadow-2xl transition-shadow group">
+                            <div className="w-12 h-12 bg-gradient-to-br from-[var(--secondary-500)] to-[var(--secondary-600)] rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                <Package className="w-6 h-6 text-white" />
+                            </div>
+                            <p className="text-3xl font-bold bg-gradient-to-r from-[var(--foreground)] to-[var(--muted-foreground)] bg-clip-text text-transparent">
+                                {sellerStats.totalProducts}
+                            </p>
+                            <p className="text-sm text-[var(--muted-foreground)] mt-1">Products</p>
+                        </div>
+
+                        <div className="bg-[var(--card)] backdrop-blur-lg border border-[var(--border)] rounded-2xl p-6 text-center shadow-xl hover:shadow-2xl transition-shadow group">
+                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                <BookOpen className="w-6 h-6 text-white" />
+                            </div>
+                            <p className="text-3xl font-bold bg-gradient-to-r from-[var(--foreground)] to-[var(--muted-foreground)] bg-clip-text text-transparent">
+                                {sellerStats.totalCourses}
+                            </p>
+                            <p className="text-sm text-[var(--muted-foreground)] mt-1">Courses</p>
+                        </div>
+
+                        <div className="bg-[var(--card)] backdrop-blur-lg border border-[var(--border)] rounded-2xl p-6 text-center shadow-xl hover:shadow-2xl transition-shadow group">
+                            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                <Star className="w-6 h-6 text-white" />
+                            </div>
+                            <p className="text-3xl font-bold bg-gradient-to-r from-[var(--foreground)] to-[var(--muted-foreground)] bg-clip-text text-transparent">
+                                {sellerStats.avgRating > 0 ? sellerStats.avgRating.toFixed(1) : "New"}
+                            </p>
+                            <p className="text-sm text-[var(--muted-foreground)] mt-1">Rating</p>
+                        </div>
+
+                        <div className="bg-[var(--card)] backdrop-blur-lg border border-[var(--border)] rounded-2xl p-6 text-center shadow-xl hover:shadow-2xl transition-shadow group">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                <Award className="w-6 h-6 text-white" />
+                            </div>
+                            <p className="text-3xl font-bold bg-gradient-to-r from-[var(--foreground)] to-[var(--muted-foreground)] bg-clip-text text-transparent">
+                                {sellerStats.totalReviews}
+                            </p>
+                            <p className="text-sm text-[var(--muted-foreground)] mt-1">Reviews</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Courses Section - Only show if has courses */}
+                {hasCourses && (
+                    <div className="container-app py-12">
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl">
+                                    <PlayCircle className="w-5 h-5 text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold">Courses</h2>
+                            </div>
+                            <span className="text-sm text-[var(--muted-foreground)]">
+                                {coursesData.length} course{coursesData.length !== 1 ? "s" : ""}
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {coursesData.map((course: any) => (
+                                <Card key={course._id} hover className="overflow-hidden group border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
+                                    <Link href={`/learn/${course.slug}`} className="block aspect-video overflow-hidden relative">
                                         <img
-                                            src={course.thumbnail || "https://placehold.co/600x400?text=Course"}
+                                            src={course.thumbnail || "https://placehold.co/800x450?text=Course"}
                                             alt={course.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
-                                        <Link href={`/learn/${course.slug}`} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <Play className="w-12 h-12 text-white fill-current" />
-                                        </Link>
-                                        <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur text-xs font-bold rounded capitalize">
-                                            {course.level}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                        {/* Play button overlay */}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                                                <PlayCircle className="w-8 h-8 text-[var(--secondary-600)]" />
+                                            </div>
                                         </div>
-                                    </div>
+
+                                        {/* Level badge */}
+                                        <div className="absolute top-3 left-3">
+                                            <span className="px-2 py-1 bg-black/50 backdrop-blur-sm text-white text-xs font-medium rounded-full capitalize">
+                                                {course.level || "All Levels"}
+                                            </span>
+                                        </div>
+                                    </Link>
                                     <CardContent className="p-4">
-                                        <div className="flex items-center gap-2 mb-2 text-xs text-[var(--muted-foreground)]">
-                                            <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-500 fill-amber-500" /> {course.rating?.toFixed(1) || "New"}</span>
-                                            <span>•</span>
-                                            <span>{course.enrollmentCount?.toLocaleString() || 0} students</span>
-                                        </div>
-                                        <Link href={`/learn/${course.slug}`} className="hover:text-[var(--secondary-600)]">
-                                            <h3 className="font-bold mb-2 line-clamp-2">{course.title}</h3>
+                                        <p className="text-xs text-[var(--muted-foreground)] mb-1">{course.category}</p>
+                                        <Link href={`/learn/${course.slug}`} className="font-medium text-sm line-clamp-2 hover:text-[var(--secondary-600)] transition-colors">
+                                            {course.title}
                                         </Link>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-lg">{formatPrice(course.price)}</span>
-                                            <Button size="sm" variant="secondary" asChild>
-                                                <Link href={`/learn/${course.slug}`}>View Course</Link>
+                                        <div className="flex items-center gap-3 mt-3 text-xs text-[var(--muted-foreground)]">
+                                            <span className="flex items-center gap-1">
+                                                <Users className="w-3.5 h-3.5" />
+                                                {course.totalStudents || 0}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                {Math.round((course.totalDuration || 0) / 60)}h
+                                            </span>
+                                            {course.averageRating > 0 && (
+                                                <span className="flex items-center gap-1">
+                                                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                                                    {course.averageRating.toFixed(1)}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border)]">
+                                            <span className="font-bold text-lg text-[var(--secondary-600)]">
+                                                {course.price === 0 ? "Free" : `$${course.price}`}
+                                            </span>
+                                            <Button variant="ghost" size="sm" className="text-xs">
+                                                View Course
                                             </Button>
                                         </div>
                                     </CardContent>
@@ -198,39 +459,157 @@ export default function ArtistProfilePage() {
                             ))}
                         </div>
                     </div>
-                </section>
-            )}
+                )}
 
-            {/* Products Section */}
-            {artist.products && artist.products.length > 0 && (
-                <section className="py-12 bg-[var(--muted)]">
-                    <div className="container-app">
-                        <h2 className="text-2xl font-bold mb-6">Artworks by {artist.name}</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {artist.products.map((product) => (
-                                <Card key={product._id} hover className="overflow-hidden">
-                                    <div className="relative aspect-square">
-                                        <Link href={`/marketplace/${product.slug}`}>
-                                            <img
-                                                src={product.images?.[0]?.url || "https://placehold.co/400x400?text=Artwork"}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                                            />
-                                        </Link>
-                                    </div>
+                {/* Products Section - Only show if has products */}
+                {hasProducts && (
+                    <div className="container-app py-12">
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-[var(--secondary-500)] to-[var(--secondary-600)] rounded-xl">
+                                    <Sparkles className="w-5 h-5 text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold">Artwork & Products</h2>
+                            </div>
+                            <span className="text-sm text-[var(--muted-foreground)]">
+                                {productsData.length} item{productsData.length !== 1 ? "s" : ""}
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {productsData.map((product: any) => (
+                                <Card key={product._id} hover className="overflow-hidden group border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
+                                    <Link href={`/marketplace/${product.slug}`} className="block aspect-square overflow-hidden relative">
+                                        <img
+                                            src={product.images?.find((i: any) => i.isPrimary)?.url || product.images?.[0]?.url || "https://placehold.co/400x400?text=Product"}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                        {/* Quick actions */}
+                                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                                            <span className="text-white font-bold text-lg drop-shadow-lg">
+                                                ${product.price}
+                                            </span>
+                                            <button className="p-2 rounded-full bg-white/90 hover:bg-white text-gray-900 transition-colors shadow-lg">
+                                                <Heart className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </Link>
                                     <CardContent className="p-4">
-                                        <p className="text-xs text-[var(--muted-foreground)] mb-1">{product.category}</p>
-                                        <Link href={`/marketplace/${product.slug}`} className="hover:text-[var(--secondary-600)]">
-                                            <h3 className="font-semibold line-clamp-1">{product.name}</h3>
+                                        <Link href={`/marketplace/${product.slug}`} className="font-medium text-sm line-clamp-2 hover:text-[var(--secondary-600)] transition-colors">
+                                            {product.name}
                                         </Link>
-                                        <span className="text-lg font-bold text-[var(--secondary-600)] mt-2 block">{formatPrice(product.price)}</span>
+                                        <div className="flex items-center justify-between mt-3">
+                                            <span className="font-bold text-lg text-[var(--secondary-600)]">${product.price}</span>
+                                            <div className="flex items-center gap-1.5 bg-[var(--muted)] px-2 py-1 rounded-full">
+                                                {product.rating > 0 ? (
+                                                    <>
+                                                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                                                        <span className="text-xs font-medium">{product.rating.toFixed(1)}</span>
+                                                    </>
+                                                ) : (
+                                                    <span className="text-xs text-[var(--muted-foreground)]">New</span>
+                                                )}
+                                            </div>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             ))}
                         </div>
                     </div>
-                </section>
-            )}
+                )}
+
+                {/* Workshops Section - Only show if has workshops */}
+                {hasWorkshops && (
+                    <div className="container-app py-12">
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl">
+                                    <Calendar className="w-5 h-5 text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold">Workshops</h2>
+                            </div>
+                            <span className="text-sm text-[var(--muted-foreground)]">
+                                {workshopsData.length} workshop{workshopsData.length !== 1 ? "s" : ""}
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {workshopsData.map((workshop: any) => (
+                                <Card key={workshop.id} hover className="overflow-hidden group border-0 shadow-lg hover:shadow-2xl transition-all duration-300">
+                                    <Link href={`/workshops/${workshop.slug}`} className="block aspect-video overflow-hidden relative">
+                                        <img
+                                            src={workshop.thumbnail || "https://placehold.co/800x450?text=Workshop"}
+                                            alt={workshop.title}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                        {/* Calendar overlay */}
+                                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md rounded-lg p-2 text-center min-w-[3.5rem] shadow-sm">
+                                            <p className="text-xs text-[var(--muted-foreground)] uppercase font-semibold">
+                                                {new Date(workshop.date).toLocaleDateString("en-US", { month: "short" })}
+                                            </p>
+                                            <p className="text-lg font-bold text-[var(--foreground)]">
+                                                {new Date(workshop.date).getDate()}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                    <CardContent className="p-4">
+                                        <p className="text-xs text-[var(--muted-foreground)] mb-1 flex items-center gap-1">
+                                            <MapPin className="w-3 h-3" />
+                                            {workshop.city}, {workshop.country}
+                                        </p>
+                                        <Link href={`/workshops/${workshop.slug}`} className="font-medium text-sm line-clamp-2 hover:text-[var(--secondary-600)] transition-colors">
+                                            {workshop.title}
+                                        </Link>
+                                        <div className="flex items-center gap-3 mt-3 text-xs text-[var(--muted-foreground)]">
+                                            <span className="flex items-center gap-1">
+                                                <Users className="w-3.5 h-3.5" />
+                                                {workshop.capacity - workshop.enrolled} spots left
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                {Math.round((workshop.duration || 0) / 60)}h
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border)]">
+                                            <span className="font-bold text-lg text-[var(--secondary-600)]">
+                                                ${workshop.price}
+                                            </span>
+                                            <Button variant="ghost" size="sm" className="text-xs">
+                                                Book Now
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty state if no products and no courses */}
+                {!hasProducts && !hasCourses && !hasWorkshops && (
+                    <div className="container-app py-12">
+                        <div className="text-center py-20 bg-gradient-to-b from-[var(--muted)]/50 to-transparent rounded-3xl">
+                            <div className="w-20 h-20 bg-[var(--muted)] rounded-full flex items-center justify-center mx-auto mb-6">
+                                <ShoppingBag className="w-10 h-10 text-[var(--muted-foreground)]" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">Nothing here yet</h3>
+                            <p className="text-[var(--muted-foreground)] max-w-md mx-auto">
+                                This studio hasn&apos;t listed any products, courses, or workshops yet. Check back soon for amazing content!
+                            </p>
+                            <Link href="/marketplace">
+                                <Button variant="secondary" className="mt-6">
+                                    Browse Marketplace
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                )}
+            </main>
 
             <Footer />
         </div>

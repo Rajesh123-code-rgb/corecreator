@@ -20,7 +20,7 @@ export default function FollowShopButton({ sellerId, sellerName }: FollowShopBut
     const handleFollow = async () => {
         if (status === "unauthenticated") {
             // Redirect to login if not authenticated
-            router.push(`/login?callbackUrl=/studio/${sellerId}`);
+            router.push(`/login?callbackUrl=/artists/${sellerId}`);
             return;
         }
 

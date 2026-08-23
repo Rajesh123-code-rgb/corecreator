@@ -1,11 +1,48 @@
+# Core Creator — corecreator.online
+#
+# The creator PORTAL is discoverable; the creator DASHBOARD is not. Those live
+# under the same /studio path today, so the dashboard routes are listed
+# explicitly. Previously only /studio/dashboard was excluded, leaving the other
+# 24 dashboard paths unlisted.
+
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /checkout
-Disallow: /cart
-Disallow: /user/
+
+# Creator acquisition and public profiles — these should be found
+Allow: /studio/register
+Allow: /studio/login
+Allow: /artists/
+
+# Creator dashboard — private, nothing here is content
+Disallow: /studio/analytics
+Disallow: /studio/audience
+Disallow: /studio/courses
 Disallow: /studio/dashboard
+Disallow: /studio/earnings
+Disallow: /studio/inventory
+Disallow: /studio/messages
+Disallow: /studio/notifications
+Disallow: /studio/orders
+Disallow: /studio/products
+Disallow: /studio/returns
+Disallow: /studio/reviews
+Disallow: /studio/settings
+Disallow: /studio/support
+Disallow: /studio/verification
+Disallow: /studio/workshops
+
+# Administration — no part of this is public
+Disallow: /admin
+Disallow: /admin/
+
+# Buyer account area and transactional pages
+Disallow: /user/
+Disallow: /cart
+Disallow: /checkout
 Disallow: /reset-password
+Disallow: /forgot-password
+
+# Internal
+Disallow: /api/
 
 Sitemap: https://corecreator.online/sitemap.xml
