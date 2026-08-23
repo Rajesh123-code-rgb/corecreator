@@ -53,3 +53,6 @@ worker-*.js
 # Debug logs (auth callbacks used to write session JSON here)
 auth-debug.log
 *-debug.log
+
+# Local review database binary cache (mongodb-memory-server)
+.cache/mongodb-binaries/
