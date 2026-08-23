@@ -62,6 +62,19 @@ function isStudioDashboardPath(pathname: string): boolean {
     return segment ? STUDIO_DASHBOARD_SEGMENTS.has(segment) : false;
 }
 
+/** Shop routes, which belong on the apex rather than on a portal hostname. */
+const STOREFRONT_PREFIXES = [
+    "/marketplace", "/learn", "/workshops", "/artists", "/blog", "/cart",
+    "/checkout", "/pricing", "/about", "/contact", "/faqs", "/help", "/terms",
+    "/privacy", "/returns", "/shipping", "/cookies", "/careers", "/community",
+    "/documentation", "/product", "/search", "/user", "/accessibility",
+    "/learning-paths", "/tutorials", "/certificates", "/report",
+];
+
+function isStorefrontPath(pathname: string): boolean {
+    return STOREFRONT_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 /** Paths every portal needs regardless of host. */
 function isSharedInfrastructure(pathname: string): boolean {
     return (
@@ -183,39 +196,59 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
         return authMiddleware(req as NextRequestWithAuth, event);
     }
 
-    if (portal === "studio") {
-        // The portal root is the dashboard.
-        if (pathname === "/") {
-            return NextResponse.redirect(new URL("/studio/dashboard", req.url));
-        }
-        // withAuth sends unauthenticated users to /login; on this host that
-        // should be the creator sign-in, not the buyer one.
-        if (pathname === "/login") {
-            const target = new URL("/studio/login", req.url);
-            target.search = req.nextUrl.search;
-            return NextResponse.redirect(target);
-        }
-        // Storefront routes do not belong here - send them to the apex rather
-        // than serving two copies of the shop.
-        if (!pathname.startsWith("/studio")) {
-            return NextResponse.redirect(new URL(pathname + req.nextUrl.search, `https://${APEX}`));
-        }
-        return guarded(req, event, portal);
-    }
+    // The two portals serve their section at the root of their own hostname.
+    //
+    // studio.corecreator.online/register serves /studio/register, so the path
+    // never repeats what the hostname already says. Two rules do it:
+    //
+    //   - a REWRITE maps the clean path to the internal one, leaving the URL
+    //     in the address bar untouched
+    //   - a REDIRECT normalises any prefixed URL to the clean form, because
+    //     links inside the app are still written as /studio/... and would
+    //     otherwise produce studio.corecreator.online/studio/...
+    //
+    // The rewrite is internal, so the two cannot loop.
+    if (portal === "studio" || portal === "admin") {
+        const prefix = portal === "studio" ? "/studio" : "/admin";
 
-    if (portal === "admin") {
-        if (pathname === "/") {
-            return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+        if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+            const target = req.nextUrl.clone();
+            target.pathname = pathname.slice(prefix.length) || "/";
+            return NextResponse.redirect(target, 308);
         }
-        if (pathname === "/login") {
-            const target = new URL("/admin/login", req.url);
-            target.search = req.nextUrl.search;
-            return NextResponse.redirect(target);
-        }
-        if (!pathname.startsWith("/admin")) {
+
+        // Storefront routes do not belong here - send them to the apex rather
+        // than serving a second copy of the shop.
+        if (isStorefrontPath(pathname)) {
             return NextResponse.redirect(new URL(pathname + req.nextUrl.search, `https://${APEX}`));
         }
-        return guarded(req, event, portal);
+
+        // The path this request will actually be served from.
+        const internalPath = pathname === "/" ? `${prefix}/dashboard` : `${prefix}${pathname}`;
+
+        // Auth has to be judged against the path that will be served, not the
+        // one in the address bar - otherwise /earnings looks like a public
+        // route. nextUrl is mutable in middleware, so the rewrite target and
+        // the path withAuth inspects are the same object.
+        req.nextUrl.pathname = internalPath;
+
+        const res = await authMiddleware(req as NextRequestWithAuth, event);
+        // A redirect means withAuth refused - hand it back untouched.
+        if (res && res.headers.get("location")) {
+            return applyPortalHeaders(res as NextResponse, portal);
+        }
+
+        // Carry x-pathname through the rewrite. The root layout reads it for
+        // maintenance mode, including the bypass that lets an admin reach
+        // /admin/login - dropping it would lock the admin out of turning
+        // maintenance back off.
+        const forwarded = new Headers(req.headers);
+        forwarded.set("x-pathname", internalPath);
+
+        return applyPortalHeaders(
+            NextResponse.rewrite(req.nextUrl, { request: { headers: forwarded } }),
+            portal
+        );
     }
 
     // Apex. Administration is not acknowledged here at all - a redirect would
