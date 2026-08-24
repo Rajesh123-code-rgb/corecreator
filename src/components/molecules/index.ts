@@ -18,3 +18,4 @@ export * from "./ArticleEngagement";
 export * from "./ConfirmModal";
 export * from "./Toast";
 export { default as AIGeneratorButton } from "./AIGeneratorButton";
+export { SearchableSelect } from "./SearchableSelect";

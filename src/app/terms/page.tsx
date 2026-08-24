@@ -59,7 +59,7 @@ export default function TermsPage() {
 
                         <h2 className="text-2xl font-bold mb-4 mt-8">7. Governing Law</h2>
                         <p className="mb-6 text-[var(--muted-foreground)]">
-                            These Terms are governed by and construed in accordance with the laws of India.
+                            These Terms are governed by and construed in accordance with the laws of India. The courts at Jaipur, Rajasthan shall have exclusive jurisdiction over any dispute arising from them.
                         </p>
 
                         <h2 className="text-2xl font-bold mb-4">8. Contact Us</h2>

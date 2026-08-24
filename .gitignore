@@ -56,3 +56,6 @@ auth-debug.log
 
 # Local review database binary cache (mongodb-memory-server)
 .cache/mongodb-binaries/
+
+# Generated reports, not source
+generated/
