@@ -99,9 +99,21 @@ ssh-copy-id -i ~/.ssh/migrate.pub root@$NEW_IP
 
 Copy the three things GitHub cannot give you:
 
+The box holds **two** certificate lineages: `corecreator.online` and
+`app.convoo.cloud` (omnichannel). Copy only ours - shipping the other app's
+private keys to a server that cannot renew them is both a leak and a source of
+recurring renewal failures.
+
 ```bash
-# on the OLD box
-rsync -az -e "ssh -i ~/.ssh/migrate" /etc/letsencrypt/ root@$NEW_IP:/etc/letsencrypt/
+ssh -i ~/.ssh/migrate root@$NEW_IP 'mkdir -p /etc/letsencrypt/{live,archive,renewal}'
+rsync -az -e "ssh -i ~/.ssh/migrate" /etc/letsencrypt/live/corecreator.online \
+      root@$NEW_IP:/etc/letsencrypt/live/
+rsync -az -e "ssh -i ~/.ssh/migrate" /etc/letsencrypt/archive/corecreator.online \
+      root@$NEW_IP:/etc/letsencrypt/archive/
+rsync -az -e "ssh -i ~/.ssh/migrate" /etc/letsencrypt/renewal/corecreator.online.conf \
+      root@$NEW_IP:/etc/letsencrypt/renewal/
+rsync -az -e "ssh -i ~/.ssh/migrate" /etc/letsencrypt/options-ssl-nginx.conf \
+      /etc/letsencrypt/ssl-dhparams.pem root@$NEW_IP:/etc/letsencrypt/
 rsync -az -e "ssh -i ~/.ssh/migrate" /etc/nginx/sites-available/corecreator \
       root@$NEW_IP:/etc/nginx/sites-available/corecreator
 rsync -az -e "ssh -i ~/.ssh/migrate" /opt/corecreator/.env.production \
@@ -112,9 +124,8 @@ rsync -az -e "ssh -i ~/.ssh/migrate" /opt/corecreator/.env.production \
 `archive/`. Do not add `--copy-links`; it breaks renewal.
 
 The nginx config is **copied rather than rewritten** on purpose. It already
-carries whatever was tuned on the old box - `client_max_body_size` for uploads,
-proxy timeouts, and certbot's managed TLS block. Re-authoring it risks losing a
-setting nobody remembers adding. Confirm it forwards the host header, since the
+carries certbot's managed TLS block and the portal server_name grouping.
+Re-authoring it risks losing a setting nobody remembers adding. Confirm it forwards the host header, since the
 three portals are routed entirely by it:
 
 ```bash
@@ -126,14 +137,32 @@ grep -E 'proxy_set_header|client_max_body_size|server_name' \
 `proxy_set_header Host $host;` must be present. Without it every hostname
 resolves to the storefront and both portals disappear.
 
-If the repo is cloned over SSH on the old box (`git remote -v` starts with
-`git@`), also copy the deploy key:
+Then apply three corrections the old config needs. They are pre-existing faults,
+carried along by the copy, and this is the cheapest moment to fix them:
 
 ```bash
-# on the OLD box, only if the remote is git@github.com
-rsync -az -e "ssh -i ~/.ssh/migrate" ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub \
-      ~/.ssh/known_hosts root@$NEW_IP:/root/.ssh/
+CONF=/etc/nginx/sites-available/corecreator
+
+# 1. Uploads. There is no client_max_body_size anywhere, so nginx applies its
+#    1MB default and returns 413. Measured on the old box: a 900KB POST reaches
+#    the app, 1500KB does not. Uploads pass through the Next server, so every
+#    creator photo over 1MB fails, and the 1GB video path never worked at all.
+sed -i '/listen 443 ssl/a\    client_max_body_size 1024m;\n    proxy_read_timeout 300s;' $CONF
+
+# 2. The apex block proxies to "localhost:3002" while the portal block uses
+#    127.0.0.1. localhost can resolve to ::1 first, and the app binds IPv4 only
+#    - the same trap that made the Docker healthcheck report unhealthy for hours
+#    while the site served perfectly. nginx retries the second address, so it
+#    works, slowly and for no reason.
+sed -i 's|proxy_pass http://localhost:3002;|proxy_pass http://127.0.0.1:3002;|' $CONF
+
+nginx -t
 ```
+
+The third is `www`, handled after cutover in Stage 5 - it needs DNS pointing
+here first.
+
+The repository is public and cloned over HTTPS, so no deploy key is needed.
 
 ## Stage 3 - build on the new box
 
@@ -181,8 +210,13 @@ done
 curl -s --resolve "corecreator.online:443:$NEW_IP" https://corecreator.online/api/health
 ```
 
-Expect 200 on the apex and www. The portals redirect to their login pages.
-A certificate error here means the `/etc/letsencrypt` copy did not land.
+Expect 200 on the apex. The portals redirect to their login pages.
+A certificate error there means the `/etc/letsencrypt` copy did not land.
+
+**`www` will fail, and already does on the old box.** The certificate covers
+`corecreator.online`, `admin.` and `studio.` only, and no server block names
+`www`, so it returns a TLS error over HTTPS and 404 over HTTP. Fixed in Stage 5,
+once DNS points here and certbot can validate it.
 
 Then, in a browser with a hosts-file override, walk the paths that have broken
 before:
@@ -241,5 +275,24 @@ on every `deploy.sh` today and will not carry to the new box:
   Bunny Stream is unconfigured
 - `src/app/api/admin/seo/config/route.ts` - the admin robots.txt editor
 - `src/app/api/admin/seo/redirects/route.ts` - redirects.json
+
+`BUNNY_STREAM_API_KEY` is set, so the local video fallback is dormant.
+
+**`RAZORPAY_WEBHOOK_SECRET` is absent from `.env.production`.** The webhook
+handler falls back to an empty HMAC key, so the computed signature can never
+match and every webhook is rejected with a 400. It fails closed - nothing is
+forgeable - but the webhook is the only confirmation path when a customer closes
+the tab immediately after paying, which is why grantWorkshopAttendance was
+written to run from both paths. Those buyers are charged and receive nothing.
+
+Fix it on whichever server is live, then carry the value across:
+
+```bash
+echo "RAZORPAY_WEBHOOK_SECRET=<secret from the Razorpay webhook settings>" >> .env.production
+docker compose -f docker-compose.prod.yml up -d --force-recreate
+```
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` is also absent, so Google Analytics is inert.
+`NEXT_PUBLIC_API_URL` is absent but only read by an admin debug panel.
 
 Tracked separately. They are pre-existing, not caused by the migration.
