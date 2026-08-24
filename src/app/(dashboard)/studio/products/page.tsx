@@ -25,6 +25,7 @@ interface Product {
     id: string;
     title: string;
     status: "active" | "draft" | "archived" | "sold";
+    taxRate?: number;
     sales: number;
     views: number;
     price: number;
@@ -45,6 +46,7 @@ export default function StudioProductsPage() {
     const [loading, setLoading] = React.useState(true);
     const [searchQuery, setSearchQuery] = React.useState("");
     const [statusFilter, setStatusFilter] = React.useState<string>("all");
+    const [savingTax, setSavingTax] = React.useState<string | null>(null);
     const confirmModal = useConfirmModal();
     const toast = useToast();
 
@@ -119,6 +121,31 @@ export default function StudioProductsPage() {
         }
     };
 
+    /**
+     * Saves a GST slab straight from the list. The row updates optimistically and
+     * rolls back if the request fails, so the select never shows a rate the
+     * server did not accept.
+     */
+    const updateTaxRate = async (id: string, taxRate: number) => {
+        const previous = products.find((p) => p.id === id)?.taxRate;
+        setSavingTax(id);
+        setProducts((list) => list.map((p) => (p.id === id ? { ...p, taxRate } : p)));
+        try {
+            const res = await fetch(`/api/studio/products/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ taxRate }),
+            });
+            if (!res.ok) throw new Error("Save failed");
+            toast.success("GST updated", `Now charged at ${taxRate}% on this item.`);
+        } catch {
+            setProducts((list) => list.map((p) => (p.id === id ? { ...p, taxRate: previous } : p)));
+            toast.error("Could not update GST", "Please try again.");
+        } finally {
+            setSavingTax(null);
+        }
+    };
+
     return (
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -173,6 +200,7 @@ export default function StudioProductsPage() {
                                 <th className="px-6 py-4 font-medium">Status</th>
                                 <th className="px-6 py-4 font-medium">Inventory</th>
                                 <th className="px-6 py-4 font-medium">Price</th>
+                                <th className="px-6 py-4 font-medium">GST</th>
                                 <th className="px-6 py-4 font-medium">Sales</th>
                                 <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
@@ -210,6 +238,22 @@ export default function StudioProductsPage() {
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
                                         {formatPrice(product.price, product.currency || "INR")}
+                                    </td>
+                                    {/* Set here as well as on the edit page: the rate depends on
+                                        what the item is, and a seller pricing a batch of listings
+                                        should not have to open each one to set it. */}
+                                    <td className="px-6 py-4">
+                                        <select
+                                            aria-label={`GST rate for ${product.title}`}
+                                            value={product.taxRate ?? 18}
+                                            disabled={savingTax === product.id}
+                                            onChange={(e) => updateTaxRate(product.id, Number(e.target.value))}
+                                            className="min-h-9 px-2 py-1 text-sm rounded-md border border-gray-200 bg-white disabled:opacity-50"
+                                        >
+                                            {[5, 12, 18].map((r) => (
+                                                <option key={r} value={r}>{r}%</option>
+                                            ))}
+                                        </select>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-600">
                                         {product.sales} sold

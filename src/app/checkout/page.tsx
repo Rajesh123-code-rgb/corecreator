@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { taxForItems } from "@/lib/tax";
+import { SearchableSelect } from "@/components/molecules";
+import { COUNTRIES, regionsFor, regionLabel, postalRules, countryByName } from "@/lib/locations";
 
 const steps = ["Shipping", "Review & Pay"];
 
@@ -52,8 +54,12 @@ export default function CheckoutPage() {
         city: "",
         zip: "",
         state: "",
-        country: ""
+        country: "India"
     });
+
+    // Field-level errors, cleared as the shopper corrects each one rather than
+    // only on the next submit.
+    const [errors, setErrors] = React.useState<Record<string, string>>({});
 
     // Checkout progress is kept in sessionStorage so a reload or an accidental
     // back-navigation doesn't wipe a half-filled shipping form. sessionStorage
@@ -111,6 +117,9 @@ export default function CheckoutPage() {
     }, [isHydrated, items, router]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (errors[e.target.name]) {
+            setErrors((prev) => { const n = { ...prev }; delete n[e.target.name]; return n; });
+        }
         setAddress({ ...address, [e.target.name]: e.target.value });
     };
 
@@ -126,6 +135,54 @@ export default function CheckoutPage() {
             return;
         }
         toast.success("Removed from your order", `${name} is no longer in this order.`);
+    };
+
+    const selectedCountry = countryByName(address.country);
+    const countryCode = selectedCountry?.code || "";
+    const regions = regionsFor(countryCode);
+    const postal = postalRules(countryCode);
+
+    /**
+     * Validates the shipping step. The form previously had no validation at all,
+     * so an order could be placed with an empty address and only failed later,
+     * at the point where someone had to ship it.
+     */
+    const validateAddress = (): boolean => {
+        const next: Record<string, string> = {};
+
+        if (!address.firstName.trim()) next.firstName = "Enter your first name";
+        if (!address.lastName.trim()) next.lastName = "Enter your last name";
+
+        if (!address.email.trim()) next.email = "Enter your email address";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address.email.trim()))
+            next.email = "That doesn't look like a valid email address";
+
+        const digits = address.phone.replace(/\D/g, "");
+        if (!digits) next.phone = "Enter a phone number so the courier can reach you";
+        else if (countryCode === "IN" && !/^(91)?[6-9]\d{9}$/.test(digits))
+            next.phone = "Enter a 10-digit Indian mobile number";
+        else if (digits.length < 7) next.phone = "That number looks too short";
+
+        if (!address.addressLine.trim()) next.addressLine = "Enter your street address";
+        else if (address.addressLine.trim().length < 5) next.addressLine = "Please give the full street address";
+
+        if (!address.city.trim()) next.city = "Enter your city";
+        if (!address.country.trim()) next.country = "Select your country";
+        if (!address.state.trim()) next.state = `Select your ${regionLabel(countryCode).toLowerCase()}`;
+
+        if (!address.zip.trim()) next.zip = `Enter your ${postal.label.toLowerCase()}`;
+        else if (postal.pattern && !postal.pattern.test(address.zip.trim()))
+            next.zip = `${postal.label} should be ${postal.hint}`;
+
+        setErrors(next);
+        if (Object.keys(next).length > 0) {
+            // Move to the first problem rather than leaving them to hunt for it.
+            const firstField = Object.keys(next)[0];
+            document.querySelector<HTMLElement>(`[name="${firstField}"]`)?.focus();
+            toast.warning("Check your details", "A few fields still need attention.");
+            return false;
+        }
+        return true;
     };
 
     const handlePayment = async () => {
@@ -354,17 +411,60 @@ export default function CheckoutPage() {
                                             <MapPin className="w-5 h-5" /> Shipping Information
                                         </h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <Input label="First Name" name="firstName" placeholder="John" value={address.firstName} onChange={handleInputChange} leftIcon={<User className="w-5 h-5" />} />
-                                            <Input label="Last Name" name="lastName" placeholder="Doe" value={address.lastName} onChange={handleInputChange} />
-                                            <Input label="Email" name="email" type="email" placeholder="john@example.com" value={address.email} onChange={handleInputChange} leftIcon={<Mail className="w-5 h-5" />} className="md:col-span-2" />
-                                            <Input label="Phone" name="phone" type="tel" placeholder="+1 (555) 000-0000" value={address.phone} onChange={handleInputChange} leftIcon={<Phone className="w-5 h-5" />} className="md:col-span-2" />
-                                            <Input label="Address" name="addressLine" placeholder="123 Main St" value={address.addressLine} onChange={handleInputChange} className="md:col-span-2" />
-                                            <Input label="City" name="city" placeholder="New York" value={address.city} onChange={handleInputChange} />
-                                            <Input label="ZIP Code" name="zip" placeholder="10001" value={address.zip} onChange={handleInputChange} />
-                                            <Input label="State" name="state" placeholder="NY" value={address.state} onChange={handleInputChange} />
-                                            <Input label="Country" name="country" placeholder="United States" value={address.country} onChange={handleInputChange} />
+                                            <Input label="First Name" name="firstName" autoComplete="given-name" placeholder="Asha" value={address.firstName} onChange={handleInputChange} leftIcon={<User className="w-5 h-5" />} error={errors.firstName} />
+                                            <Input label="Last Name" name="lastName" autoComplete="family-name" placeholder="Sharma" value={address.lastName} onChange={handleInputChange} error={errors.lastName} />
+                                            <Input label="Email" name="email" type="email" autoComplete="email" placeholder="asha@example.com" value={address.email} onChange={handleInputChange} leftIcon={<Mail className="w-5 h-5" />} className="md:col-span-2" error={errors.email} />
+                                            <Input label="Phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" placeholder={selectedCountry ? `${selectedCountry.dial} 98765 43210` : "Phone number"} value={address.phone} onChange={handleInputChange} leftIcon={<Phone className="w-5 h-5" />} className="md:col-span-2" error={errors.phone} />
+                                            <Input label="Address" name="addressLine" autoComplete="street-address" placeholder="House / flat, street, landmark" value={address.addressLine} onChange={handleInputChange} className="md:col-span-2" error={errors.addressLine} />
+                                            <Input label="City" name="city" autoComplete="address-level2" placeholder="Jaipur" value={address.city} onChange={handleInputChange} error={errors.city} />
+                                            <Input label={postal.label} name="zip" autoComplete="postal-code" inputMode="numeric" placeholder={countryCode === "IN" ? "302001" : ""} value={address.zip} onChange={handleInputChange} error={errors.zip} />
+
+                                            {/* Country drives the region list, the postal rule and
+                                                the phone check, so it is chosen rather than typed. */}
+                                            <SearchableSelect
+                                                label="Country"
+                                                name="country"
+                                                autoComplete="country-name"
+                                                required
+                                                value={address.country}
+                                                options={COUNTRIES.map((c) => c.name)}
+                                                error={errors.country}
+                                                onChange={(v) => {
+                                                    // Clear the region: a state from the old country
+                                                    // is meaningless under the new one.
+                                                    setAddress((a) => ({ ...a, country: v, state: "" }));
+                                                    setErrors((e) => { const n = { ...e }; delete n.country; delete n.state; return n; });
+                                                }}
+                                            />
+
+                                            {regions.length > 0 ? (
+                                                <SearchableSelect
+                                                    label={regionLabel(countryCode)}
+                                                    name="state"
+                                                    autoComplete="address-level1"
+                                                    required
+                                                    value={address.state}
+                                                    options={regions}
+                                                    error={errors.state}
+                                                    onChange={(v) => {
+                                                        setAddress((a) => ({ ...a, state: v }));
+                                                        setErrors((e) => { const n = { ...e }; delete n.state; return n; });
+                                                    }}
+                                                />
+                                            ) : (
+                                                // No region list for this country - accept free text
+                                                // rather than block the order.
+                                                <Input
+                                                    label={regionLabel(countryCode)}
+                                                    name="state"
+                                                    autoComplete="address-level1"
+                                                    value={address.state}
+                                                    onChange={handleInputChange}
+                                                    error={errors.state}
+                                                />
+                                            )}
                                         </div>
-                                        <Button variant="secondary" size="lg" className="w-full" onClick={() => setCurrentStep(1)}>
+                                        <Button variant="secondary" size="lg" className="w-full" onClick={() => { if (validateAddress()) setCurrentStep(1); }}>
                                             Continue to Review
                                         </Button>
                                     </div>
