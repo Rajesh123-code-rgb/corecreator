@@ -67,6 +67,34 @@ function isStudioDashboardPath(pathname: string): boolean {
     return segment ? STUDIO_DASHBOARD_SEGMENTS.has(segment) : false;
 }
 
+/**
+ * Top-level sections each portal owns - kept in sync with the route folders.
+ *
+ * These are checked BEFORE the storefront list, because the two overlap:
+ * "workshops", "returns" and "shipping" name both a shop page and a portal
+ * section. Without this, /admin/workshops was stripped to /workshops, matched
+ * the storefront list, and was redirected to the shop - so three admin sections
+ * and two creator sections were unreachable.
+ */
+const ADMIN_SECTIONS = new Set([
+    "analytics", "audit-logs", "banners", "categories", "cms", "courses", "dashboard",
+    "email-templates", "enquiries", "finance", "login", "messages", "notifications",
+    "orders", "payouts", "products", "promo-codes", "reports", "returns", "reviews",
+    "seo", "settings", "shipping", "support", "taxes", "users", "workshops",
+]);
+
+const STUDIO_SECTIONS = new Set([
+    "analytics", "audience", "courses", "dashboard", "earnings", "inventory", "login",
+    "messages", "notifications", "orders", "products", "register", "returns", "reviews",
+    "settings", "support", "verification", "workshops",
+]);
+
+function isPortalSection(portal: "studio" | "admin", pathname: string): boolean {
+    const segment = pathname.split("/")[1];
+    if (!segment) return false;
+    return (portal === "admin" ? ADMIN_SECTIONS : STUDIO_SECTIONS).has(segment);
+}
+
 /** Shop routes, which belong on the apex rather than on a portal hostname. */
 const STOREFRONT_PREFIXES = [
     "/marketplace", "/learn", "/workshops", "/artists", "/blog", "/cart",
@@ -222,9 +250,9 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
             return NextResponse.redirect(target, 308);
         }
 
-        // Storefront routes do not belong here - send them to the apex rather
-        // than serving a second copy of the shop.
-        if (isStorefrontPath(pathname)) {
+        // A section this portal owns always wins. Only paths that are not a
+        // portal section get treated as shop routes.
+        if (!isPortalSection(portal, pathname) && isStorefrontPath(pathname)) {
             return NextResponse.redirect(new URL(pathname + req.nextUrl.search, `https://${APEX}`));
         }
 

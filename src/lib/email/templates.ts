@@ -36,6 +36,9 @@ export const getWelcomeEmailTemplate = (name: string) => `
 </html>
 `;
 
+// Values may arrive already formatted - the admin template preview renders this
+// with "{{total}}" in place of a number, and a string has no .toFixed(). Calling
+// it unconditionally made the whole email-templates endpoint return 500.
 export const getOrderConfirmationTemplate = (order: any, userName: string) => `
 <!DOCTYPE html>
 <html>
@@ -68,11 +71,11 @@ export const getOrderConfirmationTemplate = (order: any, userName: string) => `
                 ${(order.items || []).map((item: any) => `
                 <div class="item">
                     <span>${item.name} (x${item.quantity})</span>
-                    <span>${order.currency || 'USD'} ${item.price.toFixed(2)}</span>
+                    <span>${order.currency || 'INR'} ${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}</span>
                 </div>
                 `).join('')}
                 <div class="total">
-                    Total: ${order.currency || 'USD'} ${order.total.toFixed(2)}
+                    Total: ${order.currency || 'INR'} ${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}
                 </div>
             </div>
             
