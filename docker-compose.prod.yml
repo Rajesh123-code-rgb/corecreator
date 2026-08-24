@@ -6,7 +6,13 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3002:3000"
+    # Bound to loopback, NOT 0.0.0.0. Published as "3002:3000" the app was
+    # reachable at http://<vps-ip>:3002 over plain HTTP - the whole site,
+    # including the login forms, served without TLS and bypassing nginx
+    # entirely. Sending a Host header of admin.corecreator.online to that port
+    # reached the admin portal over cleartext. nginx is the only public
+    # entrance now; it proxies to 127.0.0.1:3002 on the host, which still works.
+      - "127.0.0.1:3002:3000"
     env_file:
       - .env.production
     # Surfaces real health in `docker ps` rather than just "is the process
