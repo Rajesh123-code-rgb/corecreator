@@ -19,11 +19,14 @@ services:
     # alive" - /api/health returns 503 if the app can't reach MongoDB.
     # wget is busybox-provided in the node:20-alpine base image.
     #
-    # 127.0.0.1, NOT localhost. Inside the container localhost resolves to the
-    # IPv6 loopback ::1 first, while the Next.js standalone server binds to
-    # 0.0.0.0 - IPv4 only. wget therefore got "Connection refused" on every
-    # attempt and the container reported unhealthy for hours while serving
-    # traffic perfectly well.
+    # 127.0.0.1, NOT localhost: inside the container localhost resolves to the
+    # IPv6 loopback ::1 first, and the server does not listen there.
+    #
+    # That alone did not fix it. The server binds to process.env.HOSTNAME, which
+    # Docker sets to the container ID, so it was listening only on the
+    # container's own eth0 address and not on loopback at all. See ENV HOSTNAME
+    # in the Dockerfile - without that line this check fails whatever address it
+    # is pointed at.
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 30s

@@ -62,6 +62,18 @@ EXPOSE 3000
 
 ENV PORT=3000
 
+# Next's standalone server binds to process.env.HOSTNAME, and Docker injects the
+# container ID as HOSTNAME. Left alone it therefore listened only on the
+# container's eth0 address - 172.18.0.2:3000 - and nothing else in the container
+# could reach it. The published port still worked, because docker-proxy targets
+# that address, so the site served perfectly while the healthcheck hit
+# 127.0.0.1:3000 and got "Connection refused" on every attempt, for weeks:
+# FailingStreak 25 and climbing on a container that was answering every request.
+#
+# Binding 0.0.0.0 makes the process listen on loopback as well, which is all the
+# healthcheck ever needed.
+ENV HOSTNAME=0.0.0.0
+
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
 CMD ["node", "server.js"]
