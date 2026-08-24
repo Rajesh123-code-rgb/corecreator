@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { APEX_URL } from "@/lib/portals";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -105,9 +106,9 @@ export default function AdminLoginPage() {
                 </form>
 
                 <div className="mt-6 text-center">
-                    <Link href="/" className="text-sm text-gray-500 hover:text-gray-900">
+                    <a href={APEX_URL} className="text-sm text-gray-500 hover:text-gray-900">
                         Back to Home
-                    </Link>
+                    </a>
                 </div>
             </div>
         </div>

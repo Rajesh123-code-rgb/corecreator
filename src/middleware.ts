@@ -1,5 +1,6 @@
 import { withAuth, type NextRequestWithAuth } from "next-auth/middleware";
 import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
+import { APEX_HOST as APEX } from "@/lib/portals";
 
 /* ---------------------------------------------------------------------------
  * Portals
@@ -21,7 +22,6 @@ import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server
  * for all three hosts.
  * ------------------------------------------------------------------------- */
 
-const APEX = "corecreator.online";
 
 type Portal = "main" | "studio" | "admin";
 
@@ -58,6 +58,11 @@ const STUDIO_DASHBOARD_SEGMENTS = new Set([
 ]);
 
 function isStudioDashboardPath(pathname: string): boolean {
+    // The /studio prefix check is load-bearing. Without it this matched on the
+    // second segment alone, so /user/dashboard, /user/orders, /user/courses and
+    // /user/settings all looked like creator-dashboard paths and were redirected
+    // to the studio portal - the entire buyer account area.
+    if (pathname !== "/studio" && !pathname.startsWith("/studio/")) return false;
     const segment = pathname.split("/")[2];
     return segment ? STUDIO_DASHBOARD_SEGMENTS.has(segment) : false;
 }
@@ -265,9 +270,12 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     // The creator dashboard has moved. A permanent redirect keeps existing
     // bookmarks and any indexed links working through the transition.
     if (isStudioDashboardPath(pathname)) {
+        // 307, not 308: browsers cache a permanent redirect indefinitely, so a
+        // wrong one is very hard to take back. These pages are noindex anyway,
+        // so permanence buys nothing here.
         return NextResponse.redirect(
             new URL(pathname + req.nextUrl.search, `https://studio.${APEX}`),
-            308
+            307
         );
     }
 
