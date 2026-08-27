@@ -178,13 +178,13 @@ export default function EditCoursePage() {
             });
 
             if (res.ok) {
-                const updated = await res.json();
-                console.log("Course updated successfully:", {
-                    learningOutcomes: updated.learningOutcomes,
-                });
                 router.push("/studio/courses");
             } else {
-                toast.error("Failed to update course");
+                // Show what the server actually objected to. A fixed "Failed to
+                // update course" tells the creator nothing about which field to
+                // correct, and hid a validation error for as long as it existed.
+                const err = await res.json().catch(() => null);
+                toast.error(err?.error || "Failed to update course");
             }
         } catch (error) {
             console.error("Error updating course:", error);
