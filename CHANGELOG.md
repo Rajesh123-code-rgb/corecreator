@@ -7,6 +7,69 @@ left alone.
 
 ---
 
+## Phase 18 — Server migration, and three faults it exposed
+
+The app moved to a new Hostinger VPS. It turned out to be a far smaller job than
+expected: MONGODB_URI is an Atlas connection, and images, video, email and
+payments are all external services addressed by domain. The server holds no
+durable state, so the migration needed no dump, no maintenance window and no
+cutover freeze - two servers can serve the same domain from the same database at
+once, which also makes rollback a single DNS revert.
+
+Preparing it surfaced three problems that had nothing to do with the move.
+
+**The container healthcheck could never pass.** Next's standalone server binds to
+process.env.HOSTNAME, and Docker injects the container ID as HOSTNAME, so it was
+listening on the container's own eth0 address and nowhere else:
+
+    tcp 0 0 172.18.0.2:3000 0.0.0.0:* LISTEN
+    wget http://127.0.0.1:3000/api/health -> Connection refused
+
+The published port still worked, because docker-proxy targets that address - so
+the site answered every request correctly while the check was refused every 30
+seconds, FailingStreak 25 and climbing. An earlier fix had pointed the check at
+127.0.0.1 rather than localhost; the ::1 reasoning was right but the server was
+not on the IPv4 loopback either, so it changed nothing. This matters because
+deploy.sh waits on that check before calling a release good, so the one signal
+that would catch a bad deploy had been dead the whole time. ENV HOSTNAME=0.0.0.0
+fixes it; the new box reports healthy after 20s.
+
+**nginx was rejecting uploads above 1MB.** No client_max_body_size was set
+anywhere, so nginx applied its 1MB default. Measured against the old server, a
+900KB POST reached the app and a 1500KB POST returned 413. Uploads pass through
+the Next server, so every creator photo over 1MB failed - a phone photo is 2-5MB
+- and the 1GB video path had never been usable. Now 1024m, matching the ceiling
+the application already enforces itself. Verified on the new box: 5MB returns
+401 rather than 413.
+
+**Every Razorpay webhook was being rejected.** RAZORPAY_WEBHOOK_SECRET was absent
+from .env.production, so the handler computed its HMAC with an empty key and no
+signature could ever match. It failed closed, so nothing was forgeable, but the
+webhook is the only confirmation path when a buyer closes the tab immediately
+after paying - which is exactly why grantWorkshopAttendance was written to run
+from both paths. Those buyers were charged and received nothing: no access, no
+seat, no email. Set on the live server.
+
+Two smaller things were fixed while the new server was being built. The app port
+was published as "3002:3000", which binds 0.0.0.0, so the whole site was
+reachable over plain HTTP at the VPS address - and because the portals route on
+the Host header, sending Host: admin.corecreator.online to that port reached the
+admin portal in cleartext. It is bound to 127.0.0.1 now, with nginx the only
+public entrance. And www had never worked at all: the certificate omitted it and
+no server block named it, so it failed the TLS handshake and 404'd over HTTP. It
+now redirects to the apex, which is the canonical form the sitemap and
+NEXTAUTH_URL already use.
+
+The nginx config was rewritten rather than copied verbatim. Reading all 80 lines
+showed no hidden tuning to preserve - it was stock certbot output plus a
+hand-written portal block - and the apex block was missing the forwarded headers
+the portal block already had, and proxied to localhost:3002 where the portal
+block used 127.0.0.1. Only the corecreator certificate lineage was carried
+across; app.convoo.cloud belongs to the other application on the old box and
+stayed there.
+
+---
+
 ## Phase 17 — One creator profile, and honest crawl rules
 
 Groundwork for the three-portal split, but valuable on its own: it untangles the
