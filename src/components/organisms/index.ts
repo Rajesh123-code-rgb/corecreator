@@ -5,3 +5,4 @@ export { ReviewsSection } from "./ReviewsSection";
 export * from "./ReferencesSection";
 export * from "./RelatedArticles";
 
+export { ArtFormsShowcase } from "./ArtFormsShowcase";

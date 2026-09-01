@@ -109,6 +109,7 @@ const features = [
   },
 ];
 
+import { ArtFormsShowcase } from "@/components/organisms/ArtFormsShowcase";
 import { categories } from "@/lib/categories";
 import { courseCategories } from "@/lib/courseCategories";
 
@@ -438,6 +439,9 @@ export default function HomeClient() {
           </div>
         </div>
       </section>
+
+      {/* Art forms - the full list of traditions, filterable, load-more */}
+      <ArtFormsShowcase />
 
       {/* Top Courses Section */}
       <section className="py-20 bg-[var(--muted)]">

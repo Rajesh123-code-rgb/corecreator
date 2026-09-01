@@ -1,0 +1,282 @@
+[
+  {
+    "label": "Modern & contemporary",
+    "forms": [
+      {
+        "name": "Resin Art",
+        "slug": "resin-art",
+        "description": "Pouring liquid epoxy resin mixed with pigments to create glossy, glass-like fluid art and functional items."
+      },
+      {
+        "name": "Punch Needle & Tufting",
+        "slug": "punch-needle-tufting",
+        "description": "Modern textile arts using specialized needles to loop yarn into thick, plush rugs and wall decor."
+      },
+      {
+        "name": "Alcohol Ink Art",
+        "slug": "alcohol-ink-art",
+        "description": "Creating vibrant, ethereal abstract designs by manipulating fast-drying dye inks on non-porous surfaces."
+      },
+      {
+        "name": "Fluid Acrylic Pouring",
+        "slug": "fluid-acrylic-pouring",
+        "description": "Thinning acrylic paints with mediums to pour and tilt them across canvases, creating marbled patterns."
+      },
+      {
+        "name": "Digital Painting & Concept Art",
+        "slug": "digital-painting-concept-art",
+        "description": "Using drawing tablets and software to create hyper-detailed visual art, illustrations, and animations."
+      },
+      {
+        "name": "3D Pen Sculpting",
+        "slug": "3d-pen-sculpting",
+        "description": "Extruding heated plastic filament that instantly cools to draw three-dimensional sculptures in mid-air."
+      },
+      {
+        "name": "Eco-Printing",
+        "slug": "eco-printing",
+        "description": "Steaming or boiling leaves and flowers bundled tightly against fabric to transfer their natural pigments directly."
+      },
+      {
+        "name": "Upcycled & Mixed Media Assemblage",
+        "slug": "upcycled-mixed-media-assemblage",
+        "description": "Combining discarded objects, scrap metals, and different mediums into cohesive modern sculptures."
+      }
+    ]
+  },
+  {
+    "label": "Paper arts",
+    "forms": [
+      {
+        "name": "Paper Quilling",
+        "slug": "paper-quilling",
+        "description": "Rolling, shaping, and gluing narrow paper strips together to create intricate, 3D mosaic-like designs."
+      },
+      {
+        "name": "Origami",
+        "slug": "origami",
+        "description": "The traditional Japanese art of folding flat paper sheets into complex geometric shapes and objects without cutting."
+      },
+      {
+        "name": "Modern Faux Calligraphy & Hand Lettering",
+        "slug": "faux-calligraphy-hand-lettering",
+        "description": "Stylizing text by drawing fake brush strokes, heavily popularized in modern graphic design."
+      },
+      {
+        "name": "Decoupage",
+        "slug": "decoupage",
+        "description": "Gluing printed paper cutouts onto home goods, furniture, or frames and sealing them with thick lacquer."
+      },
+      {
+        "name": "Papier-Mâché",
+        "slug": "papier-mache",
+        "description": "Building lightweight, durable objects and masks out of paper pulp or paper strips mixed with paste."
+      },
+      {
+        "name": "Scherenschnitte",
+        "slug": "scherenschnitte",
+        "description": "Highly intricate traditional German paper-cutting that uses fine scissors to create symmetrical silhouettes."
+      }
+    ]
+  },
+  {
+    "label": "Ceramics & glass",
+    "forms": [
+      {
+        "name": "Studio Ceramics",
+        "slug": "studio-ceramics",
+        "description": "Modern wheel-throwing and hand-building techniques used to create unique, contemporary functional pottery."
+      },
+      {
+        "name": "Kintsugi",
+        "slug": "kintsugi",
+        "description": "The Japanese art of repairing broken pottery with lacquer dusted with real gold, highlighting flaws instead of hiding them."
+      },
+      {
+        "name": "Murano Glassblowing",
+        "slug": "murano-glassblowing",
+        "description": "The famous Venetian tradition of shaping molten glass into colorful, fluid sculptures and vessels."
+      },
+      {
+        "name": "Stained Glass",
+        "slug": "stained-glass",
+        "description": "Creating large windows or panels by arranging colored glass pieces held together with lead framing."
+      },
+      {
+        "name": "Azulejos",
+        "slug": "azulejos",
+        "description": "Distinctive, historically blue-and-white tin-glazed ceramic tiles characteristic of Portuguese architecture."
+      },
+      {
+        "name": "Celadon Pottery",
+        "slug": "celadon-pottery",
+        "description": "Jade-green glazed stoneware highly valued across East Asia for its smooth finish and subtle cracks."
+      }
+    ]
+  },
+  {
+    "label": "Painting traditions",
+    "forms": [
+      {
+        "name": "Oil Painting",
+        "slug": "oil-painting",
+        "description": "Classic European canvas mastery utilizing slow-drying pigments, refined heavily during the Renaissance."
+      },
+      {
+        "name": "Chinese Shanshui",
+        "slug": "chinese-shanshui",
+        "description": "Traditional brush-and-ink landscape paintings executed on delicate silk or paper scrolls."
+      },
+      {
+        "name": "Ukiyo-e",
+        "slug": "ukiyo-e",
+        "description": "Japanese woodblock prints that captured urban pop culture and natural landscapes during the Edo period."
+      },
+      {
+        "name": "Aboriginal Dot Painting",
+        "slug": "aboriginal-dot-painting",
+        "description": "Australian Indigenous storytelling using layered dots to represent land maps and sacred cultural symbols."
+      },
+      {
+        "name": "Fresco Painting",
+        "slug": "fresco-painting",
+        "description": "Applying water-based pigments directly onto fresh, wet lime plaster walls for permanent murals."
+      },
+      {
+        "name": "Encaustic Painting",
+        "slug": "encaustic-painting",
+        "description": "An ancient Egyptian technique using heated, colored beeswax to paint luminous, durable portraits."
+      }
+    ]
+  },
+  {
+    "label": "Indian folk & classical",
+    "forms": [
+      {
+        "name": "Madhubani Painting",
+        "slug": "madhubani-painting",
+        "description": "Intricate, geometric folk art made with twigs, fingers, and natural dyes from Bihar."
+      },
+      {
+        "name": "Warli Art",
+        "slug": "warli-art",
+        "description": "Minimalist geometric tribal paintings from Maharashtra using circles, triangles, and squares to show village life."
+      },
+      {
+        "name": "Gond Art",
+        "slug": "gond-art",
+        "description": "Vibrant tribal paintings from Madhya Pradesh featuring dense patterns of repetitive lines and dots."
+      },
+      {
+        "name": "Kalamkari",
+        "slug": "kalamkari",
+        "description": "Hand-painted or block-printed cotton textiles using natural organic dyes, native to South India."
+      },
+      {
+        "name": "Pattachitra",
+        "slug": "pattachitra",
+        "description": "Highly detailed cloth-based scroll paintings depicting epic mythological tales from Odisha."
+      },
+      {
+        "name": "Tanjore Painting",
+        "slug": "tanjore-painting",
+        "description": "Classical South Indian art heavily encrusted with genuine gold foil, semiprecious stones, and glass."
+      }
+    ]
+  },
+  {
+    "label": "Textiles",
+    "forms": [
+      {
+        "name": "Batik",
+        "slug": "batik",
+        "description": "The Indonesian craft of applying wax-resist patterns to cloth before immersion dyeing."
+      },
+      {
+        "name": "Ikat",
+        "slug": "ikat",
+        "description": "A highly complex resist-dyeing process applied directly to individual yarns before they are woven into fabric."
+      },
+      {
+        "name": "Sashiko",
+        "slug": "sashiko",
+        "description": "Japanese functional embroidery that uses simple running stitches to reinforce and beautifully patch old fabric."
+      },
+      {
+        "name": "Macramé",
+        "slug": "macrame",
+        "description": "Textile work created by knotting cords together into geometric patterns, popular in bohemian home decor."
+      },
+      {
+        "name": "Chikankari",
+        "slug": "chikankari",
+        "description": "Delicate, intricate white-on-white shadow-work hand embroidery originating from Lucknow."
+      },
+      {
+        "name": "Tapestry Weaving",
+        "slug": "tapestry-weaving",
+        "description": "Heavy, hand-woven pictorial textiles designed to be hung as insulation and decoration on walls."
+      }
+    ]
+  },
+  {
+    "label": "Metal, stone & wood",
+    "forms": [
+      {
+        "name": "Dokra",
+        "slug": "dokra",
+        "description": "An ancient Indian tribal lost-wax casting technique used to create detailed bronze artifacts."
+      },
+      {
+        "name": "Damascening",
+        "slug": "damascening",
+        "description": "The luxury art of inlaying gold or silver wire into hard iron or steel surfaces."
+      },
+      {
+        "name": "Filigree",
+        "slug": "filigree",
+        "description": "Delicate jewelry making that involves twisting and soldering fine threads of precious metals."
+      },
+      {
+        "name": "Pietra Dura",
+        "slug": "pietra-dura",
+        "description": "Inlaying highly polished, colored semiprecious stones into marble surfaces to form seamless images."
+      },
+      {
+        "name": "Wood Carving",
+        "slug": "wood-carving",
+        "description": "Sculpting ornaments, relief scenes, or three-dimensional figures out of solid wood blocks."
+      },
+      {
+        "name": "Cloisonné",
+        "slug": "cloisonne",
+        "description": "An enameling technique where wire outlines are fixed to metal surfaces and filled with colorful glass paste."
+      }
+    ]
+  },
+  {
+    "label": "Folk art worldwide",
+    "forms": [
+      {
+        "name": "Huichol Beadwork",
+        "slug": "huichol-beadwork",
+        "description": "Mexican yarn and glass bead art applied over wax-coated sculptures to depict sacred visions."
+      },
+      {
+        "name": "Pysanka",
+        "slug": "pysanka",
+        "description": "Ukrainian Easter eggs decorated with highly symbolic, intricate wax-resist batik designs."
+      },
+      {
+        "name": "Alebrijes",
+        "slug": "alebrijes",
+        "description": "Whimsical, brightly colored Mexican folk-art sculptures depicting fantastical, hybrid creatures."
+      },
+      {
+        "name": "Totem Pole Carving",
+        "slug": "totem-pole-carving",
+        "description": "Pacific Northwest Indigenous monumental pillars carved from massive cedar logs to display family lineages."
+      }
+    ]
+  }
+]
