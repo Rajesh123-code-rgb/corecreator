@@ -2,71 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { uploadToCloudinary } from "@/lib/cloudinary";
-
-// Helper fetch with AbortController timeout
-async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 12000): Promise<Response> {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-        const response = await fetch(url, {
-            ...options,
-            signal: controller.signal,
-        });
-        return response;
-    } finally {
-        clearTimeout(id);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Tier 1: Real OpenAI AI Image Generation (gpt-image-1, gpt-image-2, dall-e-3)
-// ---------------------------------------------------------------------------
-const OPENAI_IMAGE_MODELS = [
-    "gpt-image-1",
-    "gpt-image-2",
-    "gpt-image-1.5",
-    "chatgpt-image-latest",
-    "dall-e-3",
-    "dall-e-2",
-];
-
-async function generateWithOpenAI(prompt: string): Promise<Buffer | null> {
-    if (!process.env.OPENAI_API_KEY) return null;
-    try {
-        const { default: OpenAI } = await import("openai");
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-        for (const model of OPENAI_IMAGE_MODELS) {
-            try {
-                console.log(`[AI] Generating with OpenAI model: ${model}...`);
-                const response = await openai.images.generate({
-                    model,
-                    prompt: prompt.substring(0, 4000),
-                    n: 1,
-                    size: "1024x1024",
-                });
-
-                const dataItem = response?.data?.[0];
-                if (dataItem?.b64_json) {
-                    console.log(`[AI] OpenAI model ${model} succeeded! (b64_json)`);
-                    return Buffer.from(dataItem.b64_json, "base64");
-                }
-                if (dataItem?.url) {
-                    console.log(`[AI] OpenAI model ${model} succeeded! (url)`);
-                    const imgRes = await fetchWithTimeout(dataItem.url, {}, 10000);
-                    if (imgRes.ok) {
-                        return Buffer.from(await imgRes.arrayBuffer());
-                    }
-                }
-            } catch (modelErr: any) {
-                console.warn(`[AI] OpenAI model ${model} notice:`, modelErr?.message || modelErr);
-            }
-        }
-    } catch (err: any) {
-        console.warn("[AI] OpenAI client notice:", err?.message || err);
-    }
-    return null;
-}
+// Tier 1 lives in @/lib/ai/imageGeneration so the admin category backfill can
+// use the same model-fallback loop rather than carrying a second copy of it.
+import { fetchWithTimeout, generateWithOpenAI } from "@/lib/ai/imageGeneration";
 
 // ---------------------------------------------------------------------------
 // Tier 2: Pollinations AI

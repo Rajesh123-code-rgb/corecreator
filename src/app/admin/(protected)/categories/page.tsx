@@ -47,6 +47,24 @@ export default function AdminCategoriesPage() {
     const toast = useToast();
     const [deleteConfirm, setDeleteConfirm] = React.useState<{ show: boolean; id: string; name: string }>({ show: false, id: "", name: "" });
 
+    // The form renders above the table. With 25 categories it was usually still
+    // on screen when you pressed edit; with 120 it opens several thousand pixels
+    // above the viewport and edit looks like a dead button. Bring it to the user
+    // instead of expecting them to scroll back up and find it.
+    const formRef = React.useRef<HTMLDivElement>(null);
+    const nameInputRef = React.useRef<HTMLInputElement>(null);
+    const [imageProgress, setImageProgress] = React.useState<{ running: boolean; done: number; total: number }>(
+        { running: false, done: 0, total: 0 }
+    );
+
+    const revealForm = React.useCallback(() => {
+        // After paint, or the node is not in the document yet on first open.
+        requestAnimationFrame(() => {
+            formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            nameInputRef.current?.focus();
+        });
+    }, []);
+
     const fetchCategories = React.useCallback(async () => {
         setLoading(true);
         try {
@@ -88,10 +106,19 @@ export default function AdminCategoriesPage() {
                 setShowForm(false);
                 setEditingId(null);
                 setFormData({ name: "", type: "product", description: "", image: "" });
+                toast.success(editingId ? "Category updated" : "Category created");
                 fetchCategories();
+            } else {
+                // Previously there was no else at all, so a rejected save closed
+                // nothing and said nothing - the form just sat there. The API
+                // returns a usable message, including a 409 when the name
+                // collides with another category of the same type.
+                const err = await res.json().catch(() => null);
+                toast.error(err?.error || "Failed to save category");
             }
         } catch (error) {
             console.error("Failed to save category:", error);
+            toast.error("Could not reach the server");
         } finally {
             setSubmitting(false);
         }
@@ -106,6 +133,50 @@ export default function AdminCategoriesPage() {
         });
         setEditingId(category._id);
         setShowForm(true);
+        revealForm();
+    };
+
+    /**
+     * Fills in the missing category images.
+     *
+     * Batched because generating 48 images takes 8-16 minutes end to end, far
+     * past any request timeout. The endpoint does a few per call and reports
+     * what is left, so this loops until it is done and can be resumed simply by
+     * pressing the button again.
+     */
+    const handleGenerateImages = async () => {
+        setImageProgress({ running: true, done: 0, total: 0 });
+        let done = 0;
+        try {
+            for (let guard = 0; guard < 60; guard++) {
+                const res = await fetch("/api/admin/categories/generate-images", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ limit: 5 }),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => null);
+                    toast.error(err?.error || "Image generation failed");
+                    break;
+                }
+                const data = await res.json();
+                done += data.generated ?? 0;
+                setImageProgress({ running: true, done, total: done + (data.remaining ?? 0) });
+                if (data.failed?.length) {
+                    toast.error(`Could not generate: ${data.failed.join(", ")}`);
+                }
+                if (!data.remaining) {
+                    toast.success(done ? `Generated ${done} images` : "Every category already has an image");
+                    break;
+                }
+            }
+            fetchCategories();
+        } catch (error) {
+            console.error("Image generation error:", error);
+            toast.error("Image generation stopped unexpectedly");
+        } finally {
+            setImageProgress((p) => ({ ...p, running: false }));
+        }
     };
 
     const handleDelete = async (id: string) => {
@@ -185,7 +256,23 @@ export default function AdminCategoriesPage() {
                             Seed Default Categories
                         </Button>
                     )}
-                    <Button onClick={() => { setShowForm(true); setEditingId(null); setFormData({ name: "", type: "product", description: "", image: "" }); }}>
+                    <Button
+                        variant="outline"
+                        onClick={handleGenerateImages}
+                        disabled={imageProgress.running}
+                        title="Generates an image for every category that does not have one yet"
+                    >
+                        {imageProgress.running ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                Generating {imageProgress.done}
+                                {imageProgress.total ? ` of ${imageProgress.total}` : ""}…
+                            </>
+                        ) : (
+                            <><ImageIcon className="w-4 h-4 mr-2" /> Generate missing images</>
+                        )}
+                    </Button>
+                    <Button onClick={() => { setShowForm(true); setEditingId(null); setFormData({ name: "", type: "product", description: "", image: "" }); revealForm(); }}>
                         <Plus className="w-4 h-4 mr-2" /> Add Category
                     </Button>
                 </div>
@@ -233,12 +320,13 @@ export default function AdminCategoriesPage() {
 
             {/* Form */}
             {showForm && (
-                <div className="bg-white rounded-xl border border-gray-100 p-6">
+                <div ref={formRef} className="bg-white rounded-xl border border-gray-100 p-6 scroll-mt-6">
                     <h3 className="font-semibold mb-4">{editingId ? "Edit Category" : "Add Category"}</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-1">Name</label>
                             <input
+                                ref={nameInputRef}
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
