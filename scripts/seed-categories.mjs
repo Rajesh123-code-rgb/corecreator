@@ -18,7 +18,16 @@
  *
  *   node scripts/seed-categories.mjs            # apply
  *   node scripts/seed-categories.mjs --dry-run  # report only
+ *   node scripts/seed-categories.mjs --reorder  # also reset display order
  */
+
+/**
+ * Art forms are numbered from 100 so they sort as one block after the dozen
+ * categories that predate them, which use 0-12. Sharing that range interleaved
+ * the two in the admin list - Paintings 0, Resin Art 1, Sculptures 1, Ceramics
+ * 2, Punch Needle 2 - with ties broken by name, which reads as no order at all.
+ */
+const ORDER_BASE = 100;
 import mongoose from "mongoose";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -26,6 +35,7 @@ import { dirname, join } from "node:path";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DRY = process.argv.includes("--dry-run");
+const REORDER = process.argv.includes("--reorder");
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
@@ -46,8 +56,9 @@ const bySlug = new Map(existing.map((c) => [c.slug, c]));
 let inserted = 0, updated = 0;
 const rows = [];
 forms.forEach((form, i) => {
-    rows.push({ ...form, type: "product", slug: form.slug, order: i + 1 });
-    rows.push({ ...form, type: "course", slug: `${form.slug}-course`, order: i + 1 });
+    const order = ORDER_BASE + i;
+    rows.push({ ...form, type: "product", slug: form.slug, order });
+    rows.push({ ...form, type: "course", slug: `${form.slug}-course`, order });
 });
 
 for (const row of rows) {
@@ -57,7 +68,12 @@ for (const row of rows) {
     await col.updateOne(
         { slug: row.slug },
         {
-            $set: { name: row.name, description: row.description, type: row.type },
+            // --reorder forces `order` back to this file's sequence. Without
+            // it the field is insert-only: it belongs to the admin, and a
+            // routine re-run should not shuffle a list they have arranged.
+            $set: REORDER
+                ? { name: row.name, description: row.description, type: row.type, order: row.order }
+                : { name: row.name, description: row.description, type: row.type },
             // Only on insert. `order` belongs here rather than in $set: it is
             // the admin's to change, and re-running the seed should not shuffle
             // the list back to this file's ordering. Same reasoning for
