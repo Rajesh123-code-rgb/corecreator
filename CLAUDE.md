@@ -2,29 +2,41 @@
 
 Read this before doing anything in this repository.
 
-## 1. Never deploy, and never touch the server
+## 1. Never deploy, and never write to the server
 
-Pulling code onto the VPS, running `deploy.sh`, restarting or recreating the
-container, and any SSH session that changes the running system are **the account
-owner's alone**. No agent performs them, under any phrasing of the request -
-including "deploy it", "push it live", or "just restart it".
+Putting code on the VPS and changing what is running are **the account owner's
+alone**. No agent performs them, under any phrasing of the request - including
+"deploy it", "push it live", or "just restart it".
 
-What to do instead: finish the change, commit, push, and hand over the exact
-commands to run. Copy-pasteable, in order, with what each one does and what a
-successful result looks like. That has always been the convention here; the
-difference now is that the commands stop with you.
+**Never, on the server:**
 
-This covers, and is not limited to:
-
-    ssh root@<vps>              any session that writes
-    git pull    (on the server)
+    git pull, git checkout, or any write to /opt/corecreator
     ./deploy.sh
-    docker compose up/down/restart/build
-    editing .env.production, nginx config, certificates, cron
-    seed and migration scripts run against the production database
+    docker compose up / down / restart / build / recreate
+    editing .env.production, nginx config, certificates, crontab
+    seed or migration scripts run against the production database
+    installing packages, changing firewall or SSH configuration
 
-If a change cannot be verified without running one of these, say so plainly and
-stop. Do not run it to "check first".
+**Allowed, because reading breaks nothing** - an SSH key is kept for exactly
+this, and it is how the course-submit failure and the Brevo rejection were both
+diagnosed:
+
+    docker logs / docker inspect / docker ps
+    curl http://127.0.0.1:3002/api/health
+    reading /var/log/nginx/*.log and /var/log/cc-*.log
+    git log / git status / reading files
+    read-only database queries
+
+The line between them is whether it changes state, not whether it feels risky.
+
+If a change cannot be verified without crossing that line, **say so plainly and
+stop**. Do not run it to "check first" - that is the exact move this rule exists
+to prevent.
+
+What to do instead: finish the change, commit, push, and hand over the commands.
+Copy-pasteable, in order, with what each does and what success looks like. That
+has always been the convention here; the difference now is that the commands
+stop with you.
 
 ## 2. Plan before changing anything
 
