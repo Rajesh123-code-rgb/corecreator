@@ -71,6 +71,11 @@ for (const row of rows) {
             // --reorder forces `order` back to this file's sequence. Without
             // it the field is insert-only: it belongs to the admin, and a
             // routine re-run should not shuffle a list they have arranged.
+            //
+            // `order` must appear in exactly one of these operators. Naming it
+            // in both makes MongoDB reject the whole update - "Updating the
+            // path 'order' would create a conflict at 'order'" - so $setOnInsert
+            // carries it only when $set is not already doing so.
             $set: REORDER
                 ? { name: row.name, description: row.description, type: row.type, order: row.order }
                 : { name: row.name, description: row.description, type: row.type },
@@ -78,7 +83,9 @@ for (const row of rows) {
             // the admin's to change, and re-running the seed should not shuffle
             // the list back to this file's ordering. Same reasoning for
             // isActive - a category switched off stays off.
-            $setOnInsert: { isActive: true, productCount: 0, order: row.order, createdAt: new Date() },
+            $setOnInsert: REORDER
+                ? { isActive: true, productCount: 0, createdAt: new Date() }
+                : { isActive: true, productCount: 0, order: row.order, createdAt: new Date() },
             $currentDate: { updatedAt: true },
         },
         { upsert: true }
