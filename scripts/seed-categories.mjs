@@ -57,10 +57,12 @@ for (const row of rows) {
     await col.updateOne(
         { slug: row.slug },
         {
-            $set: { name: row.name, description: row.description, type: row.type, order: row.order },
-            // Only on insert, so an admin who deactivated or reordered a
-            // category does not have that undone every time this runs.
-            $setOnInsert: { isActive: true, productCount: 0, createdAt: new Date() },
+            $set: { name: row.name, description: row.description, type: row.type },
+            // Only on insert. `order` belongs here rather than in $set: it is
+            // the admin's to change, and re-running the seed should not shuffle
+            // the list back to this file's ordering. Same reasoning for
+            // isActive - a category switched off stays off.
+            $setOnInsert: { isActive: true, productCount: 0, order: row.order, createdAt: new Date() },
             $currentDate: { updatedAt: true },
         },
         { upsert: true }

@@ -6,6 +6,30 @@ import Category from "@/lib/db/models/Category";
 import { hasAdminPermission } from "@/lib/config/permissions";
 import { PERMISSIONS } from "@/lib/config/rbac";
 
+/**
+ * Builds the slug for a category.
+ *
+ * `slug` carries a unique index across the whole collection rather than one
+ * scoped per type, so a product and a course category cannot share a slug. The
+ * rows already in the database work around that by suffixing the type on
+ * everything except products - "kintsugi" and "kintsugi-course" - and this
+ * keeps new and renamed rows to the same rule.
+ *
+ * Both handlers previously derived the slug from the name alone. That was
+ * harmless while product and course names barely overlapped; now that all 48
+ * art forms exist under both types it means an admin could neither create a
+ * course category named after an existing product one - the duplicate check
+ * rejected it - nor rename an existing one, because regenerating the slug
+ * dropped the suffix and collided on the unique index.
+ */
+function buildSlug(name: string, type: string): string {
+    const base = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+    return type === "product" ? base : `${base}-${type}`;
+}
+
 // GET - Fetch all categories
 export async function GET(request: NextRequest) {
     try {
@@ -70,16 +94,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Name and type are required" }, { status: 400 });
         }
 
-        // Generate slug
-        const slug = name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "");
+        const slug = buildSlug(name, type);
 
-        // Check for duplicate slug
         const existing = await Category.findOne({ slug });
         if (existing) {
-            return NextResponse.json({ error: "Category with this name already exists" }, { status: 400 });
+            return NextResponse.json(
+                { error: `A ${type} category named "${name}" already exists` },
+                { status: 400 }
+            );
         }
 
         const category = await Category.create({
@@ -121,13 +143,18 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: "Category ID required" }, { status: 400 });
         }
 
+        const current = await Category.findById(id).select("type").lean();
+        if (!current) {
+            return NextResponse.json({ error: "Category not found" }, { status: 404 });
+        }
+
         const updateData: Record<string, unknown> = {};
         if (name !== undefined) {
             updateData.name = name;
-            updateData.slug = name
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
+            // Derived from this row's own type, not from the name alone -
+            // otherwise renaming a course category strips its "-course" suffix
+            // and collides with the product category of the same name.
+            updateData.slug = buildSlug(name, (current as { type: string }).type);
         }
         if (description !== undefined) updateData.description = description;
         if (image !== undefined) updateData.image = image;
@@ -147,6 +174,14 @@ export async function PUT(request: NextRequest) {
             category: JSON.parse(JSON.stringify(category)),
         });
     } catch (error) {
+        // A unique-index clash on slug is a name the admin can fix, not a
+        // server fault. Saying so beats a generic 500.
+        if ((error as { code?: number }).code === 11000) {
+            return NextResponse.json(
+                { error: "Another category of this type already uses that name" },
+                { status: 409 }
+            );
+        }
         console.error("Failed to update category:", error);
         return NextResponse.json({ error: "Failed to update category" }, { status: 500 });
     }
